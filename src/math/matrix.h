@@ -5,29 +5,52 @@
 #ifndef __SGL_MATH_MATRIX_H__
 #define __SGL_MATH_MATRIX_H__
 
-#define VEC_MALLOC 0x1
+#include "glheaders.h"
 
 enum SGLmatrixtype {
   MATRIX_GENERAL,
   MATRIX_IDENTITY
 }
 
+/*
+ * @brief matirx structure
+ * 
+ * m:
+ *     0  1  2  3
+ *     4  5  6  7
+ *     8  9  10 11
+ *     12 13 14 15
+ */
+
 typedef struct {
   GLfloat *m;
   GLfloat *inv;
-  GLuint flags;
+  GLbitfield flags;
 } SGLmatrix;
 
+/*
+ * @brief Initialize a matrix
+ *
+ * Allocates the matrix and set it to Identity
+ */
 extern void _sgl_matrix_init(SGLmatrix* m);
 
+/*
+ * @brief  free a matrix
+ */
 extern void _sgl_matrix_free(SGLmatrix* m);
 
+/*
+ * @brief Allocate the matrix inverse
+ *
+ * Allocates the matrix inverse and set it to Identity.
+ */
 extern void _sgl_matrix_alloc_inv(SGLmatrix* m);
 
-extern void _sgl_matrix_mul_matrix(SGLmatrix* dest, const SGLmatrix* a,
+extern void _sgl_matrix_mul_matrix(SGLmatrix* product, const SGLmatrix* a,
                                    const SGLmatrix* b);
 
-extern void _sgl_matrix_mul_float(SGLmatrix* dest, const GLfloat* b);
+extern void _sgl_matrix_mul_floats(SGLmatrix* product, const GLfloat* b);
 
 extern void _sgl_matrix_loadf(SGLmatrix* mat, const GLfloat* m);
 
@@ -48,7 +71,7 @@ extern void _sgl_matrix_frustum(SGLmatrix* mat,
                                 GLfloat bottom, GLfloat top,
                                 GLfloat nerval, GLfloat farval);
 
-extern void _sgl_matrix_set_indentity(SGLmatrix* dest);
+extern void _sgl_matrix_set_indentity(SGLmatrix* self);
 
 extern void _sgl_matrix_copy(SGLmatrix* to, const SGLmatrix* from);
 
