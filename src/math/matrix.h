@@ -52,21 +52,21 @@ extern void _sgl_matrix_mul_matrix(SGLmatrix* product, const SGLmatrix* a,
 
 extern void _sgl_matrix_mul_floats(SGLmatrix* product, const GLfloat* b);
 
-extern void _sgl_matrix_loadf(SGLmatrix* mat, const GLfloat* m);
+extern void _sgl_matrix_loadf(SGLmatrix* self, const GLfloat* m);
 
-extern void _sgl_matrix_translate(SGLmatrix* mat, const GLfloat* m);
+extern void _sgl_matrix_translate(SGLmatrix* self, const GLfloat* m);
 
-extern void _sgl_matrix_rotate(SGLmatrix* mat, GLfloat angle, GLfloat x,
+extern void _sgl_matrix_rotate(SGLmatrix* self, GLfloat angle, GLfloat x,
                                GLfloat y, GLfloat z);
 
-extern void _sgl_matrix_scale(SGLmatrix* mat, GLfloat x, GLfloat y, GLfloat z);
+extern void _sgl_matrix_scale(SGLmatrix* self, GLfloat x, GLfloat y, GLfloat z);
 
-extern void _sgl_matrix_ortho(SGLmatrix* mat,
+extern void _sgl_matrix_ortho(SGLmatrix* self,
                               GLfloat left, GLfloat right,
                               GLfloat bottom, GLfloat top,
                               GLfloat nerval, GLfloat farval);
 
-extern void _sgl_matrix_frustum(SGLmatrix* mat,
+extern void _sgl_matrix_frustum(SGLmatrix* self,
                                 GLfloat left, GLfloat right,
                                 GLfloat bottom, GLfloat top,
                                 GLfloat nerval, GLfloat farval);
