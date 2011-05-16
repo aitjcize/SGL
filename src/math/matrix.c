@@ -7,9 +7,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <math.h>
 
 #include "utils.h"
 
+#define D2R(x) ((x) * M_PI / 180.0)
 /*
  * Identity matrix
  */
@@ -81,20 +83,51 @@ void _sgl_matrix_loadf(SGLmatrix* self, const GLfloat* m)
   memcpy(self->m, m, 16 * sizeof(GLfloat));
 }
 
-void _sgl_matrix_translate(SGLmatrix* mat, const GLfloat* m)
+void _sgl_matrix_translate(SGLmatrix* mat, GLfloat x , GLfloat y ,GLfloat z)
 {
-  
+  GLfloat *m = mat->m;
+  m[12] = x * m[0] + y * m[4] + z * m[8] + m[12]; 
+  m[13] = x * m[1] + y * m[5] + z * m[9] + m[13];
+  m[14] = x * m[2] + y * m[6] + z * m[10] + m[14];
+  m[15] = x * m[3] + y * m[7] + z * m[11] + m[15];
 }
 
 void _sgl_matrix_rotate(SGLmatrix* mat, GLfloat angle, GLfloat x,
                         GLfloat y, GLfloat z)
 {
+  GLfloat ux, uy, uz, xy, xz, yz, norm, cos, sin;
+  norm = sqrt(x * x + y * y + z * z);
+  ux = x / norm;  
+  uy = y / norm;  
+  uz = z / norm;
+  xy = ux * uy;
+  xz = ux * uz;
+  yz = uy * uz;
+  cos = cos(D2R(angle));  
+  sin = sin(D2R(angle));
+
+  SGLmatrix rotate;
+  _sgl_matrix_init(&rotate);
+  _sgl_matrix_init(&tmp);
+  GLfloat *R = rotate.m;
   
+  R[0] = cos + ux * ux * (1-cos);   R[1] = xy * (1-cos) + uz * sin;   R[2] = xz * (1-cos) - uy * sin;   R[3] = 0;
+  R[4] = xy * (1-cos) + uz * sin;   R[5] = cos + uy * uy * (1-cos);   R[6] = yz * (1-cos) + ux * sin;   R[7] = 0;
+  R[8] = xz * (1-cos) - uy * sin;   R[9] = yz * (1-cos) + ux * sin;   R[10]= cos + uz * uz * (1-cos);   R[11]= 0;
+  R[12]= 0;                         R[13]= 0;                         R[14]= 0;                         R[15]= 1;    
+
+  _sgl_matrix_copy(tmp , mat);
+  matmul4(mat->m, rotate.m, tmp.m);
+  _sgl_matrix_free(&rotate);
+  _sgl_matrix_free(&tmp);
 }
 
 void _sgl_matrix_scale(SGLmatrix* mat, GLfloat x, GLfloat y, GLfloat z)
 {
-  
+  GLfloat *m = mat->m;
+  m[0] *= x ; m[1] *= x ; m[2] *= x; m[3] *= x;
+  m[4] *= y ; m[5] *= y ; m[6] *= y; m[7] *= y;
+  m[8] *= z ; m[9] *= z ; m[10]*= z; m[11]*= z;
 }
 
 void _sgl_matrix_ortho(SGLmatrix* mat,
