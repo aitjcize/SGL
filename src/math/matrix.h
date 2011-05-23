@@ -22,11 +22,12 @@ enum SGLmatrixtype {
  *     12 13 14 15
  */
 
-typedef struct {
+typedef struct _SGLMatrix SGLMatrix;
+struct _SGLMatrix {
   GLfloat *m;
   GLfloat *inv;
   GLbitfield flags;
-} SGLmatrix;
+};
 
 /*
  * @brief Initialize a matrix
@@ -54,7 +55,8 @@ extern void _sgl_matrix_mul_floats(SGLmatrix* product, const GLfloat* b);
 
 extern void _sgl_matrix_loadf(SGLmatrix* self, const GLfloat* m);
 
-extern void _sgl_matrix_translate(SGLmatrix* self, const GLfloat* m);
+extern void _sgl_matrix_translate(SGLmatrix* mat, GLfloat x, GLfloat y,
+                                  GLfloat z);
 
 extern void _sgl_matrix_rotate(SGLmatrix* self, GLfloat angle, GLfloat x,
                                GLfloat y, GLfloat z);

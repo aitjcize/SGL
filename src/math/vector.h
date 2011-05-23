@@ -12,7 +12,8 @@
 
 #define VEC_MALLOC 0x1
 
-typedef struct {
+typedef _SGLvector4f SGLvector4f;
+struct _SGLvector4f {
   GLfloat (*data)[4];     /* point to malloced data or client data */
   GLfloat* start;         /* points somewhere inside of <data> */
   GLuint count;           /* size of the vector (in elements) */
@@ -20,7 +21,7 @@ typedef struct {
   GLuint size;            /* element size 2-4 */
   void* storage;          /* self-allocated storage */
   GLbitfield flags;       /* VEC_X flags */
-} SGLvector4f;
+};
 
 extern void _sgl_vector4f_init(SGLvector4f *v, GLbitfield flags,
                                GLfloat (*storage)[4]);
