@@ -1,4 +1,4 @@
-#include "sglCOntext.h"
+#include "sglContext.h"
 #include "sglMatrixOp.h"
 
 extern SGLContext* g_sgl_context;
@@ -11,7 +11,7 @@ void glPushMatrix(void)
 void glPopMatrix(void)
 {
   SList* last = s_list_remove_link(g_sgl_context->matrix_stack,
-                                   s_list_last(g_sgl_context));
+                                   s_list_last(g_sgl_context->matrix_stack));
   g_sgl_context->matrix = (SGLmatrix*)last->data;
 }
 

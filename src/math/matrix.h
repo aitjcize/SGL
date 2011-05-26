@@ -5,12 +5,12 @@
 #ifndef __SGL_MATH_MATRIX_H__
 #define __SGL_MATH_MATRIX_H__
 
-#include "glheaders.h"
+#include "glHeaders.h"
 
 enum SGLmatrixtype {
   MATRIX_GENERAL,
   MATRIX_IDENTITY
-}
+};
 
 /*
  * @brief matirx structure
@@ -22,8 +22,8 @@ enum SGLmatrixtype {
  *     12 13 14 15
  */
 
-typedef struct _SGLMatrix SGLMatrix;
-struct _SGLMatrix {
+typedef struct _SGLmatrix SGLmatrix;
+struct _SGLmatrix {
   GLfloat *m;
   GLfloat *inv;
   GLbitfield flags;
@@ -73,7 +73,7 @@ extern void _sgl_matrix_frustum(SGLmatrix* self,
                                 GLfloat bottom, GLfloat top,
                                 GLfloat nerval, GLfloat farval);
 
-extern void _sgl_matrix_set_indentity(SGLmatrix* self);
+extern void _sgl_matrix_set_identity(SGLmatrix* self);
 
 extern void _sgl_matrix_copy(SGLmatrix* to, const SGLmatrix* from);
 

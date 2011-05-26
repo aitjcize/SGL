@@ -94,6 +94,6 @@ extern unsigned s_list_index(SList* self, const void* data);
  * @return : the position of the element in the SList, or -1 if the element in
  * not found
  */
-extern SList* s_list_position(SList* self, SList* link);
+extern int s_list_position(SList* self, SList* link);
 
 #endif /* __SGL_UTILS_LIST_H__ */

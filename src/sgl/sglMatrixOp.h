@@ -1,7 +1,7 @@
 #ifndef __SGL_SGLMATRIX_OP_H__
 #define __SGL_SGLMATRIX_OP_H__
 
-#include "glHeader.h"
+#include "glHeaders.h"
 
 void glPushMatrix(void);
 

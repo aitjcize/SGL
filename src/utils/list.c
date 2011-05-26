@@ -3,6 +3,7 @@
  */
 
 #include "list.h"
+#include "misc.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -24,7 +25,7 @@ SList* s_list_append(SList* self, void* data)
   return s_list_first(self);
 }
 
-SList* s_list_insert(SList* self, void* data, unsigned position);
+SList* s_list_insert(SList* self, void* data, unsigned position)
 {
   SList* new_link = s_new0(SList, 1);
   new_link->data = data;
@@ -45,7 +46,7 @@ SList* s_list_insert(SList* self, void* data, unsigned position);
   return s_list_first(self);
 }
 
-SList* s_list_remove(SList* self, const void* data);
+SList* s_list_remove(SList* self, const void* data)
 {
   SList* current = s_list_first(self);
   self = NULL;
@@ -108,7 +109,7 @@ void s_list_free(SList* self)
   }
 }
 
-SList* s_list_first(SList* self);
+SList* s_list_first(SList* self)
 {
   SList* current = self;
   while (current && current->prev)
@@ -116,7 +117,7 @@ SList* s_list_first(SList* self);
   return current;
 }
 
-SList* s_list_last(SList* self);
+SList* s_list_last(SList* self)
 {
   SList* current = self;
   while (current && current->next)
@@ -147,7 +148,7 @@ unsigned s_list_index(SList* self, const void* data)
   return (current)? count: -1;
 }
 
-SList* s_list_position(SList* self, SList* link)
+int s_list_position(SList* self, SList* link)
 {
   unsigned count = -1;
   SList* current = s_list_first(self);
