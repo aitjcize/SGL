@@ -147,7 +147,32 @@ void _sgl_matrix_ortho(SGLmatrix* self,
                        GLfloat bottom, GLfloat top,
                        GLfloat nerval, GLfloat farval)
 {
-  
+  SGLmatrix ortho;
+  _sgl_matrix_init(&ortho);
+  GLfloat *Or = ortho.m; 
+
+  Or[0] = 2.0F / (right - left);
+  Or[1] = 0.0F;
+  Or[2] = 0.0F;
+  Or[3] = 0.0F;
+
+  Or[4] = 0.0F;
+  Or[5] = 2.0F / (top - bottom);
+  Or[6] = 0.0F;
+  Or[7] = 0.0F;
+
+  Or[8] = 0.0F;
+  Or[9] = 0.0F;
+  Or[10] = -2.0F / (farval - nerval);
+  Or[11] = 0.0F;
+
+  Or[12] = -(right + left) / (right - left);
+  Or[13] = -(top + bottom) / (top - bottom);
+  Or[14] = -(farval + nerval) / (farval - nerval);
+  Or[15] = 1.0F;
+
+  sgl_matrix_mul_floats(self, ortho.m);
+  _sgl_matrix_free(&ortho);
 }
 
 void _sgl_matrix_frustum(SGLmatrix* self,
@@ -155,7 +180,32 @@ void _sgl_matrix_frustum(SGLmatrix* self,
                          GLfloat bottom, GLfloat top,
                          GLfloat nerval, GLfloat farval)
 {
-  
+  SGLmatrix frustum;
+  _sgl_matrix_init(&frustum);
+  GLfloat *Fr = frustum.m;
+
+  Fr[0] = (2.0F * nerval) / (right - left);
+  Fr[1] = 0.0F;
+  Fr[2] = 0.0F;
+  Fr[3] = 0.0F;
+
+  Fr[4] = 0.0F;
+  Fr[5] = (2.0F * nerval) / (top - bottom);
+  Fr[6] = 0.0F;
+  Fr[7] = 0.0F;
+
+  Fr[8] = (right + left) / (right - left);
+  Fr[9] = (top + bottom) / (top - bottom);
+  Fr[10] = -(farval + nerval) / (farval - nerval);
+  Fr[11] = -1.0F;
+
+  Fr[12] = 0.0F;
+  Fr[13] = 0.0F;
+  Fr[14] = -(2.0F * farval * nerval) / (farval - nerval);
+  Fr[15] = 0.0F;
+
+  sgl_matrix_mul_floats(self, frustum.m);
+  _sgl_matrix_free(&frustum);
 }
 
 void _sgl_matrix_set_indentity(SGLmatrix* self)
