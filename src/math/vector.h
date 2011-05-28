@@ -8,11 +8,11 @@
 #ifndef __SGL_MATH_VECTOR_H__
 #define __SGL_MATH_VECTOR_H__
 
-#include "glheader.h"
+#include "glHeaders.h"
 
 #define VEC_MALLOC 0x1
 
-typedef _SGLvector4f SGLvector4f;
+typedef struct _SGLvector4f SGLvector4f;
 struct _SGLvector4f {
   GLfloat (*data)[4];     /* point to malloced data or client data */
   GLfloat* start;         /* points somewhere inside of <data> */
@@ -20,6 +20,7 @@ struct _SGLvector4f {
   GLuint stride;          /* stride from one element to the next (in bytes) */
   GLuint size;            /* element size 2-4 */
   void* storage;          /* self-allocated storage */
+  GLuint storage_count;   /* storage size in elements */
   GLbitfield flags;       /* VEC_X flags */
 };
 

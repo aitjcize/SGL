@@ -1,7 +1,7 @@
 #ifndef __SGL_SGLGEOMETRY_H__
 #define __SGL_SGLGEOMETRY_H__
 
-#include "glheader.h"
+#include "glHeaders.h"
 
 void glVertex2s(GLshort x, GLshort y);
 
