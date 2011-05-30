@@ -30,7 +30,15 @@ extern void _sgl_vector4f_init(SGLvector4f *v, GLbitfield flags,
 extern void _sgl_vector4f_alloc(SGLvector4f *v, GLbitfield flags,
                                 GLuint count);
 
+extern void _sgl_vector4f_alloc_double(SGLvector4f *v);
+
 extern void _sgl_vector4f_free(SGLvector4f* v);
+
+extern GLboolean _sgl_vector4f_push_back(SGLvector4f* v, GLfloat* data,
+                                         GLuint size);
+
+extern GLboolean _sgl_vector4f_pop_back(SGLvector4f* v, GLfloat* data,
+                                        GLuint size);
 
 extern void _sgl_vector4f_print(SGLvector4f* v);
 

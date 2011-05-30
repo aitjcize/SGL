@@ -3,28 +3,40 @@
 
 #include "glHeaders.h"
 
-void glVertex2s(GLshort x, GLshort y);
+/* glVertex */
+extern void glVertex3s(GLshort x, GLshort y, GLshort z);
 
-void glVertex2i(GLint x, GLint y);
+extern void glVertex3i(GLint x, GLint y, GLint z);
 
-void glVertex2f(GLfloat x, GLfloat y);
+extern void glVertex3f(GLfloat x, GLfloat y, GLfloat z);
 
-void glVertex2d(GLdouble x, GLdouble y);
+extern void glVertex3d(GLdouble x, GLdouble y, GLdouble z);
 
-void glVertex3s(GLshort x, GLshort y, GLshort z);
+/* glColor */
+extern void glColor3d(GLdouble red, GLdouble green, GLdouble blue);
 
-void glVertex3i(GLint x, GLint y, GLint z);
+extern void glColor3f(GLfloat red, GLfloat green, GLfloat blue);
 
-void glVertex3f(GLfloat x, GLfloat y, GLfloat z);
+extern void glColor3i(GLint red, GLint green, GLint blue);
 
-void glVertex3d(GLdouble x, GLdouble y, GLdouble z);
+extern void glColor3s(GLshort red, GLshort green, GLshort blue);
 
-void glVertex4s(GLshort x, GLshort y, GLshort z, GLshort w);
+/* glNormal */
+extern void glNormal3d(GLdouble nx, GLdouble ny, GLdouble nz);
 
-void glVertex4i(GLint x, GLint y, GLint z, GLint w);
+extern void glNormal3f(GLfloat nx, GLfloat ny, GLfloat nz);
 
-void glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+extern void glNormal3i(GLint nx, GLint ny, GLint nz);
 
-void glVertex4d(GLdouble x, GLdouble y, GLdouble z, GLdouble w);
+extern void glNormal3s(GLshort nx, GLshort ny, GLshort nz);
+
+/* Pointer */
+extern void glVertexPointer(GLint size, GLenum type, GLsizei stride,
+                            const GLvoid *ptr);
+
+extern void glNormalPointer(GLenum type, GLsizei stride, const GLvoid *ptr);
+
+extern void glColorPointer(GLint size, GLenum type, GLsizei stride,
+                           const GLvoid *ptr);
 
 #endif /* __SGL_SGLGEOMETRY_H__ */

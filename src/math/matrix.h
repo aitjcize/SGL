@@ -79,5 +79,4 @@ extern void _sgl_matrix_copy(SGLmatrix* to, const SGLmatrix* from);
 
 extern void _sgl_matrix_print(SGLmatrix* m);
 
-
 #endif /* __SGL_MATH_MATRIX_H__ */
