@@ -29,6 +29,7 @@ struct _SGLContext {
   SGLvector4f color_pointer;
 
   /* ClientState Flags */
+  GLuint flags;
   GLuint clientstate_flags;
 };
 
@@ -41,8 +42,12 @@ extern void glClear(GLbitfield mask);
 extern void glClearColor(GLclampf red, GLclampf green, GLclampf blue,
                          GLclampf alpha);
 
-void glEnableClientState(GLenum cap);
+extern void glBegin(GLenum mode);
 
-void glDisableClientState(GLenum cap);
+extern void glEnd(void);
+
+extern void glEnableClientState(GLenum cap);
+
+extern void glDisableClientState(GLenum cap);
 
 #endif /* __SGL_SGLCONTEXT_H__ */

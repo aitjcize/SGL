@@ -29,6 +29,11 @@ void glutInit(int argc, char* argv[])
   for (i = 1; i < argc; ++i)
     if (strcmp(argv[i], "-d") == 0)
       g_sglut.flags |= SGLUT_DEBUG;
+
+  g_sglut.displayFunc = NULL;
+  g_sglut.mouseFunc = NULL;
+  g_sglut.motionFunc = NULL;
+  g_sglut.keyboardFunc = NULL;
 }
 
 void glutInitWindowSize(int width, int height)

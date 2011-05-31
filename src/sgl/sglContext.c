@@ -7,6 +7,8 @@ void sgl_context_init(SGLContext* sc)
   sc->matrix_mode = GL_MODELVIEW;
   _sgl_matrix_init(sc->matrix);
   sc->matrix_stack = NULL;
+  sc->flags = 0;
+  sc->clientstate_flags = 0;
 }
 
 void sgl_context_free(SGLContext* sc)

@@ -1,5 +1,9 @@
-#include "sglutContext.h"
+#include "sglut.h"
 #include "utils.h"
+
+void motion(int x, int y) {
+  printf("(%d, %d)\n", x, y);
+}
 
 int main(int argc, char *argv[])
 {
@@ -18,6 +22,7 @@ int main(int argc, char *argv[])
   glutInitWindowSize(512, 512);
   glutInitWindowPosition(100, 100);
   glutCreateWindow("Lena");
+  glutMotionFunc(motion);
   glutMainLoop();
 
   return 0;

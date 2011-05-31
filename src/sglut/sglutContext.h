@@ -34,26 +34,26 @@ struct _SGLUTContext {
   int flags;
 };
 
-void glutInit(int argc, char* argv[]);
+extern void glutInit(int argc, char* argv[]);
 
-void glutInitWindowSize(int width, int height);
+extern void glutInitWindowSize(int width, int height);
 
-void glutInitWindowPosition(int x, int y);
+extern void glutInitWindowPosition(int x, int y);
 
-void glutCreateWindow(char* name);
+extern void glutCreateWindow(char* name);
 
-void glutBindBuffer(char* buf1, char* buf2);
+extern void glutBindBuffer(char* buf1, char* buf2);
 
-void glutDisplayFunc(void (*func)(void));
+extern void glutDisplayFunc(void (*func)(void));
 
-void glutKeyboardFunc(void (*func)(unsigned char key, int x, int y));
+extern void glutKeyboardFunc(void (*func)(unsigned char key, int x, int y));
 
-void glutMouseFunc(void (*func)(int button, int state, int x, int y));
+extern void glutMouseFunc(void (*func)(int button, int state, int x, int y));
 
-void glutMotionFunc(void (*func)(int x, int y));
+extern void glutMotionFunc(void (*func)(int x, int y));
 
-void glutSwapBuffers(void);
+extern void glutSwapBuffers(void);
 
-void glutMainLoop(void);
+extern void glutMainLoop(void);
 
 #endif /* __SGLUT_SGLUTCONTEXT_H__ */
