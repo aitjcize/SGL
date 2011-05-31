@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
   }
 
   glutBindBuffer(buf, buf);
+  glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
   glutInitWindowSize(512, 512);
   glutInitWindowPosition(100, 100);
   glutCreateWindow("Lena");

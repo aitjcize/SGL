@@ -6,7 +6,14 @@
 
 #include <X11/Xlib.h>
 
-#define SGLUT_DEBUG  (1 << 1)
+#define GLUT_ENABLED(flag) ((g_sglut.flags & (flag)) > 0)
+
+#define GLUT_DEBUG    (1 << 1)
+#define GLUT_RGBA     (1 << 2)
+#define GLUT_RGB      GLUT_RGBA
+#define GLUT_SINGLE   (1 << 3)
+#define GLUT_DOUBLE   (1 << 4)
+#define GLUT_DEPTH    (1 << 4)
 
 typedef struct _SGLUTContext SGLUTContext;
 struct _SGLUTContext {
@@ -19,10 +26,11 @@ struct _SGLUTContext {
   int win_width;
   int win_height;
 
-  /* Framebuffer */
+  /* Buffers */
+  int buf_index;
   XImage* framebuffer_image[2];
   char* framebuffer[2];
-  int buf_index;
+  char* depthbuffer[2];
 
   /* Events handler */
   void (*displayFunc)(void);
@@ -40,7 +48,11 @@ extern void glutInitWindowSize(int width, int height);
 
 extern void glutInitWindowPosition(int x, int y);
 
+extern void glutInitDisplayMode(unsigned int mode);
+
 extern void glutCreateWindow(char* name);
+
+extern void glutSwapBuffers(void);
 
 extern void glutBindBuffer(char* buf1, char* buf2);
 
@@ -51,8 +63,6 @@ extern void glutKeyboardFunc(void (*func)(unsigned char key, int x, int y));
 extern void glutMouseFunc(void (*func)(int button, int state, int x, int y));
 
 extern void glutMotionFunc(void (*func)(int x, int y));
-
-extern void glutSwapBuffers(void);
 
 extern void glutMainLoop(void);
 
