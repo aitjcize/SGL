@@ -19,14 +19,14 @@ struct _SGLUTContext {
 
   /* Framebuffer */
   XImage* framebuffer_image[2];
-  char* framebuffer[2]
+  char* framebuffer[2];
 };
 
 void sglutInit(int argc, char* argv[]);
 void sglutInitWindowSize(int width, int height);
 void sglutInitWindowPosition(int x, int y);
 void sglutCreateWindow(char* name);
-void sglutGetBuffer(char** buf1, char** buf2);
+void sglutBindBuffer(char* buf1, char* buf2);
 void sglutMainLoop(void);
 
 #endif /* __SGLUT_SGLUTCONTEXT_H__ */
