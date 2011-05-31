@@ -6,6 +6,8 @@
 
 #include <X11/Xlib.h>
 
+#define SGLUT_DEBUG  (1 << 1)
+
 typedef struct _SGLUTContext SGLUTContext;
 struct _SGLUTContext {
   /* XLib Related */
@@ -20,11 +22,15 @@ struct _SGLUTContext {
   /* Framebuffer */
   XImage* framebuffer_image[2];
   char* framebuffer[2];
+  int buf_index;
 
   /* Events handler */
   void (*displayFunc)(void);
   void (*mouseFunc)(int button, int state, int x, int y);
   void (*keyboardFunc)(unsigned char key, int x, int y);
+
+  /* Misc */
+  int flags;
 };
 
 void sglutInit(int argc, char* argv[]);
@@ -42,6 +48,8 @@ void sglutDisplayFunc(void (*func)(void));
 void sglutKeyboardFunc(void (*func)(unsigned char key, int x, int y));
 
 void sglutMouseFunc(void (*func)(int button, int state, int x, int y));
+
+void sglutSwapBuffers(void);
 
 void sglutMainLoop(void);
 
