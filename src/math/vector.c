@@ -55,7 +55,7 @@ GLboolean _sgl_vector4f_push_back(SGLvector4f* v, GLfloat* data, GLuint size)
     if (v->start == v->storage + v->storage_count)
       return GL_FALSE;
   } else {
-    if (v->start == v->data + v->count)
+    if (v->start == (void*)v->data + v->count)
       return GL_FALSE;
   }
 
@@ -67,7 +67,7 @@ GLboolean _sgl_vector4f_push_back(SGLvector4f* v, GLfloat* data, GLuint size)
 
 GLboolean _sgl_vector4f_pop_back(SGLvector4f* v, GLfloat* data, GLuint size)
 {
-  if (v->start == v->data)
+  if (v->start == (void*)v->data)
     return GL_FALSE;
 
   v->start -= 1;

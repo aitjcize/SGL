@@ -29,6 +29,7 @@ AC_CHECK_FUNCS([memset sqrt])
 AC_CONFIG_FILES([Makefile
 		 src/Makefile
 		 src/sgl/Makefile
+		 src/sglut/Makefile
 		 ])
 
 AC_OUTPUT

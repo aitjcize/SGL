@@ -55,6 +55,7 @@ void sglutCreateWindow(char* name)
   /* Select Input Mask */
   XSelectInput(g_sglut.display, g_sglut.window,
       StructureNotifyMask | ExposureMask | KeyPressMask | ButtonPressMask);
+
   XMapWindow(g_sglut.display, g_sglut.window);
   do {
     XNextEvent(g_sglut.display, &e);
