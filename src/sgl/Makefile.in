@@ -68,7 +68,7 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libSGL_la_LIBADD =
-am_libSGL_la_OBJECTS = sglContext.lo sglMatrixOp.lo sglGeometry.lo \
+am_libSGL_la_OBJECTS = sglContext.lo sglMatrix.lo sglGeometry.lo \
 	vector.lo matrix.lo list.lo
 libSGL_la_OBJECTS = $(am_libSGL_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -207,7 +207,7 @@ SRC_ROOT = ..
 AM_CFLAGS = -I$(SRC_ROOT)
 lib_LTLIBRARIES = libSGL.la
 libSGL_la_SOURCES = sglContext.c sglContext.h \
-		    sglMatrixOp.c sglMatrixOp .h \
+		    sglMatrix.c sglMatrix .h \
 		    sglGeometry.c sglGeometry. h \
 		    $(SRC_ROOT)/math/vector.c $(SRC_ROOT)/math/vector.h \
 		    $(SRC_ROOT)/math/matrix.c $(SRC_ROOT)/math/matrix.h \
@@ -292,7 +292,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/matrix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sglContext.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sglGeometry.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sglMatrixOp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sglMatrix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vector.Plo@am__quote@
 
 .c.o:

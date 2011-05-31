@@ -1,22 +1,23 @@
 #ifndef __SGL_SGLCONTEXT_H__
 #define __SGL_SGLCONTEXT_H__
 
-#include "glHeaders.h"
+#include "sglHeaders.h"
 #include "math/matrix.h"
 #include "math/vector.h"
 #include "utils/list.h"
 
 #define SGL_INIT_VERTEX_LEN 512
 
-typedef struct _SGLContext SGLContext;
-struct _SGLContext {
+struct SGLContext {
   /* Context */
   GLclampf clear_color[4];
 
   /* Matrix */
   GLint matrix_mode;
   SGLmatrix* matrix;
-  SList* matrix_stack;
+  SList** current_stack;
+  SList* projection_matrix_stack;
+  SList* modelview_matrix_stack;
 
   /* Geometry Buffers */
   SGLvector4f vector_point;
@@ -33,9 +34,9 @@ struct _SGLContext {
   GLuint clientstate_flags;
 };
 
-void sgl_context_init(SGLContext* sc);
+void sgl_context_init(struct SGLContext* sc);
 
-void sgl_context_free(SGLContext* sc);
+void sgl_context_free(struct SGLContext* sc);
 
 extern void glClear(GLbitfield mask);
 

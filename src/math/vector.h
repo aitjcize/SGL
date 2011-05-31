@@ -8,7 +8,7 @@
 #ifndef __SGL_MATH_VECTOR_H__
 #define __SGL_MATH_VECTOR_H__
 
-#include "glHeaders.h"
+#include "sglHeaders.h"
 
 #define VEC_MALLOC 0x1
 

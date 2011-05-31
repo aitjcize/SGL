@@ -22,7 +22,7 @@ static GLfloat Identity[16] = {
   0.0, 0.0, 0.0, 1.0
 };
 
-void _sgl_matrix_init(SGLmatrix* self)
+void _math_matrix_init(SGLmatrix* self)
 {
   self->m = (GLfloat*) malloc(16 * sizeof(GLfloat));
   self->inv = NULL;
@@ -31,13 +31,13 @@ void _sgl_matrix_init(SGLmatrix* self)
   memcpy(self->m, Identity, 16 * sizeof(GLfloat));
 }
 
-void _sgl_matrix_free(SGLmatrix* self)
+void _math_matrix_free(SGLmatrix* self)
 {
   assert(self->m != NULL);
   free(self->m);
 }
 
-void _sgl_matrix_alloc_inv(SGLmatrix* self)
+void _math_matrix_alloc_inv(SGLmatrix* self)
 {
   if (!self->inv) {
     self->inv = (GLfloat*) malloc(sizeof(GLfloat) * 16);
@@ -66,9 +66,9 @@ static void matmul4(GLfloat* product, const GLfloat* a, const GLfloat* b)
 #undef B
 #undef A
 
-static GLboolean _sgl_matrix_invert(SGLmatrix* self)
+static GLboolean _math_matrix_invert(SGLmatrix* self)
 {
-  _sgl_matrix_alloc_inv(self);
+  _math_matrix_alloc_inv(self);
   float inv[16];
   float* m = self->m;
   float det = 0.0;
@@ -119,23 +119,23 @@ static GLboolean _sgl_matrix_invert(SGLmatrix* self)
   return GL_TRUE;
 }
 
-void _sgl_matrix_mul_matrix(SGLmatrix* product, const SGLmatrix* a,
+void _math_matrix_mul_matrix(SGLmatrix* product, const SGLmatrix* a,
                             const SGLmatrix* b)
 {
   matmul4(product->m, a->m, b->m);
 }
 
-void _sgl_matrix_mul_floats(SGLmatrix* product, const GLfloat* b)
+void _math_matrix_mul_floats(SGLmatrix* product, const GLfloat* b)
 {
   matmul4(product->m, product->m, b);
 }
 
-void _sgl_matrix_loadf(SGLmatrix* self, const GLfloat* m)
+void _math_matrix_loadf(SGLmatrix* self, const GLfloat* m)
 {
   memcpy(self->m, m, 16 * sizeof(GLfloat));
 }
 
-void _sgl_matrix_translate(SGLmatrix* mat, GLfloat x , GLfloat y ,GLfloat z)
+void _math_matrix_translate(SGLmatrix* mat, GLfloat x , GLfloat y ,GLfloat z)
 {
   GLfloat *m = mat->m;
   m[12] = x * m[0] + y * m[4] + z * m[8] + m[12]; 
@@ -144,7 +144,7 @@ void _sgl_matrix_translate(SGLmatrix* mat, GLfloat x , GLfloat y ,GLfloat z)
   m[15] = x * m[3] + y * m[7] + z * m[11] + m[15];
 }
 
-void _sgl_matrix_rotate(SGLmatrix* self, GLfloat angle, GLfloat x,
+void _math_matrix_rotate(SGLmatrix* self, GLfloat angle, GLfloat x,
                         GLfloat y, GLfloat z)
 {
   GLfloat ux, uy, uz, xy, xz, yz, norm, dcos, dsin;
@@ -159,7 +159,7 @@ void _sgl_matrix_rotate(SGLmatrix* self, GLfloat angle, GLfloat x,
   dsin = sin(D2R(angle));
 
   SGLmatrix rotate;
-  _sgl_matrix_init(&rotate);
+  _math_matrix_init(&rotate);
   GLfloat *R = rotate.m;
   
   R[0] = dcos + ux * ux * (1-dcos);
@@ -182,11 +182,11 @@ void _sgl_matrix_rotate(SGLmatrix* self, GLfloat angle, GLfloat x,
   R[14]= 0;
   R[15]= 1;
 
-  _sgl_matrix_mul_floats(self, rotate.m);
-  _sgl_matrix_free(&rotate);
+  _math_matrix_mul_floats(self, rotate.m);
+  _math_matrix_free(&rotate);
 }
 
-void _sgl_matrix_scale(SGLmatrix* self, GLfloat x, GLfloat y, GLfloat z)
+void _math_matrix_scale(SGLmatrix* self, GLfloat x, GLfloat y, GLfloat z)
 {
   GLfloat *m = self->m;
   m[0] *= x ; m[1] *= x ; m[2] *= x; m[3] *= x;
@@ -194,13 +194,13 @@ void _sgl_matrix_scale(SGLmatrix* self, GLfloat x, GLfloat y, GLfloat z)
   m[8] *= z ; m[9] *= z ; m[10]*= z; m[11]*= z;
 }
 
-void _sgl_matrix_ortho(SGLmatrix* self,
+void _math_matrix_ortho(SGLmatrix* self,
                        GLfloat left, GLfloat right,
                        GLfloat bottom, GLfloat top,
                        GLfloat nerval, GLfloat farval)
 {
   SGLmatrix ortho;
-  _sgl_matrix_init(&ortho);
+  _math_matrix_init(&ortho);
   GLfloat *Or = ortho.m; 
 
   Or[0] = 2.0F / (right - left);
@@ -224,61 +224,61 @@ void _sgl_matrix_ortho(SGLmatrix* self,
   Or[15] = 1.0F;
 
   sgl_matrix_mul_floats(self, ortho.m);
-  _sgl_matrix_free(&ortho);
+  _math_matrix_free(&ortho);
 }
 
-void _sgl_matrix_frustum(SGLmatrix* self,
+void _math_matrix_frustum(SGLmatrix* self,
                          GLfloat left, GLfloat right,
                          GLfloat bottom, GLfloat top,
                          GLfloat nerval, GLfloat farval)
 {
   SGLmatrix frustum;
-  _sgl_matrix_init(&frustum);
-  GLfloat *Fr = frustum.m;
+  _math_matrix_init(&frustum);
+  GLfloat *m = frustum.m;
 
-  Fr[0] = (2.0F * nerval) / (right - left);
-  Fr[1] = 0.0F;
-  Fr[2] = 0.0F;
-  Fr[3] = 0.0F;
+  m[0] = (2.0F * nerval) / (right - left);
+  m[1] = 0.0F;
+  m[2] = 0.0F;
+  m[3] = 0.0F;
 
-  Fr[4] = 0.0F;
-  Fr[5] = (2.0F * nerval) / (top - bottom);
-  Fr[6] = 0.0F;
-  Fr[7] = 0.0F;
+  m[4] = 0.0F;
+  m[5] = (2.0F * nerval) / (top - bottom);
+  m[6] = 0.0F;
+  m[7] = 0.0F;
 
-  Fr[8] = (right + left) / (right - left);
-  Fr[9] = (top + bottom) / (top - bottom);
-  Fr[10] = -(farval + nerval) / (farval - nerval);
-  Fr[11] = -1.0F;
+  m[8] = (right + left) / (right - left);
+  m[9] = (top + bottom) / (top - bottom);
+  m[10] = -(farval + nerval) / (farval - nerval);
+  m[11] = -1.0F;
 
-  Fr[12] = 0.0F;
-  Fr[13] = 0.0F;
-  Fr[14] = -(2.0F * farval * nerval) / (farval - nerval);
-  Fr[15] = 0.0F;
+  m[12] = 0.0F;
+  m[13] = 0.0F;
+  m[14] = -(2.0F * farval * nerval) / (farval - nerval);
+  m[15] = 0.0F;
 
   sgl_matrix_mul_floats(self, frustum.m);
-  _sgl_matrix_free(&frustum);
+  _math_matrix_free(&frustum);
 }
 
-void _sgl_matrix_set_identity(SGLmatrix* self)
+void _math_matrix_set_identity(SGLmatrix* self)
 {
   memcpy(self->m, Identity, 16 * sizeof(GLfloat));
 }
 
-void _sgl_matrix_copy(SGLmatrix* to, const SGLmatrix* from)
+void _math_matrix_copy(SGLmatrix* to, const SGLmatrix* from)
 {
   memcpy(to->m, from->m, 16 * sizeof(GLfloat));
   to->flags = from->flags;
 
   if (to->inv != 0) {
     if (from->inv == 0)
-      _sgl_matrix_invert(to);
+      _math_matrix_invert(to);
     else
       memcpy(to->inv, from->inv, 16 * sizeof(GLfloat));
   }
 }
 
-void _sgl_matrix_print(SGLmatrix* m)
+void _math_matrix_print(SGLmatrix* m)
 {
   
 }

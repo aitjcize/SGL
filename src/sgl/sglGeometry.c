@@ -1,11 +1,10 @@
 #include "sglContext.h"
 #include "sglGeometry.h"
 
-extern SGLContext g_sgl;
-
-void glBegin(GLenum mode);
+void glBegin(GLenum mode)
 {
-  g_sgl.flags |= mode;
+  GET_CURRENT_CONTEXT(ctx);
+  ctx->flags |= mode;
 }
 
 void glEnd(void)
@@ -24,11 +23,12 @@ void glVertex3i(GLint x, GLint y, GLint z)
 
 void glVertex3f(GLfloat x, GLfloat y, GLfloat z)
 {
+  GET_CURRENT_CONTEXT(ctx);
   GLfloat data[3];
   data[0] = x;
   data[1] = y;
   data[2] = z;
-  _sgl_vertex_push_back(g_sgl.vector_point, data, 3);
+  _sgl_vertex_push_back(ctx->vector_point, data, 3);
 }
 
 void glVertex3d(GLdouble x, GLdouble y, GLdouble z)
@@ -43,11 +43,12 @@ void glColor3d(GLdouble red, GLdouble green, GLdouble blue)
 
 void glColor3f(GLfloat red, GLfloat green, GLfloat blue)
 {
+  GET_CURRENT_CONTEXT(ctx);
   GLfloat data[3];
   data[0] = red;
   data[1] = green;
   data[2] = blue;
-  _sgl_vertex_push_back(g_sgl.vector_color, data, 3);
+  _sgl_vertex_push_back(ctx->vector_color, data, 3);
 }
 
 void glColor3i(GLint red, GLint green, GLint blue)
@@ -67,11 +68,12 @@ void glNormal3d(GLdouble nx, GLdouble ny, GLdouble nz)
 
 void glNormal3f(GLfloat nx, GLfloat ny, GLfloat nz)
 {
+  GET_CURRENT_CONTEXT(ctx);
   GLfloat data[3];
   data[0] = nx;
   data[1] = ny;
   data[2] = nz;
-  _sgl_vertex_push_back(g_sgl.vector_normal, data, 3);
+  _sgl_vertex_push_back(ctx->vector_normal, data, 3);
 }
 
 void glNormal3i(GLint nx, GLint ny, GLint nz)
@@ -87,17 +89,19 @@ void glNormal3s(GLshort nx, GLshort ny, GLshort nz)
 void glVertexPointer(GLint size, GLenum type, GLsizei stride,
                      const GLvoid *ptr)
 {
-  if (g_sgl.clientstate_flags & GL_VERTEX_ARRAY) {
-    _sgl_vector4f_init(&g_sgl.vertex_pointer, 0, (GLvoid*)ptr);
-    g_sgl.vertex_pointer.stride = stride;
+  GET_CURRENT_CONTEXT(ctx);
+  if (ctx->clientstate_flags & GL_VERTEX_ARRAY) {
+    _sgl_vector4f_init(&ctx->vertex_pointer, 0, (GLvoid*)ptr);
+    ctx->vertex_pointer.stride = stride;
   }
 }
 
 void glNormalPointer(GLenum type, GLsizei stride, const GLvoid *ptr)
 {
-  if (g_sgl.clientstate_flags & GL_NORMAL_ARRAY) {
-    _sgl_vector4f_init(&g_sgl.normal_pointer, 0, (GLvoid*)ptr);
-    g_sgl.vertex_pointer.stride = stride;
+  GET_CURRENT_CONTEXT(ctx);
+  if (ctx->clientstate_flags & GL_NORMAL_ARRAY) {
+    _sgl_vector4f_init(&ctx->normal_pointer, 0, (GLvoid*)ptr);
+    ctx->vertex_pointer.stride = stride;
   }
 }
 
@@ -105,8 +109,9 @@ void glNormalPointer(GLenum type, GLsizei stride, const GLvoid *ptr)
 void glColorPointer(GLint size, GLenum type, GLsizei stride,
                     const GLvoid *ptr)
 {
-  if (g_sgl.clientstate_flags & GL_COLOR_ARRAY) {
-    _sgl_vector4f_init(&g_sgl.color_pointer, 0, (GLvoid*)ptr);
-    g_sgl.vertex_pointer.stride = stride;
+  GET_CURRENT_CONTEXT(ctx);
+  if (ctx->clientstate_flags & GL_COLOR_ARRAY) {
+    _sgl_vector4f_init(&ctx->color_pointer, 0, (GLvoid*)ptr);
+    ctx->vertex_pointer.stride = stride;
   }
 }

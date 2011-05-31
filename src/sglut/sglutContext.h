@@ -6,7 +6,7 @@
 
 #include <X11/Xlib.h>
 
-#define GLUT_ENABLED(flag) ((g_sglut.flags & (flag)) > 0)
+#define GLUT_ENABLED(flag) ((ctx->flags & (flag)) > 0)
 
 #define GLUT_DEBUG    (1 << 1)
 #define GLUT_RGBA     (1 << 2)
@@ -15,8 +15,7 @@
 #define GLUT_DOUBLE   (1 << 4)
 #define GLUT_DEPTH    (1 << 4)
 
-typedef struct _SGLUTContext SGLUTContext;
-struct _SGLUTContext {
+struct SGLUTContext {
   /* XLib Related */
   Display* display;
   Window window;

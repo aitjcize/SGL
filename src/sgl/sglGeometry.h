@@ -1,7 +1,7 @@
 #ifndef __SGL_SGLGEOMETRY_H__
 #define __SGL_SGLGEOMETRY_H__
 
-#include "glHeaders.h"
+#include "sglHeaders.h"
 
 /* glVertex */
 extern void glVertex3s(GLshort x, GLshort y, GLshort z);
