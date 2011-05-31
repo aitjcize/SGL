@@ -66,7 +66,7 @@ static void matmul4(GLfloat* product, const GLfloat* a, const GLfloat* b)
 #undef B
 #undef A
 
-static void _sgl_matrix_invert(SGLmatrix* self)
+static GLboolean _sgl_matrix_invert(SGLmatrix* self)
 {
   _sgl_matrix_alloc_inv(self);
   float inv[16];

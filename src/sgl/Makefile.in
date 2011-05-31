@@ -67,10 +67,10 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libsgl_la_LIBADD =
-am_libsgl_la_OBJECTS = sglContext.lo sglMatrixOp.lo sglGeometry.lo \
+libSGL_la_LIBADD =
+am_libSGL_la_OBJECTS = sglContext.lo sglMatrixOp.lo sglGeometry.lo \
 	vector.lo matrix.lo list.lo
-libsgl_la_OBJECTS = $(am_libsgl_la_OBJECTS)
+libSGL_la_OBJECTS = $(am_libSGL_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -84,8 +84,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libsgl_la_SOURCES)
-DIST_SOURCES = $(libsgl_la_SOURCES)
+SOURCES = $(libSGL_la_SOURCES)
+DIST_SOURCES = $(libSGL_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -205,8 +205,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SRC_ROOT = ..
 AM_CFLAGS = -I$(SRC_ROOT)
-lib_LTLIBRARIES = libsgl.la
-libsgl_la_SOURCES = sglContext.c sglContext.h \
+lib_LTLIBRARIES = libSGL.la
+libSGL_la_SOURCES = sglContext.c sglContext.h \
 		    sglMatrixOp.c sglMatrixOp .h \
 		    sglGeometry.c sglGeometry. h \
 		    $(SRC_ROOT)/math/vector.c $(SRC_ROOT)/math/vector.h \
@@ -279,8 +279,8 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libsgl.la: $(libsgl_la_OBJECTS) $(libsgl_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libdir) $(libsgl_la_OBJECTS) $(libsgl_la_LIBADD) $(LIBS)
+libSGL.la: $(libSGL_la_OBJECTS) $(libSGL_la_DEPENDENCIES) 
+	$(LINK) -rpath $(libdir) $(libSGL_la_OBJECTS) $(libSGL_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

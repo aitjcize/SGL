@@ -1,46 +1,46 @@
 #include "sglContext.h"
 #include "sglMatrixOp.h"
 
-extern SGLContext* g_sgl_context;
+extern SGLContext* s_sgl;
 
 void glPushMatrix(void)
 {
-  s_list_append(g_sgl_context->matrix_stack, g_sgl_context->matrix);
+  s_list_append(s_sgl->matrix_stack, s_sgl->matrix);
 }
 
 void glPopMatrix(void)
 {
-  SList* last = s_list_remove_link(g_sgl_context->matrix_stack,
-                                   s_list_last(g_sgl_context->matrix_stack));
-  g_sgl_context->matrix = (SGLmatrix*)last->data;
+  SList* last = s_list_remove_link(s_sgl->matrix_stack,
+                                   s_list_last(s_sgl->matrix_stack));
+  s_sgl->matrix = (SGLmatrix*)last->data;
 }
 
 void glLoadIdentity(void)
 {
-  _sgl_matrix_set_identity(g_sgl_context->matrix);
+  _sgl_matrix_set_identity(s_sgl->matrix);
 }
 
 void glLoadMatrixd(const GLdouble* m)
 {
-  _sgl_matrix_loadf(g_sgl_context->matrix, (const GLfloat*)m);
+  _sgl_matrix_loadf(s_sgl->matrix, (const GLfloat*)m);
 }
 
 void glLoadMatrixf(const GLfloat* m)
 {
-  _sgl_matrix_loadf(g_sgl_context->matrix, m);
+  _sgl_matrix_loadf(s_sgl->matrix, m);
 }
 
 void glTranslatef(GLfloat x, GLfloat y, GLfloat z)
 {
-  _sgl_matrix_translate(g_sgl_context->matrix, x, y, z);
+  _sgl_matrix_translate(s_sgl->matrix, x, y, z);
 }
 
 void glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
 {
-  _sgl_matrix_rotate(g_sgl_context->matrix, angle, x, y, z);
+  _sgl_matrix_rotate(s_sgl->matrix, angle, x, y, z);
 }
 
 void glScalef(GLfloat x, GLfloat y, GLfloat z)
 {
-  _sgl_matrix_scale(g_sgl_context->matrix, x, y, z);
+  _sgl_matrix_scale(s_sgl->matrix, x, y, z);
 }
