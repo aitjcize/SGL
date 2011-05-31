@@ -27,30 +27,33 @@ struct _SGLUTContext {
   /* Events handler */
   void (*displayFunc)(void);
   void (*mouseFunc)(int button, int state, int x, int y);
+  void (*motionFunc)(int x, int y);
   void (*keyboardFunc)(unsigned char key, int x, int y);
 
   /* Misc */
   int flags;
 };
 
-void sglutInit(int argc, char* argv[]);
+void glutInit(int argc, char* argv[]);
 
-void sglutInitWindowSize(int width, int height);
+void glutInitWindowSize(int width, int height);
 
-void sglutInitWindowPosition(int x, int y);
+void glutInitWindowPosition(int x, int y);
 
-void sglutCreateWindow(char* name);
+void glutCreateWindow(char* name);
 
-void sglutBindBuffer(char* buf1, char* buf2);
+void glutBindBuffer(char* buf1, char* buf2);
 
-void sglutDisplayFunc(void (*func)(void));
+void glutDisplayFunc(void (*func)(void));
 
-void sglutKeyboardFunc(void (*func)(unsigned char key, int x, int y));
+void glutKeyboardFunc(void (*func)(unsigned char key, int x, int y));
 
-void sglutMouseFunc(void (*func)(int button, int state, int x, int y));
+void glutMouseFunc(void (*func)(int button, int state, int x, int y));
 
-void sglutSwapBuffers(void);
+void glutMotionFunc(void (*func)(int x, int y));
 
-void sglutMainLoop(void);
+void glutSwapBuffers(void);
+
+void glutMainLoop(void);
 
 #endif /* __SGLUT_SGLUTCONTEXT_H__ */
