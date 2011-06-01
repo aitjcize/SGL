@@ -30,6 +30,7 @@ struct SGLUTContext {
   XImage* framebuffer_image[2];
   char* framebuffer[2];
   char* depthbuffer[2];
+  void (*renderApp)(char* framebuffer);
 
   /* Events handler */
   void (*displayFunc)(void);
@@ -41,6 +42,8 @@ struct SGLUTContext {
   int flags;
 };
 
+extern void glutSetRenderApp(void (*func)(char* framebuffer));
+
 extern void glutInit(int argc, char* argv[]);
 
 extern void glutInitWindowSize(int width, int height);
@@ -51,9 +54,9 @@ extern void glutInitDisplayMode(unsigned int mode);
 
 extern void glutCreateWindow(char* name);
 
-extern void glutSwapBuffers(void);
+extern void glutSetWindowTitle(char* name);
 
-extern void glutBindBuffer(char* buf1, char* buf2);
+extern void glutSwapBuffers(void);
 
 extern void glutDisplayFunc(void (*func)(void));
 

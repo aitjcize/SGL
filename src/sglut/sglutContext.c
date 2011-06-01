@@ -7,9 +7,16 @@
 
 struct SGLUTContext _g_sglut_context;
 
+void _glutRenderFromApp(void)
+{
+  GET_CURRENT_CONTEXT(ctx);
+  ctx->renderApp(ctx->framebuffer[ctx->buf_index]);
+}
+
 void _glutRenderSingleFrame(void)
 {
   GET_CURRENT_CONTEXT(ctx);
+  _glutRenderFromApp();
   XPutImage(ctx->display, ctx->window, ctx->gc,
             ctx->framebuffer_image[ctx->buf_index], 0, 0, 0, 0,
             ctx->win_width, ctx->win_height);
@@ -22,6 +29,12 @@ void _glutDestroy(void)
   XFreeGC(ctx->display, ctx->gc);
   XDestroyWindow(ctx->display, ctx->window);
   XCloseDisplay(ctx->display);
+}
+
+void glutSetRenderApp(void (*func)(char* framebuffer))
+{
+  GET_CURRENT_CONTEXT(ctx);
+  ctx->renderApp = func;
 }
 
 void glutInit(int argc, char* argv[])
@@ -51,7 +64,7 @@ void glutInitWindowSize(int width, int height)
 
   for (i = 0; i < 1 + GLUT_ENABLED(GLUT_DOUBLE); ++i) {
     /* Create Framebuffer */
-    //ctx->framebuffer[i] = malloc(width * height * 4 * sizeof(char));
+    ctx->framebuffer[i] = malloc(width * height * 4 * sizeof(char));
 
     ctx->framebuffer_image[i] = XCreateImage(ctx->display,
         XDefaultVisual(ctx->display, screen_number),
@@ -110,19 +123,18 @@ void glutCreateWindow(char* name)
   ctx->gc = XCreateGC(ctx->display, ctx->window, 0, NULL);
 }
 
+void glutSetWindowTitle(char* name)
+{
+  GET_CURRENT_CONTEXT(ctx);
+  XStoreName(ctx->display, ctx->window, name);
+}
+
 void glutSwapBuffers(void)
 {
   GET_CURRENT_CONTEXT(ctx);
   if (GLUT_ENABLED(GLUT_DOUBLE))
     ctx->buf_index = ++ctx->buf_index % 2;
   _glutRenderSingleFrame();
-}
-
-void glutBindBuffer(char* buf1, char* buf2)
-{
-  GET_CURRENT_CONTEXT(ctx);
-  ctx->framebuffer[0] = buf1;
-  ctx->framebuffer[1] = buf2;
 }
 
 void glutDisplayFunc(void (*func)(void))
