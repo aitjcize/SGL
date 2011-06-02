@@ -1,9 +1,10 @@
 SRC_ROOT = ..
-AM_CFLAGS = -I$(SRC_ROOT)
+AM_CFLAGS = -I$(SRC_ROOT) -Wall -O2
 lib_LTLIBRARIES = libSGL.la
 libSGL_la_SOURCES = sgl_headers.h \
 		    sgl_api.h \
 		    types.h \
+		    config.h \
 		    logging.c logging.h \
 		    context.c context.h \
 		    matrix.c matrix .h \

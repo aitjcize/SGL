@@ -1,6 +1,7 @@
 #include "logging.h"
 
 #include <stdio.h>
+#include <stdarg.h>
 
 void _sgl_debug(struct sgl_context* ctx, const char* fmtstr, ...)
 {

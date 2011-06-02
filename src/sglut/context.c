@@ -132,8 +132,10 @@ void glutSetWindowTitle(char* name)
 void glutSwapBuffers(void)
 {
   GET_CURRENT_CONTEXT(ctx);
-  if (GLUT_ENABLED(GLUT_DOUBLE))
-    ctx->buf_index = ++ctx->buf_index % 2;
+  if (GLUT_ENABLED(GLUT_DOUBLE)) {
+    ctx->buf_index++;
+    ctx->buf_index %= 2;
+  }
   _glutRenderSingleFrame();
 }
 

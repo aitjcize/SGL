@@ -103,9 +103,9 @@ static GLboolean _math_matrix_invert(SGLmatrix* mat)
    r3[7] = 1.0, r3[4] = r3[5] = r3[6] = 0.0;
 
    /* choose pivot - or die */
-   if (FABSF(r3[0])>FABSF(r2[0])) SWAP_ROWS(r3, r2);
-   if (FABSF(r2[0])>FABSF(r1[0])) SWAP_ROWS(r2, r1);
-   if (FABSF(r1[0])>FABSF(r0[0])) SWAP_ROWS(r1, r0);
+   if (fabsf(r3[0])>fabsf(r2[0])) SWAP_ROWS(r3, r2);
+   if (fabsf(r2[0])>fabsf(r1[0])) SWAP_ROWS(r2, r1);
+   if (fabsf(r1[0])>fabsf(r0[0])) SWAP_ROWS(r1, r0);
    if (0.0 == r0[0])  return GL_FALSE;
 
    /* eliminate first variable     */
@@ -123,8 +123,8 @@ static GLboolean _math_matrix_invert(SGLmatrix* mat)
    if (s != 0.0) { r1[7] -= m1 * s; r2[7] -= m2 * s; r3[7] -= m3 * s; }
 
    /* choose pivot - or die */
-   if (FABSF(r3[1])>FABSF(r2[1])) SWAP_ROWS(r3, r2);
-   if (FABSF(r2[1])>FABSF(r1[1])) SWAP_ROWS(r2, r1);
+   if (fabsf(r3[1])>fabsf(r2[1])) SWAP_ROWS(r3, r2);
+   if (fabsf(r2[1])>fabsf(r1[1])) SWAP_ROWS(r2, r1);
    if (0.0 == r1[1])  return GL_FALSE;
 
    /* eliminate second variable */
@@ -137,7 +137,7 @@ static GLboolean _math_matrix_invert(SGLmatrix* mat)
    s = r1[7]; if (0.0 != s) { r2[7] -= m2 * s; r3[7] -= m3 * s; }
 
    /* choose pivot - or die */
-   if (FABSF(r3[2])>FABSF(r2[2])) SWAP_ROWS(r3, r2);
+   if (fabsf(r3[2])>fabsf(r2[2])) SWAP_ROWS(r3, r2);
    if (0.0 == r2[2])  return GL_FALSE;
 
    /* eliminate third variable */
@@ -278,7 +278,7 @@ void _math_matrix_rotate(SGLmatrix* mat, GLfloat angle, GLfloat x,
   }
 
   if (!optimized) {
-    const GLfloat mag = SQRTF(x * x + y * y + z * z);
+    const GLfloat mag = sqrtf(x * x + y * y + z * z);
 
     if (mag <= 1.0e-4) {
       /* no rotation, leave mat as-is */
@@ -438,7 +438,7 @@ void _math_matrix_frustum(SGLmatrix* mat,
    c = -(farval+nearval) / ( farval-nearval);
    d = -(2.0F*farval*nearval) / (farval-nearval);  /* error? */
 
-#define M(row,col)  m[col<<2+row]
+#define M(row,col)  m[(col<<2)+row]
    M(0,0) = x;     M(0,1) = 0.0F;  M(0,2) = a;      M(0,3) = 0.0F;
    M(1,0) = 0.0F;  M(1,1) = y;     M(1,2) = b;      M(1,3) = 0.0F;
    M(2,0) = 0.0F;  M(2,1) = 0.0F;  M(2,2) = c;      M(2,3) = d;

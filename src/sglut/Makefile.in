@@ -202,6 +202,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+AM_CFLAGS = -Wall -O2
 lib_LTLIBRARIES = libSGLUT.la
 libSGLUT_la_SOURCES = sglut_api.h \
 		      types.h \

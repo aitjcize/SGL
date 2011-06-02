@@ -95,10 +95,38 @@ void glLoadIdentity(void)
   _math_matrix_set_identity(ctx->current_stack->top);
 }
 
-void glLoadMatrixd(const GLdouble* m)
+void glFrustum(GLdouble left, GLdouble right,
+               GLdouble bottom, GLdouble top,
+               GLdouble near_val, GLdouble far_val)
 {
   GET_CURRENT_CONTEXT(ctx);
-  _math_matrix_loadf(ctx->current_stack->top, (const GLfloat*)m);
+  _math_matrix_frustum(ctx->current_stack->top, left, right, bottom, top,
+                       near_val, far_val);
+}
+
+void glOrtho(GLdouble left, GLdouble right,
+             GLdouble bottom, GLdouble top,
+             GLdouble near_val, GLdouble far_val)
+{
+  GET_CURRENT_CONTEXT(ctx);
+  _math_matrix_ortho(ctx->current_stack->top, left, right, bottom, top,
+                     near_val, far_val);
+}
+
+void glMultMatrixd(const GLdouble* m)
+{
+  glMultMatrixf((GLfloat*) m);
+}
+
+void glMultMatrixf(const GLfloat* m)
+{
+  GET_CURRENT_CONTEXT(ctx);
+  _math_matrix_mul_floats(ctx->current_stack->top, m);
+}
+
+void glLoadMatrixd(const GLdouble* m)
+{
+  glLoadMatrixf((GLfloat*) m);
 }
 
 void glLoadMatrixf(const GLfloat* m)
@@ -107,10 +135,22 @@ void glLoadMatrixf(const GLfloat* m)
   _math_matrix_loadf(ctx->current_stack->top, (const GLfloat*)m);
 }
 
+void glTranslated(GLdouble x, GLdouble y, GLdouble z)
+{
+  GET_CURRENT_CONTEXT(ctx);
+  _math_matrix_translate(ctx->current_stack->top, x, y, z);
+}
+
 void glTranslatef(GLfloat x, GLfloat y, GLfloat z)
 {
   GET_CURRENT_CONTEXT(ctx);
   _math_matrix_translate(ctx->current_stack->top, x, y, z);
+}
+
+void glRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z)
+{
+  GET_CURRENT_CONTEXT(ctx);
+  _math_matrix_rotate(ctx->current_stack->top, angle, x, y, z);
 }
 
 void glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)

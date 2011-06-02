@@ -1,11 +1,12 @@
 #include "context.h"
+#include "matrix.h"
 
 struct sgl_context _g_sgl_context;
 
 void sgl_context_init(struct sgl_context* ctx)
 {
   ctx->matrix_mode = GL_MODELVIEW;
-  _sgl_init_matrix_data(ctx);
+  _sgl_init_matrix(ctx);
 
   ctx->flags = 0;
   ctx->clientstate_flags = 0;
@@ -19,12 +20,12 @@ void sgl_context_free(struct sgl_context* ctx)
 void glClear(GLbitfield mask)
 {
   GET_CURRENT_CONTEXT(ctx);
-  _sgl_vector4f_free(&ctx->vector_point);
-  _sgl_vector4f_free(&ctx->vector_normal);
-  _sgl_vector4f_free(&ctx->vector_color);
-  _sgl_vector4f_alloc(&ctx->vector_color, 0, SGL_INIT_VERTEX_LEN);
-  _sgl_vector4f_alloc(&ctx->vector_color, 0, SGL_INIT_VERTEX_LEN);
-  _sgl_vector4f_alloc(&ctx->vector_color, 0, SGL_INIT_VERTEX_LEN);
+  _math_vector4f_free(&ctx->vector_point);
+  _math_vector4f_free(&ctx->vector_normal);
+  _math_vector4f_free(&ctx->vector_color);
+  _math_vector4f_alloc(&ctx->vector_color, 0, SGL_INIT_VERTEX_LEN);
+  _math_vector4f_alloc(&ctx->vector_color, 0, SGL_INIT_VERTEX_LEN);
+  _math_vector4f_alloc(&ctx->vector_color, 0, SGL_INIT_VERTEX_LEN);
 }
 
 void glClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)

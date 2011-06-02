@@ -8,7 +8,7 @@
 #include "m_vector.h"
 #include "utils.h"
 
-void _sgl_vector4f_init(SGLvector4f *v, GLbitfield flags, GLfloat (*storage)[4])
+void _math_vector4f_init(SGLvector4f *v, GLbitfield flags, GLfloat (*storage)[4])
 {
   v->stride = 4 * sizeof(GLfloat);
   v->size = 2;
@@ -17,7 +17,7 @@ void _sgl_vector4f_init(SGLvector4f *v, GLbitfield flags, GLfloat (*storage)[4])
   v->count = 0;
 }
 
-void _sgl_vector4f_alloc(SGLvector4f *v, GLbitfield flags, GLuint count)
+void _math_vector4f_alloc(SGLvector4f *v, GLbitfield flags, GLuint count)
 {
   v->stride = 4 * sizeof(GLfloat);
   v->size = 2;
@@ -29,7 +29,7 @@ void _sgl_vector4f_alloc(SGLvector4f *v, GLbitfield flags, GLuint count)
   v->flags = flags | VEC_MALLOC;
 }
 
-void _sgl_vector4f_alloc_double(SGLvector4f *v)
+void _math_vector4f_alloc_double(SGLvector4f *v)
 {
   void* new_storage = malloc(v->storage_count * 2 * 4 * sizeof(GLfloat));
   memcpy(new_storage, v->storage, v->storage_count * 4 * sizeof(GLfloat));
@@ -38,7 +38,7 @@ void _sgl_vector4f_alloc_double(SGLvector4f *v)
   v->storage_count *= 2;
 }
 
-void _sgl_vector4f_free(SGLvector4f* v)
+void _math_vector4f_free(SGLvector4f* v)
 {
   if (v->flags & VEC_MALLOC) {
     free(v->storage);
@@ -49,7 +49,7 @@ void _sgl_vector4f_free(SGLvector4f* v)
   }
 }
 
-GLboolean _sgl_vector4f_push_back(SGLvector4f* v, GLfloat* data, GLuint size)
+GLboolean _math_vector4f_push_back(SGLvector4f* v, GLfloat* data, GLuint size)
 {
   if (v->flags & VEC_MALLOC) {
     if (v->start == v->storage + v->storage_count)
@@ -65,7 +65,7 @@ GLboolean _sgl_vector4f_push_back(SGLvector4f* v, GLfloat* data, GLuint size)
   return GL_TRUE;
 }
 
-GLboolean _sgl_vector4f_pop_back(SGLvector4f* v, GLfloat* data, GLuint size)
+GLboolean _math_vector4f_pop_back(SGLvector4f* v, GLfloat* data, GLuint size)
 {
   if (v->start == (void*)v->data)
     return GL_FALSE;
@@ -76,7 +76,7 @@ GLboolean _sgl_vector4f_pop_back(SGLvector4f* v, GLfloat* data, GLuint size)
   return GL_TRUE;
 }
 
-void _sgl_vector4f_print(SGLvector4f* v)
+void _math_vector4f_print(SGLvector4f* v)
 {
   static const char *templates[5] = {
     "%d:\t0, 0, 0, 1\n",
@@ -88,10 +88,10 @@ void _sgl_vector4f_print(SGLvector4f* v)
 
   const char *t = templates[v->size];
   GLfloat *d = (GLfloat *)v->data;
-  GLuint j, i = 0, count;
+  GLuint i = 0;
 
   printf("data-start\n");
-  for (; d != v->start; STRIDE_F(d, v->stride), i++)
+  for (; d != v->start; d = (GLfloat*)((GLubyte *)d + v->stride), i++)
     printf(t, i, d[0], d[1], d[2], d[3]);
 
   printf("start-count(%u)\n", v->count);
