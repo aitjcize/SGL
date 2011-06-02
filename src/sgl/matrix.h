@@ -1,7 +1,7 @@
 #ifndef __SGL_MATRIX_H__
 #define __SGL_MATRIX_H__
 
-#include "sgl_headers.h"
+#include "sglheader.h"
 
 extern void _sgl_init_matrix(struct sgl_context* ctx);
 

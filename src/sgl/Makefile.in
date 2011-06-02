@@ -68,8 +68,8 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libSGL_la_LIBADD =
-am_libSGL_la_OBJECTS = logging.lo context.lo matrix.lo geometry.lo \
-	m_vector.lo m_matrix.lo
+am_libSGL_la_OBJECTS = context.lo geometry.lo logging.lo matrix.lo \
+	viewport.lo m_vector.lo m_matrix.lo
 libSGL_la_OBJECTS = $(am_libSGL_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
@@ -206,14 +206,17 @@ top_srcdir = @top_srcdir@
 SRC_ROOT = ..
 AM_CFLAGS = -I$(SRC_ROOT) -Wall -O2
 lib_LTLIBRARIES = libSGL.la
-libSGL_la_SOURCES = sgl_headers.h \
-		    sgl_api.h \
+libSGL_la_SOURCES = config.h \
+		    macro.h \
+		    sglapi.h \
+		    sglheader.h \
 		    types.h \
-		    config.h \
-		    logging.c logging.h \
 		    context.c context.h \
-		    matrix.c matrix .h \
 		    geometry.c geometry. h \
+		    logging.c logging.h \
+		    matrix.c matrix .h \
+		    viewport.c viewport.h \
+		    driver.h \
 		    $(SRC_ROOT)/math/m_vector.c $(SRC_ROOT)/math/m_vector.h \
 		    $(SRC_ROOT)/math/m_matrix.c $(SRC_ROOT)/math/m_matrix.h
 
@@ -297,6 +300,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_matrix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/matrix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/viewport.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

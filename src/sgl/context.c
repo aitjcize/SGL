@@ -23,9 +23,9 @@ void glClear(GLbitfield mask)
   _math_vector4f_free(&ctx->vector_point);
   _math_vector4f_free(&ctx->vector_normal);
   _math_vector4f_free(&ctx->vector_color);
-  _math_vector4f_alloc(&ctx->vector_color, 0, SGL_INIT_VERTEX_LEN);
-  _math_vector4f_alloc(&ctx->vector_color, 0, SGL_INIT_VERTEX_LEN);
-  _math_vector4f_alloc(&ctx->vector_color, 0, SGL_INIT_VERTEX_LEN);
+  _math_vector4f_alloc(&ctx->vector_color, 0, VECTOR_INIT_LEN);
+  _math_vector4f_alloc(&ctx->vector_color, 0, VECTOR_INIT_LEN);
+  _math_vector4f_alloc(&ctx->vector_color, 0, VECTOR_INIT_LEN);
 }
 
 void glClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)

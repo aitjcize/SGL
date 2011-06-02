@@ -5,12 +5,18 @@
 #ifndef __SGL_MATH_MATRIX_H__
 #define __SGL_MATH_MATRIX_H__
 
-#include "sgl_headers.h"
+#include "sglheader.h"
 
-enum SGLmatrixtype {
-  MATRIX_GENERAL,
-  MATRIX_IDENTITY
-};
+/**
+ * @brief Symbolic names to some of the entries in the matrix
+ * These are handy for the viewport mapping, which is expressed as a matrix.
+ */
+#define MAT_SX 0
+#define MAT_SY 5
+#define MAT_SZ 10
+#define MAT_TX 12
+#define MAT_TY 13
+#define MAT_TZ 14
 
 /*
  * @brief matirx element layout
@@ -23,7 +29,8 @@ enum SGLmatrixtype {
  */
 
 typedef struct _SGLmatrix SGLmatrix;
-struct _SGLmatrix {
+struct _SGLmatrix
+{
   GLfloat *m;
   GLfloat *inv;
   GLbitfield flags;
@@ -73,6 +80,11 @@ extern void _math_matrix_frustum(SGLmatrix* self,
                                  GLfloat left, GLfloat right,
                                  GLfloat bottom, GLfloat top,
                                  GLfloat nearval, GLfloat farval);
+
+extern void _math_matrix_viewport(SGLmatrix *m, GLint x, GLint y,
+                                  GLint width, GLint height,
+                                  GLfloat zNear, GLfloat zFar,
+                                  GLfloat depthMax);
 
 extern void _math_matrix_set_identity(SGLmatrix* self);
 

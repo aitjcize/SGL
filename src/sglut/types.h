@@ -1,5 +1,5 @@
-#ifndef __SGLUT_SGLUTTYPES_H__
-#define __SGLUT_SGLUTTYPES_H__
+#ifndef __SGLUT_TYPES_H__
+#define __SGLUT_TYPES_H__
 
 #include <stdlib.h>
 #include <string.h>
@@ -15,7 +15,8 @@
 #define GLUT_DOUBLE   (1 << 4)
 #define GLUT_DEPTH    (1 << 4)
 
-struct sglut_context {
+struct sglut_context
+{
   /* XLib Related */
   Display* display;
   Window window;
@@ -42,4 +43,4 @@ struct sglut_context {
   int flags;
 };
 
-#endif /* __SGLUT_SGLUTTYPES_H__ */
+#endif /* __SGLUT_TYPES_H__ */

@@ -448,6 +448,18 @@ void _math_matrix_frustum(SGLmatrix* mat,
    matrix_multf(mat, m);
 }
 
+void _math_matrix_viewport(SGLmatrix *m, GLint x, GLint y,
+                           GLint width, GLint height,
+                           GLfloat zNear, GLfloat zFar, GLfloat depthMax)
+{
+   m->m[MAT_SX] = (GLfloat) width / 2.0F;
+   m->m[MAT_TX] = m->m[MAT_SX] + x;
+   m->m[MAT_SY] = (GLfloat) height / 2.0F;
+   m->m[MAT_TY] = m->m[MAT_SY] + y;
+   m->m[MAT_SZ] = depthMax * ((zFar - zNear) / 2.0F);
+   m->m[MAT_TZ] = depthMax * ((zFar - zNear) / 2.0F + zNear);
+}
+
 void _math_matrix_set_identity(SGLmatrix* mat)
 {
   memcpy(mat->m, Identity, 16 * sizeof(GLfloat));

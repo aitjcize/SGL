@@ -49,6 +49,7 @@ void _sgl_free_matrix_data(struct sgl_context* ctx)
 void glMatrixMode(GLenum mode)
 {
   GET_CURRENT_CONTEXT(ctx);
+  ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
   switch (mode) {
   case GL_MODELVIEW:
     ctx->current_stack = &ctx->modelview_matrix_stack;
@@ -64,6 +65,7 @@ void glMatrixMode(GLenum mode)
 void glPushMatrix(void)
 {
   GET_CURRENT_CONTEXT(ctx);
+  ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
   struct sgl_matrix_stack* stack = ctx->current_stack;
 
   if (stack->depth + 1 >= stack->max_depth) {
@@ -79,6 +81,7 @@ void glPushMatrix(void)
 void glPopMatrix(void)
 {
   GET_CURRENT_CONTEXT(ctx);
+  ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
   struct sgl_matrix_stack* stack = ctx->current_stack;
 
   if (stack->depth  == 0) {
@@ -92,6 +95,7 @@ void glPopMatrix(void)
 void glLoadIdentity(void)
 {
   GET_CURRENT_CONTEXT(ctx);
+  ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
   _math_matrix_set_identity(ctx->current_stack->top);
 }
 
@@ -100,6 +104,7 @@ void glFrustum(GLdouble left, GLdouble right,
                GLdouble near_val, GLdouble far_val)
 {
   GET_CURRENT_CONTEXT(ctx);
+  ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
   _math_matrix_frustum(ctx->current_stack->top, left, right, bottom, top,
                        near_val, far_val);
 }
@@ -109,6 +114,7 @@ void glOrtho(GLdouble left, GLdouble right,
              GLdouble near_val, GLdouble far_val)
 {
   GET_CURRENT_CONTEXT(ctx);
+  ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
   _math_matrix_ortho(ctx->current_stack->top, left, right, bottom, top,
                      near_val, far_val);
 }
@@ -121,6 +127,7 @@ void glMultMatrixd(const GLdouble* m)
 void glMultMatrixf(const GLfloat* m)
 {
   GET_CURRENT_CONTEXT(ctx);
+  ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
   _math_matrix_mul_floats(ctx->current_stack->top, m);
 }
 
@@ -132,35 +139,41 @@ void glLoadMatrixd(const GLdouble* m)
 void glLoadMatrixf(const GLfloat* m)
 {
   GET_CURRENT_CONTEXT(ctx);
+  ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
   _math_matrix_loadf(ctx->current_stack->top, (const GLfloat*)m);
 }
 
 void glTranslated(GLdouble x, GLdouble y, GLdouble z)
 {
   GET_CURRENT_CONTEXT(ctx);
+  ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
   _math_matrix_translate(ctx->current_stack->top, x, y, z);
 }
 
 void glTranslatef(GLfloat x, GLfloat y, GLfloat z)
 {
   GET_CURRENT_CONTEXT(ctx);
+  ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
   _math_matrix_translate(ctx->current_stack->top, x, y, z);
 }
 
 void glRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z)
 {
   GET_CURRENT_CONTEXT(ctx);
+  ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
   _math_matrix_rotate(ctx->current_stack->top, angle, x, y, z);
 }
 
 void glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
 {
   GET_CURRENT_CONTEXT(ctx);
+  ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
   _math_matrix_rotate(ctx->current_stack->top, angle, x, y, z);
 }
 
 void glScalef(GLfloat x, GLfloat y, GLfloat z)
 {
   GET_CURRENT_CONTEXT(ctx);
+  ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
   _math_matrix_scale(ctx->current_stack->top, x, y, z);
 }
