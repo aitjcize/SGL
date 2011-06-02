@@ -71,6 +71,9 @@ libSGL_la_LIBADD =
 am_libSGL_la_OBJECTS = context.lo geometry.lo logging.lo matrix.lo \
 	viewport.lo m_vector.lo m_matrix.lo
 libSGL_la_OBJECTS = $(am_libSGL_la_OBJECTS)
+libSGL_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(libSGL_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -123,6 +126,9 @@ LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBSGL_AGE = @LIBSGL_AGE@
+LIBSGL_CURRENT = @LIBSGL_CURRENT@
+LIBSGL_REVISION = @LIBSGL_REVISION@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LIPO = @LIPO@
@@ -206,19 +212,23 @@ top_srcdir = @top_srcdir@
 SRC_ROOT = ..
 AM_CFLAGS = -I$(SRC_ROOT) -Wall -O2
 lib_LTLIBRARIES = libSGL.la
-libSGL_la_SOURCES = config.h \
-		    macro.h \
-		    sglapi.h \
-		    sglheader.h \
-		    types.h \
-		    context.c context.h \
-		    geometry.c geometry. h \
-		    logging.c logging.h \
-		    matrix.c matrix .h \
-		    viewport.c viewport.h \
-		    driver.h \
-		    $(SRC_ROOT)/math/m_vector.c $(SRC_ROOT)/math/m_vector.h \
-		    $(SRC_ROOT)/math/m_matrix.c $(SRC_ROOT)/math/m_matrix.h
+libSGL_la_LDFLAGS = \
+		-version-info $(LIBSGL_CURRENT):$(LIBSGL_REVISION):$(LIBSGL_AGE)
+
+libSGL_la_SOURCES = \
+		config.h \
+		macro.h \
+		sglapi.h \
+		sglheader.h \
+		types.h \
+		context.c context.h \
+		geometry.c geometry. h \
+		logging.c logging.h \
+		matrix.c matrix .h \
+		viewport.c viewport.h \
+		driver.h \
+		$(SRC_ROOT)/math/m_vector.c $(SRC_ROOT)/math/m_vector.h \
+		$(SRC_ROOT)/math/m_matrix.c $(SRC_ROOT)/math/m_matrix.h
 
 all: all-am
 
@@ -286,7 +296,7 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libSGL.la: $(libSGL_la_OBJECTS) $(libSGL_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libdir) $(libSGL_la_OBJECTS) $(libSGL_la_LIBADD) $(LIBS)
+	$(libSGL_la_LINK) -rpath $(libdir) $(libSGL_la_OBJECTS) $(libSGL_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

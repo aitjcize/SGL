@@ -663,6 +663,9 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
+LIBSGL_AGE
+LIBSGL_REVISION
+LIBSGL_CURRENT
 am__untar
 am__tar
 AMTAR
@@ -2684,6 +2687,15 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 
 
 ac_config_headers="$ac_config_headers config.h"
+
+
+# SGL Version
+LIBSGL_CURRENT=1
+LIBSGL_REVISION=0
+LIBSGL_AGE=0
+
+
+
 
 
 # Checks for programs.

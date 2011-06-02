@@ -70,6 +70,9 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libSGLUT_la_LIBADD =
 am_libSGLUT_la_OBJECTS = context.lo
 libSGLUT_la_OBJECTS = $(am_libSGLUT_la_OBJECTS)
+libSGLUT_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(libSGLUT_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -122,6 +125,9 @@ LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBSGL_AGE = @LIBSGL_AGE@
+LIBSGL_CURRENT = @LIBSGL_CURRENT@
+LIBSGL_REVISION = @LIBSGL_REVISION@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LIPO = @LIPO@
@@ -204,9 +210,14 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = -Wall -O2
 lib_LTLIBRARIES = libSGLUT.la
-libSGLUT_la_SOURCES = sglut_api.h \
-		      types.h \
-		      context.c context.h
+libSGLUT_la_LDFLAGS = \
+		-lX11 \
+		-version-info $(LIBSGL_CURRENT):$(LIBSGL_REVISION):$(LIBSGL_AGE)
+
+libSGLUT_la_SOURCES = \
+		sglut_api.h \
+		types.h \
+		context.c context.h
 
 all: all-am
 
@@ -274,7 +285,7 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libSGLUT.la: $(libSGLUT_la_OBJECTS) $(libSGLUT_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libdir) $(libSGLUT_la_OBJECTS) $(libSGLUT_la_LIBADD) $(LIBS)
+	$(libSGLUT_la_LINK) -rpath $(libdir) $(libSGLUT_la_OBJECTS) $(libSGLUT_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
