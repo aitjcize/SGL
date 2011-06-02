@@ -2,7 +2,7 @@
  * Matrix Math Library
  */
 
-#include "matrix.h"
+#include "m_matrix.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -394,7 +394,7 @@ void _math_matrix_scale(SGLmatrix* mat, GLfloat x, GLfloat y, GLfloat z)
 void _math_matrix_ortho(SGLmatrix* mat,
                         GLfloat left, GLfloat right,
                         GLfloat bottom, GLfloat top,
-                        GLfloat nerval, GLfloat farval)
+                        GLfloat nearval, GLfloat farval)
 {
    GLfloat m[16];
 
@@ -426,7 +426,7 @@ void _math_matrix_ortho(SGLmatrix* mat,
 void _math_matrix_frustum(SGLmatrix* mat,
                           GLfloat left, GLfloat right,
                           GLfloat bottom, GLfloat top,
-                          GLfloat nerval, GLfloat farval)
+                          GLfloat nearval, GLfloat farval)
 {
    GLfloat x, y, a, b, c, d;
    GLfloat m[16];

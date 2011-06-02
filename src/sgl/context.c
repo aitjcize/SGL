@@ -1,32 +1,19 @@
-#include "sglContext.h"
+#include "context.h"
 
-struct SGLContext _g_sgl_context;
+struct sgl_context _g_sgl_context;
 
-void sgl_context_init(struct SGLContext* sc)
+void sgl_context_init(struct sgl_context* ctx)
 {
-  sc->matrix_mode = GL_MODELVIEW;
-  _math_matrix_init(sc->matrix);
-  sc->projection_matrix_stack = NULL;
-  sc->modelview_matrix_stack = NULL;
-  sc->flags = 0;
-  sc->clientstate_flags = 0;
+  ctx->matrix_mode = GL_MODELVIEW;
+  _sgl_init_matrix_data(ctx);
+
+  ctx->flags = 0;
+  ctx->clientstate_flags = 0;
 }
 
-void sgl_context_free(struct SGLContext* sc)
+void sgl_context_free(struct sgl_context* ctx)
 {
-  _math_matrix_free(sc->matrix);
-
-  SList* current = s_list_first(sc->projection_matrix_stack);
-  while (current) {
-    _math_matrix_free((SGLmatrix*)current->data);
-    current = s_list_next(current);
-  }
-
-  current = s_list_first(sc->modelview_matrix_stack);
-  while (current) {
-    _math_matrix_free((SGLmatrix*)current->data);
-    current = s_list_next(current);
-  }
+  _sgl_free_matrix_data(ctx);
 }
 
 void glClear(GLbitfield mask)

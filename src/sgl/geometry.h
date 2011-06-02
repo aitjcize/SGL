@@ -1,7 +1,7 @@
-#ifndef __SGL_SGLGEOMETRY_H__
-#define __SGL_SGLGEOMETRY_H__
+#ifndef __SGL_GEOMETRY_H__
+#define __SGL_GEOMETRY_H__
 
-#include "sglHeaders.h"
+#include "sgl_headers.h"
 
 /* glVertex */
 extern void glVertex3s(GLshort x, GLshort y, GLshort z);
@@ -39,4 +39,4 @@ extern void glNormalPointer(GLenum type, GLsizei stride, const GLvoid *ptr);
 extern void glColorPointer(GLint size, GLenum type, GLsizei stride,
                            const GLvoid *ptr);
 
-#endif /* __SGL_SGLGEOMETRY_H__ */
+#endif /* __SGL_GEOMETRY_H__ */

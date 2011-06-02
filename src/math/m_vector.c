@@ -5,7 +5,7 @@
  *
  */
 
-#include "vector.h"
+#include "m_vector.h"
 #include "utils.h"
 
 void _sgl_vector4f_init(SGLvector4f *v, GLbitfield flags, GLfloat (*storage)[4])

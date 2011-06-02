@@ -1,5 +1,6 @@
-#include "sglContext.h"
-#include "sglGeometry.h"
+#include "geometry.h"
+
+#include "types.h"
 
 void glBegin(GLenum mode)
 {

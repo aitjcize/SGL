@@ -2,8 +2,8 @@
  * SList: double linked list
  */
 
-#include "list.h"
-#include "misc.h"
+#include "u_list.h"
+#include "u_misc.h"
 
 #include <stdlib.h>
 #include <string.h>

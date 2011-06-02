@@ -1,4 +1,4 @@
-#include "sglut.h"
+#include "glut.h"
 #include "utils.h"
 
 #include <stdio.h>

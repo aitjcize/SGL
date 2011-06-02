@@ -575,7 +575,7 @@ PACKAGE_STRING='SimpleGL 0.1.0'
 PACKAGE_BUGREPORT='aitjcize@gmail.com'
 PACKAGE_URL=''
 
-ac_unique_file="src/math/matrix.c"
+ac_unique_file="src/math/m_matrix.c"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>

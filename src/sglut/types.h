@@ -1,5 +1,5 @@
-#ifndef __SGLUT_SGLUTCONTEXT_H__
-#define __SGLUT_SGLUTCONTEXT_H__
+#ifndef __SGLUT_SGLUTTYPES_H__
+#define __SGLUT_SGLUTTYPES_H__
 
 #include <stdlib.h>
 #include <string.h>
@@ -15,7 +15,7 @@
 #define GLUT_DOUBLE   (1 << 4)
 #define GLUT_DEPTH    (1 << 4)
 
-struct SGLUTContext {
+struct sglut_context {
   /* XLib Related */
   Display* display;
   Window window;
@@ -42,30 +42,4 @@ struct SGLUTContext {
   int flags;
 };
 
-extern void glutSetRenderApp(void (*func)(char* framebuffer));
-
-extern void glutInit(int* argc, char** argv);
-
-extern void glutInitWindowSize(int width, int height);
-
-extern void glutInitWindowPosition(int x, int y);
-
-extern void glutInitDisplayMode(unsigned int mode);
-
-extern void glutCreateWindow(char* name);
-
-extern void glutSetWindowTitle(char* name);
-
-extern void glutSwapBuffers(void);
-
-extern void glutDisplayFunc(void (*func)(void));
-
-extern void glutKeyboardFunc(void (*func)(unsigned char key, int x, int y));
-
-extern void glutMouseFunc(void (*func)(int button, int state, int x, int y));
-
-extern void glutMotionFunc(void (*func)(int x, int y));
-
-extern void glutMainLoop(void);
-
-#endif /* __SGLUT_SGLUTCONTEXT_H__ */
+#endif /* __SGLUT_SGLUTTYPES_H__ */

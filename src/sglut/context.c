@@ -1,11 +1,11 @@
-#include "sglutContext.h"
+#include "context.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "sglutApi.h"
+#include "sglut_api.h"
 
-struct SGLUTContext _g_sglut_context;
+struct sglut_context _g_sglut_context;
 
 void _glutRenderFromApp(void)
 {

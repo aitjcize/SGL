@@ -5,7 +5,7 @@
 #ifndef __SGL_MATH_MATRIX_H__
 #define __SGL_MATH_MATRIX_H__
 
-#include "sglHeaders.h"
+#include "sgl_headers.h"
 
 enum SGLmatrixtype {
   MATRIX_GENERAL,
@@ -67,12 +67,12 @@ extern void _math_matrix_scale(SGLmatrix* self, GLfloat x, GLfloat y,
 extern void _math_matrix_ortho(SGLmatrix* self,
                                GLfloat left, GLfloat right,
                                GLfloat bottom, GLfloat top,
-                               GLfloat nerval, GLfloat farval);
+                               GLfloat nearval, GLfloat farval);
 
 extern void _math_matrix_frustum(SGLmatrix* self,
                                  GLfloat left, GLfloat right,
                                  GLfloat bottom, GLfloat top,
-                                 GLfloat nerval, GLfloat farval);
+                                 GLfloat nearval, GLfloat farval);
 
 extern void _math_matrix_set_identity(SGLmatrix* self);
 

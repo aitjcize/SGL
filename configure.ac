@@ -5,7 +5,7 @@ AC_PREREQ([2.68])
 AC_INIT([SimpleGL], [0.1.0], [aitjcize@gmail.com])
 AC_CONFIG_AUX_DIR([autotools])
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
-AC_CONFIG_SRCDIR([src/math/matrix.c])
+AC_CONFIG_SRCDIR([src/math/m_matrix.c])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.

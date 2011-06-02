@@ -1,10 +1,12 @@
 SRC_ROOT = ..
 AM_CFLAGS = -I$(SRC_ROOT)
 lib_LTLIBRARIES = libSGL.la
-libSGL_la_SOURCES = sglContext.c sglContext.h \
-		    sglMatrix.c sglMatrix .h \
-		    sglGeometry.c sglGeometry. h \
-		    $(SRC_ROOT)/math/vector.c $(SRC_ROOT)/math/vector.h \
-		    $(SRC_ROOT)/math/matrix.c $(SRC_ROOT)/math/matrix.h \
-		    $(SRC_ROOT)/utils/list.c $(SRC_ROOT)/utils/list.h \
-		    $(SRC_ROOT)/utils/misc.h
+libSGL_la_SOURCES = sgl_headers.h \
+		    sgl_api.h \
+		    types.h \
+		    logging.c logging.h \
+		    context.c context.h \
+		    matrix.c matrix .h \
+		    geometry.c geometry. h \
+		    $(SRC_ROOT)/math/m_vector.c $(SRC_ROOT)/math/m_vector.h \
+		    $(SRC_ROOT)/math/m_matrix.c $(SRC_ROOT)/math/m_matrix.h

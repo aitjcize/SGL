@@ -1,7 +1,11 @@
-#ifndef __SGL_SGLMATRIX_H__
-#define __SGL_SGLMATRIX_H__
+#ifndef __SGL_MATRIX_H__
+#define __SGL_MATRIX_H__
 
-#include "sglHeaders.h"
+#include "sgl_headers.h"
+
+extern void _sgl_init_matrix(struct sgl_context* ctx);
+
+extern void _sgl_free_matrix_data(struct sgl_context* ctx);
 
 extern void glMatrixMode(GLenum mode);
 
@@ -21,4 +25,4 @@ extern void glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z);
 
 extern void glScalef(GLfloat x, GLfloat y, GLfloat z);
 
-#endif /* __SGL_SGLMATRIX_H__ */
+#endif /* __SGL_MATRIX_H__ */
