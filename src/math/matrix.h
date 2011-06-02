@@ -13,13 +13,13 @@ enum SGLmatrixtype {
 };
 
 /*
- * @brief matirx structure
+ * @brief matirx element layout
  * 
  * m:
- *     0  1  2  3
- *     4  5  6  7
- *     8  9  10 11
- *     12 13 14 15
+ *     0  4  8  12
+ *     1  5  9  13
+ *     2  6  10 14
+ *     3  7  11 15
  */
 
 typedef struct _SGLmatrix SGLmatrix;
@@ -49,29 +49,30 @@ extern void _math_matrix_free(SGLmatrix* m);
 extern void _math_matrix_alloc_inv(SGLmatrix* m);
 
 extern void _math_matrix_mul_matrix(SGLmatrix* product, const SGLmatrix* a,
-                                   const SGLmatrix* b);
+                                    const SGLmatrix* b);
 
 extern void _math_matrix_mul_floats(SGLmatrix* product, const GLfloat* b);
 
 extern void _math_matrix_loadf(SGLmatrix* self, const GLfloat* m);
 
 extern void _math_matrix_translate(SGLmatrix* mat, GLfloat x, GLfloat y,
-                                  GLfloat z);
+                                   GLfloat z);
 
 extern void _math_matrix_rotate(SGLmatrix* self, GLfloat angle, GLfloat x,
-                               GLfloat y, GLfloat z);
+                                GLfloat y, GLfloat z);
 
-extern void _math_matrix_scale(SGLmatrix* self, GLfloat x, GLfloat y, GLfloat z);
+extern void _math_matrix_scale(SGLmatrix* self, GLfloat x, GLfloat y,
+                               GLfloat z);
 
 extern void _math_matrix_ortho(SGLmatrix* self,
-                              GLfloat left, GLfloat right,
-                              GLfloat bottom, GLfloat top,
-                              GLfloat nerval, GLfloat farval);
+                               GLfloat left, GLfloat right,
+                               GLfloat bottom, GLfloat top,
+                               GLfloat nerval, GLfloat farval);
 
 extern void _math_matrix_frustum(SGLmatrix* self,
-                                GLfloat left, GLfloat right,
-                                GLfloat bottom, GLfloat top,
-                                GLfloat nerval, GLfloat farval);
+                                 GLfloat left, GLfloat right,
+                                 GLfloat bottom, GLfloat top,
+                                 GLfloat nerval, GLfloat farval);
 
 extern void _math_matrix_set_identity(SGLmatrix* self);
 

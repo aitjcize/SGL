@@ -37,14 +37,14 @@ void glutSetRenderApp(void (*func)(char* framebuffer))
   ctx->renderApp = func;
 }
 
-void glutInit(int argc, char* argv[])
+void glutInit(int* argc, char** argv)
 {
   GET_CURRENT_CONTEXT(ctx);
   ctx->display = XOpenDisplay(NULL);
   ctx->flags = 0;
 
   int i = 0;
-  for (i = 1; i < argc; ++i)
+  for (i = 1; i < *argc; ++i)
     if (strcmp(argv[i], "-d") == 0)
       ctx->flags |= GLUT_DEBUG;
 

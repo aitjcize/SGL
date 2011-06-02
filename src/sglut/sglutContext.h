@@ -44,7 +44,7 @@ struct SGLUTContext {
 
 extern void glutSetRenderApp(void (*func)(char* framebuffer));
 
-extern void glutInit(int argc, char* argv[]);
+extern void glutInit(int* argc, char** argv);
 
 extern void glutInitWindowSize(int width, int height);
 

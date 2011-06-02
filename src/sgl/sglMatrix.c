@@ -28,8 +28,11 @@ void glPushMatrix(void)
 void glPopMatrix(void)
 {
   GET_CURRENT_CONTEXT(ctx);
-  SList* last = s_list_remove_link(*(ctx->current_stack),
-                                   s_list_last(*(ctx->current_stack)));
+  SList* last = s_list_last(*(ctx->current_stack));
+  s_list_remove_link(*(ctx->current_stack), last);
+  _math_matrix_free((SGLmatrix*)last->data);
+
+  last = s_list_last(*(ctx->current_stack));
   ctx->matrix = (SGLmatrix*)last->data;
 }
 
