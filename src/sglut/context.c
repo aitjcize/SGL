@@ -101,10 +101,10 @@ void glutCreateWindow(char* name)
   int blackColor = BlackPixel(ctx->display, DefaultScreen(ctx->display));
 
   ctx->window = XCreateSimpleWindow(ctx->display,
-                                       DefaultRootWindow(ctx->display),
-                                       ctx->win_x, ctx->win_y,
-                                       ctx->win_width, ctx->win_height,
-                                       0, blackColor, blackColor);
+                                    DefaultRootWindow(ctx->display),
+                                    ctx->win_x, ctx->win_y,
+                                    ctx->win_width, ctx->win_height,
+                                    0, blackColor, blackColor);
 
   // register interest in the delete window message
   Atom wmDeleteMessage = XInternAtom(ctx->display, "WM_DELETE_WINDOW",False);

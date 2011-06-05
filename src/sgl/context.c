@@ -1,4 +1,7 @@
 #include "context.h"
+
+#include "depth.h"
+#include "framebuffer.h"
 #include "matrix.h"
 
 struct sgl_context _g_sgl_context;
@@ -7,6 +10,8 @@ void sgl_context_init(struct sgl_context* ctx)
 {
   ctx->matrix_mode = GL_MODELVIEW;
   _sgl_init_matrix(ctx);
+  _sgl_init_depth(ctx);
+  _sgl_init_framebuffer(ctx);
 
   ctx->flags = 0;
   ctx->clientstate_flags = 0;
@@ -15,6 +20,7 @@ void sgl_context_init(struct sgl_context* ctx)
 void sgl_context_free(struct sgl_context* ctx)
 {
   _sgl_free_matrix_data(ctx);
+  _sgl_free_framebuffer_data(ctx);
 }
 
 void glClear(GLbitfield mask)

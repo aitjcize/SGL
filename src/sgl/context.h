@@ -17,8 +17,8 @@
 #define FLUSH_VERTICES(ctx, newstate)				\
 do {								\
 } while (0)
-/*   if (ctx->driver.needflush & FLUSH_STORED_VERTICES)		\
-       ctx->driver.flushvertices(ctx, FLUSH_STORED_VERTICES);	\*/
+/*   if (ctx->render_state.needflush & FLUSH_STORED_VERTICES)		\
+       ctx->render_state.flushvertices(ctx, FLUSH_STORED_VERTICES);	\*/
 
 /*
  * @brief Macro to assert that the API call was made outside the
@@ -27,12 +27,12 @@ do {								\
  * @para ctx GL context.
  * @return value to return value in case the assertion fails.
  */
-#define ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, retval)               \
-do {                                                                    \
-  if (ctx->driver.current_exec_primitive != PRIM_OUTSIDE_BEGIN_END) {   \
-    _sgl_error(ctx, GL_INVALID_OPERATION, "Inside glBegin/glEnd");     \
-    return retval;                                                      \
-  }                                                                     \
+#define ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, retval)                   \
+do {                                                                        \
+  if (ctx->render_state.current_exec_primitive != PRIM_OUTSIDE_BEGIN_END) { \
+    _sgl_error(ctx, GL_INVALID_OPERATION, "Inside glBegin/glEnd");          \
+    return retval;                                                          \
+  }                                                                         \
 } while(0)
 
 /*
@@ -41,12 +41,12 @@ do {                                                                    \
  *
  * @param ctx GL context.
  */
-#define ASSERT_OUTSIDE_BEGIN_END(ctx)                                   \
-do {                                                                    \
-  if (ctx->driver.current_exec_primitive != PRIM_OUTSIDE_BEGIN_END) {   \
-    _sgl_error(ctx, GL_INVALID_OPERATION, "Inside glBegin/glEnd");     \
-    return;                                                             \
-  }                                                                     \
+#define ASSERT_OUTSIDE_BEGIN_END(ctx)                                       \
+do {                                                                        \
+  if (ctx->render_state.current_exec_primitive != PRIM_OUTSIDE_BEGIN_END) { \
+    _sgl_error(ctx, GL_INVALID_OPERATION, "Inside glBegin/glEnd");          \
+    return;                                                                 \
+  }                                                                         \
 } while(0)
 
 /*

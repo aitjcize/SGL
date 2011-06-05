@@ -14,6 +14,8 @@ libSGL_la_SOURCES = \
 		logging.c logging.h \
 		matrix.c matrix .h \
 		viewport.c viewport.h \
-		driver.h \
+		depth.c depth.h \
+		framebuffer.c framebuffer.h \
+		renderbuffer.c renderbuffer.h \
 		$(SRC_ROOT)/math/m_vector.c $(SRC_ROOT)/math/m_vector.h \
 		$(SRC_ROOT)/math/m_matrix.c $(SRC_ROOT)/math/m_matrix.h

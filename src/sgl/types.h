@@ -3,9 +3,25 @@
 
 #include "sglheader.h"
 #include "config.h"
-#include "driver.h"
 #include "math/m_matrix.h"
 #include "math/m_vector.h"
+
+#define PRIM_OUTSIDE_BEGIN_END   (GL_POLYGON+1)
+#define PRIM_INSIDE_UNKNOW_PRIM  (GL_POLYGON+2)
+#define PRIM_UNKNOWN             (GL_POLYGON+3)
+
+struct sgl_buffer_attrib
+{
+  GLuint width, height;
+  GLuint type;
+};
+
+struct sgl_renderbuffer
+{
+  GLuint width, height;     /* Geometry of buffer */
+  GLuint type;              /* storage type */
+  GLvoid* data;             /* Buffer data */
+};
 
 struct sgl_framebuffer
 {
@@ -13,6 +29,10 @@ struct sgl_framebuffer
 
   GLuint width, height;
   GLfloat depth_max;
+
+  /* Buffers */
+  struct sgl_renderbuffer color_buffer;
+  struct sgl_renderbuffer depth_buffer;
 };
 
 struct sgl_matrix_stack
@@ -37,6 +57,13 @@ struct sgl_viewport_attrib
   GLsizei width, height;    /* dimenssion */
   GLfloat near, far;        /* near, far value */
   SGLmatrix window_map;     /* Mapping transformation as a matrix */
+};
+
+struct sgl_render_state
+{
+#define FLUSH_STORED_VERTICES 0x1
+  GLint current_exec_primitive;
+  GLint needflush;
 };
 
 struct sgl_context
@@ -65,10 +92,12 @@ struct sgl_context
   SGLvector4f color_pointer;
 
   /* Attributes */
+  struct sgl_buffer_attrib buffer;
   struct sgl_viewport_attrib viewport;
+  struct sgl_depthbuffer_attrib depth;
 
-  /* Virtual driver function pointer table */
-  struct sgl_virtual_dirver_table driver;
+  /* States */
+  struct sgl_render_state render_state;
 
   /* Flags */
   GLenum flags;

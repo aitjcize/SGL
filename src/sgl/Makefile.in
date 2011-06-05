@@ -69,7 +69,8 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libSGL_la_LIBADD =
 am_libSGL_la_OBJECTS = context.lo geometry.lo logging.lo matrix.lo \
-	viewport.lo m_vector.lo m_matrix.lo
+	viewport.lo depth.lo framebuffer.lo renderbuffer.lo \
+	m_vector.lo m_matrix.lo
 libSGL_la_OBJECTS = $(am_libSGL_la_OBJECTS)
 libSGL_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -226,7 +227,9 @@ libSGL_la_SOURCES = \
 		logging.c logging.h \
 		matrix.c matrix .h \
 		viewport.c viewport.h \
-		driver.h \
+		depth.c depth.h \
+		framebuffer.c framebuffer.h \
+		renderbuffer.c renderbuffer.h \
 		$(SRC_ROOT)/math/m_vector.c $(SRC_ROOT)/math/m_vector.h \
 		$(SRC_ROOT)/math/m_matrix.c $(SRC_ROOT)/math/m_matrix.h
 
@@ -305,11 +308,14 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/context.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/depth.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/framebuffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geometry.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logging.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_matrix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/matrix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/renderbuffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/viewport.Plo@am__quote@
 
 .c.o:
