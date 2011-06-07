@@ -1,1 +1,1 @@
-SUBDIRS = sgl sglut
+SUBDIRS = sgl sglu sglut

@@ -11430,7 +11430,7 @@ fi
 done
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/sgl/Makefile src/sglut/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/sgl/Makefile src/sglu/Makefile src/sglut/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -12445,6 +12445,7 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/sgl/Makefile") CONFIG_FILES="$CONFIG_FILES src/sgl/Makefile" ;;
+    "src/sglu/Makefile") CONFIG_FILES="$CONFIG_FILES src/sglu/Makefile" ;;
     "src/sglut/Makefile") CONFIG_FILES="$CONFIG_FILES src/sglut/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
