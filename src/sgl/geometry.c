@@ -1,6 +1,7 @@
 #include "geometry.h"
 
 #include "context.h"
+#include "logging.h"
 #include "macros.h"
 #include "pipeline.h"
 #include "math/m_vector.h"
@@ -23,6 +24,15 @@ void _vector_transform(SGLmatrix* mat, GLfloat* vec) {
 void glBegin(GLenum mode)
 {
   GET_CURRENT_CONTEXT(ctx);
+
+  if (mode != GL_POINTS &&
+      mode != GL_LINES &&
+      mode != GL_TRIANGLES &&
+      mode != GL_QUADS) {
+    _sgl_error(ctx, GL_INVALID_ENUM, "glBegin(): Invalid mode\n");
+    return;
+  }
+
   ctx->render_state.current_exec_primitive = mode;
   _math_matrix_mul_matrix(&ctx->model_projection_matrix,
                           &ctx->viewport.window_map,

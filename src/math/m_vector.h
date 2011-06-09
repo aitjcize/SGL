@@ -56,6 +56,12 @@ extern void _math_vector4f_alloc_double(SGLvector4f *v);
 extern void _math_vector4f_free(SGLvector4f* v);
 
 /*
+ * @brief lazy free
+ * @param v points to a SGLvector4f
+ */
+extern void _math_vector4f_lazy_free(SGLvector4f* v);
+
+/*
  * @brief push a vector into a SGLvector4f
  * @param v points to a SGLvector4f
  * @param data point to a vector

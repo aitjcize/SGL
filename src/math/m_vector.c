@@ -16,6 +16,7 @@ void _math_vector4f_init(SGLvector4f *v, GLbitfield flags,
   v->data = storage;
   v->start = (GLfloat*) storage;
   v->count = 0;
+  v->flags = flags;
 }
 
 void _math_vector4f_alloc(SGLvector4f *v, GLbitfield flags, GLuint count)
@@ -52,6 +53,15 @@ void _math_vector4f_free(SGLvector4f* v)
     v->start = NULL;
     v->storage = NULL;
     v->flags &= ~VEC_MALLOC;
+  }
+}
+
+void _math_vector4f_lazy_free(SGLvector4f* v)
+{
+  if (v->flags & VEC_MALLOC) {
+    v->start = (GLfloat *) v->storage;
+    v->data = (GLfloat (*)[4]) v->storage;
+    v->count = 0;
   }
 }
 

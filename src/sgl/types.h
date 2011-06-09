@@ -33,6 +33,7 @@ struct sgl_framebuffer
 
   /* Buffers */
   struct sgl_renderbuffer final_buffer;
+  struct sgl_renderbuffer clear_color_buffer;
 
   struct sgl_renderbuffer t_color_buffer;
   struct sgl_renderbuffer t_normal_buffer;
@@ -98,7 +99,7 @@ struct sgl_pipeline
 struct sgl_context
 {
   /* Context */
-  GLclampf clear_color[4];
+  GLuint clear_color;
 
   /* Framebuffers */
   struct sgl_framebuffer* drawbuffer;
@@ -117,6 +118,7 @@ struct sgl_context
   SGLvector4f vector_point;
   SGLvector4f vector_normal;
   SGLvector4f vector_color;
+  SGLvector4f flood_fill;
 
   /* Geometry Pointers */
   SGLvector4f vertex_pointer;

@@ -14,7 +14,7 @@ static double g_radius = 5;
 
 void init(void)
 {
-  glClearColor (0.0, 0.0, 0.0, 0.0);
+  glClearColor (0.0, 0.0, 0.0, 1.0);
   //glShadeModel (GL_FLAT);
 }
 
@@ -82,7 +82,6 @@ void draw_sphere(GLdouble radius, GLint slices, GLint stacks)
 
   create_sphere(radius, &p_vertices, &p_indices, NULL, slices, stacks);
   glVertexPointer(3, GL_DOUBLE, 0, p_vertices); 
-  //glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE );
   //glDrawElements(GL_QUADS, DIV * DIV * 4, GL_UNSIGNED_SHORT, p_indices);
 
   int i = 0, j = 0;
@@ -105,20 +104,21 @@ void display(void)
   glOrtho (-2.0, 2.0, -2.0, 2.0, 0.0, 20.0);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity();
-  glColor3f (1.0, 1.0, 1.0);
   gluLookAt (0.0, 0.0, g_radius, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
   glScalef (1.0, 1.0, 1.0);
   glRotatef(g_phi, 0.0, 1.0, 0.0);
   glRotatef(g_theta, cos(RAD(g_phi)), 0.0, -sin(RAD(g_phi)));
 
-  //glBegin(GL_QUADS);
-  //  glVertex3f(1, 1, 0);
-  //  glVertex3f(1, -1, 0);
-  //  glVertex3f(-1, -1, 0);
-  //  glVertex3f(-1, 1, 0);
-  //glEnd();
-  draw_sphere(2.0, DIV, DIV);
+  glColor3f (0.0, 0.0, 1.0);
+  //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+  glBegin(GL_QUADS);
+    glVertex3f(1, 1, 0);
+    glVertex3f(1, -1, 0);
+    glVertex3f(-1, -1, 0);
+    glVertex3f(-1, 1, 0);
+  glEnd();
+  //draw_sphere(1.0, DIV, DIV);
 
   glutSwapBuffers();
 }
@@ -133,7 +133,7 @@ void reshape (int w, int h)
 
 void mouse(int button, int state, int x, int y)
 {
-  g_radius += (button == 4) * 0.5 - (button == 3) * 0.5;
+  g_radius += (button == 4) * 0.5 - (button == 5) * 0.5;
   glutPostRedisplay();
 }
 
