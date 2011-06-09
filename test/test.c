@@ -110,7 +110,7 @@ void display(void)
 
   glScalef (1.0, 1.0, 1.0);
   glRotatef(g_phi, 0.0, 1.0, 0.0);
-  glRotatef(g_theta, -cos(RAD(g_phi)), 0.0, sin(RAD(g_phi)));
+  glRotatef(g_theta, cos(RAD(g_phi)), 0.0, -sin(RAD(g_phi)));
 
   //glBegin(GL_QUADS);
   //  glVertex3f(1, 1, 0);
