@@ -38,6 +38,8 @@ extern void glutMouseFunc(void (*func)(int button, int state, int x, int y));
 
 extern void glutMotionFunc(void (*func)(int x, int y));
 
+extern void glutPassiveMotionFunc(void (*func)(int x, int y));
+
 extern void glutMainLoop(void);
 
 #ifdef __cplusplus

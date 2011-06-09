@@ -60,6 +60,7 @@ void glutInit(int* argc, char** argv)
   ctx->displayFunc = NULL;
   ctx->mouseFunc = NULL;
   ctx->motionFunc = NULL;
+  ctx->passiveMotionFunc = NULL;
   ctx->keyboardFunc = NULL;
   ctx->redisplay = 0;
 
@@ -132,7 +133,8 @@ void glutCreateWindow(char* name)
                ExposureMask |
                KeyPressMask |
                ButtonPressMask |
-               ButtonMotionMask);
+               ButtonMotionMask |
+               PointerMotionMask);
 
   XMapWindow(ctx->display, ctx->window);
   XStoreName(ctx->display, ctx->window, name);
@@ -184,6 +186,12 @@ void glutMotionFunc(void (*func)(int x, int y))
   ctx->motionFunc = func;
 }
 
+void glutPassiveMotionFunc(void (*func)(int x, int y))
+{
+  GET_SGLUT_CONTEXT(ctx);
+  ctx->passiveMotionFunc = func;
+}
+
 void glutMainLoop(void)
 {
   GET_SGLUT_CONTEXT(ctx);
@@ -203,29 +211,41 @@ void glutMainLoop(void)
       break;
 
     case KeyPress:
-      if (ctx->keyboardFunc)
+      if (ctx->keyboardFunc) {
         ctx->keyboardFunc(event.xkey.keycode, event.xkey.x, event.xkey.y);
-      if (GLUT_ENABLED(GLUT_DEBUG))
-        fprintf(stderr, "**SGLUT** KeyPressEvent: (%d, %d, %d)\n",
-                event.xkey.keycode, event.xkey.x, event.xkey.y);
+        if (GLUT_ENABLED(GLUT_DEBUG))
+          fprintf(stderr, "**SGLUT** KeyPressEvent: (%d, %d, %d)\n",
+              event.xkey.keycode, event.xkey.x, event.xkey.y);
+      }
       break;
 
     case ButtonPress:
-      if (ctx->keyboardFunc)
+      if (ctx->mouseFunc) {
         ctx->mouseFunc(event.xbutton.button, event.xbutton.state,
-                          event.xbutton.x, event.xbutton.y);
-      if (GLUT_ENABLED(GLUT_DEBUG))
-        fprintf(stderr, "**SGLUT** ButtonPressEvent: (%d, %d, %d, %d)\n",
-                event.xbutton.button, event.xbutton.state,
-                event.xbutton.x, event.xbutton.y);
+            event.xbutton.x, event.xbutton.y);
+        if (GLUT_ENABLED(GLUT_DEBUG))
+          fprintf(stderr, "**SGLUT** ButtonPressEvent: (%d, %d, %d, %d)\n",
+              event.xbutton.button, event.xbutton.state,
+              event.xbutton.x, event.xbutton.y);
+      }
       break;
 
     case MotionNotify:
-      if (ctx->motionFunc)
-        ctx->motionFunc(event.xbutton.x, event.xbutton.y);
-      if (GLUT_ENABLED(GLUT_DEBUG))
-        fprintf(stderr, "**SGLUT** MotionNotifyEvent: (%d, %d)\n",
+      if (event.xmotion.state) {
+        if (ctx->motionFunc) {
+          ctx->motionFunc(event.xbutton.x, event.xbutton.y);
+          if (GLUT_ENABLED(GLUT_DEBUG))
+            fprintf(stderr, "**SGLUT** MotionNotifyEvent: (%d, %d)\n",
                 event.xbutton.x, event.xbutton.y);
+        }
+      } else {
+        if (ctx->passiveMotionFunc) {
+          ctx->passiveMotionFunc(event.xbutton.x, event.xbutton.y);
+          if (GLUT_ENABLED(GLUT_DEBUG))
+            fprintf(stderr, "**SGLUT** MotionNotifyEvent(Passive): (%d, %d)\n",
+                event.xbutton.x, event.xbutton.y);
+        }
+      }
       break;
     }
 

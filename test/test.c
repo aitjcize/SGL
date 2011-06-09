@@ -137,18 +137,30 @@ void mouse(int button, int state, int x, int y)
   glutPostRedisplay();
 }
 
-void motion(int x, int y)
+void _motion(int x, int y, int state)
 {
   static int prev_x = 0, prev_y = 0;
 
-  if (prev_x && prev_y) {
+  if (state && prev_x && prev_y) {
     g_phi += (x - prev_x) * 0.5;
     g_theta += (y - prev_y) * 0.5;
   }
 
   prev_x = x;
   prev_y = y;
-  glutPostRedisplay();
+
+  if (state)
+    glutPostRedisplay();
+}
+
+void motion(int x, int y)
+{
+  _motion(x, y, 1);
+}
+
+void passive(int x, int y)
+{
+  _motion(x, y, 0);
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -173,6 +185,7 @@ int main(int argc, char** argv)
   //glutReshapeFunc(reshape);
   glutMouseFunc(mouse);
   glutMotionFunc(motion);
+  glutPassiveMotionFunc(passive);
   glutKeyboardFunc(keyboard);
   glutMainLoop();
   return 0;

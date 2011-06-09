@@ -37,6 +37,7 @@ struct sglut_context
   void (*displayFunc)(void);
   void (*mouseFunc)(int button, int state, int x, int y);
   void (*motionFunc)(int x, int y);
+  void (*passiveMotionFunc)(int x, int y);
   void (*keyboardFunc)(unsigned char key, int x, int y);
 
   /* Misc */
