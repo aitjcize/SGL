@@ -75,6 +75,8 @@ extern GLboolean _math_vector4f_push_back(SGLvector4f* v, GLfloat* data,
 extern GLboolean _math_vector4f_pop_back(SGLvector4f* v, GLfloat* data,
                                          GLuint size);
 
+extern GLboolean _math_vector4f_empty(SGLvector4f* v);
+
 extern void _math_vector4f_print(SGLvector4f* v);
 
 /*

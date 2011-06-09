@@ -16,11 +16,11 @@ extern void glLoadIdentity(void);
 
 extern void glFrustum(GLdouble left, GLdouble right,
                       GLdouble bottom, GLdouble top,
-                      GLdouble near_val, GLdouble far_val);
+                      GLdouble nearval, GLdouble farval);
 
 extern void glOrtho(GLdouble left, GLdouble right,
                     GLdouble bottom, GLdouble top,
-                    GLdouble near_val, GLdouble far_val);
+                    GLdouble nearval, GLdouble farval);
 
 extern void glMultMatrixd(const GLdouble* m);
 extern void glMultMatrixf(const GLfloat* m);

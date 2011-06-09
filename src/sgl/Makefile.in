@@ -70,7 +70,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libSGL_la_LIBADD =
 am_libSGL_la_OBJECTS = context.lo geometry.lo logging.lo matrix.lo \
 	viewport.lo depth.lo framebuffer.lo renderbuffer.lo \
-	m_vector.lo m_matrix.lo
+	pipeline.lo rasterize.lo m_vector.lo m_matrix.lo
 libSGL_la_OBJECTS = $(am_libSGL_la_OBJECTS)
 libSGL_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -211,9 +211,10 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SRC_ROOT = ..
-AM_CFLAGS = -I$(SRC_ROOT) -Wall -O2
+AM_CFLAGS = -I$(SRC_ROOT) -Wall -O2 -g
 lib_LTLIBRARIES = libSGL.la
 libSGL_la_LDFLAGS = \
+		-lm \
 		-version-info $(LIBSGL_CURRENT):$(LIBSGL_REVISION):$(LIBSGL_AGE)
 
 libSGL_la_SOURCES = \
@@ -230,6 +231,8 @@ libSGL_la_SOURCES = \
 		depth.c depth.h \
 		framebuffer.c framebuffer.h \
 		renderbuffer.c renderbuffer.h \
+		pipeline.c pipeline.h \
+		rasterize.c rasterize.h \
 		$(SRC_ROOT)/math/m_vector.c $(SRC_ROOT)/math/m_vector.h \
 		$(SRC_ROOT)/math/m_matrix.c $(SRC_ROOT)/math/m_matrix.h
 
@@ -315,6 +318,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_matrix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/matrix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pipeline.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rasterize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/renderbuffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/viewport.Plo@am__quote@
 

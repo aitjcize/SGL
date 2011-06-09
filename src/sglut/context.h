@@ -19,6 +19,8 @@ extern void glutSetWindowTitle(char* name);
 
 extern void glutSwapBuffers(void);
 
+extern void glutPostRedisplay(void);
+
 extern void glutDisplayFunc(void (*func)(void));
 
 extern void glutKeyboardFunc(void (*func)(unsigned char key, int x, int y));

@@ -3,6 +3,7 @@
 
 #include "sglheader.h"
 #include "config.h"
+#include "pipeline.h"
 #include "math/m_matrix.h"
 #include "math/m_vector.h"
 
@@ -18,9 +19,9 @@ struct sgl_buffer_attrib
 
 struct sgl_renderbuffer
 {
-  GLuint width, height;     /* Geometry of buffer */
-  GLuint type;              /* storage type */
-  GLvoid* data;             /* Buffer data */
+  GLuint width, height;     /* Dimemsion */
+  GLuint type;              /* Storage type */
+  GLchar* data;            /* Buffer data */
 };
 
 struct sgl_framebuffer
@@ -31,7 +32,14 @@ struct sgl_framebuffer
   GLfloat depth_max;
 
   /* Buffers */
+  struct sgl_renderbuffer final_buffer;
+
+  struct sgl_renderbuffer t_color_buffer;
+  struct sgl_renderbuffer t_normal_buffer;
+  struct sgl_renderbuffer t_depth_buffer;
+
   struct sgl_renderbuffer color_buffer;
+  struct sgl_renderbuffer normal_buffer;
   struct sgl_renderbuffer depth_buffer;
 };
 
@@ -59,11 +67,32 @@ struct sgl_viewport_attrib
   SGLmatrix window_map;     /* Mapping transformation as a matrix */
 };
 
+struct sgl_primitive_attrib
+{
+  GLfloat color[4];
+  GLfloat normal[4];
+};
+
+struct sgl_polygon_attrib
+{
+  GLint front;
+  GLint back;
+};
+
 struct sgl_render_state
 {
 #define FLUSH_STORED_VERTICES 0x1
   GLint current_exec_primitive;
   GLint needflush;
+};
+
+struct sgl_pipeline
+{
+  void (*primitive_assembly)(void);
+  void (*vertex_shader)(void);
+  void (*rasterize)(void);
+  void (*fragment_shader)(void);
+  void (*zbuffer_test)(void);
 };
 
 struct sgl_context
@@ -73,6 +102,9 @@ struct sgl_context
 
   /* Framebuffers */
   struct sgl_framebuffer* drawbuffer;
+
+  /* Pipeline */
+  struct sgl_pipeline pipeline;
 
   /* Matrix */
   GLint matrix_mode;
@@ -95,6 +127,8 @@ struct sgl_context
   struct sgl_buffer_attrib buffer;
   struct sgl_viewport_attrib viewport;
   struct sgl_depthbuffer_attrib depth;
+  struct sgl_primitive_attrib primitive;
+  struct sgl_polygon_attrib polygon;
 
   /* States */
   struct sgl_render_state render_state;

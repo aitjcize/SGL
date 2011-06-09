@@ -1,5 +1,5 @@
 all:
-	$(CC) utils.c context.c test.c -o test -lX11 -g
+	$(CC) utils.c context.c test.c -o test -lX11 -g -I../sgl
 
 clean:
 	rm -f test

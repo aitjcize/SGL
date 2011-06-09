@@ -36,7 +36,7 @@ void gluLookAt(GLdouble eyex, GLdouble eyey, GLdouble eyez,
                GLdouble upx,  GLdouble upy,  GLdouble upz)
 {
     float forward[3], side[3], up[3];
-    GLfloat m[16];
+    GLfloat m[4][4];
 
     forward[0] = cenx - eyex;
     forward[1] = ceny - eyey;
@@ -54,21 +54,21 @@ void gluLookAt(GLdouble eyex, GLdouble eyey, GLdouble eyez,
     cross(side, forward, up);
     
     /* get M metrix */
-    _sglu_set_identitiy(m);
+    _sglu_set_identitiy(&m[0][0]);
 
-    m[0] = side[0];
-    m[1] = side[1];
-    m[2] = side[2];    
+    m[0][0] = side[0];
+    m[1][0] = side[1];
+    m[2][0] = side[2];
 
-    m[4] = up[0];
-    m[5] = up[1];
-    m[6] = up[2];
+    m[0][1] = up[0];
+    m[1][1] = up[1];
+    m[2][1] = up[2];
 
-    m[8] = -forward[0];
-    m[9] = -forward[1];
-    m[10]= -forward[2];
+    m[0][2] = -forward[0];
+    m[1][2] = -forward[1];
+    m[2][2] = -forward[2];
 
-    glMultMatrixf(m);
+    glMultMatrixf(&m[0][0]);
     glTranslated(-eyex, -eyey, -eyez);
 }
 

@@ -5,6 +5,13 @@
 extern "C" {
 #endif
 
+#define GLUT_DEBUG                          (1 << 31)
+#define  GLUT_RGB                           0x0000
+#define  GLUT_RGBA                          0x0000
+#define  GLUT_SINGLE                        0x0000
+#define  GLUT_DOUBLE                        0x0002
+#define  GLUT_DEPTH                         0x0010
+
 extern void glutSetRenderApp(void (*func)(char* framebuffer));
 
 extern void glutInit(int* argc, char** argv);
@@ -20,6 +27,8 @@ extern void glutCreateWindow(char* name);
 extern void glutSetWindowTitle(char* name);
 
 extern void glutSwapBuffers(void);
+
+extern void glutPostRedisplay(void);
 
 extern void glutDisplayFunc(void (*func)(void));
 

@@ -71,7 +71,7 @@ GLboolean _math_vector4f_push_back(SGLvector4f* v, GLfloat* data, GLuint size)
 
 GLboolean _math_vector4f_pop_back(SGLvector4f* v, GLfloat* data, GLuint size)
 {
-  if (v->start == (void*)v->data)
+  if (v->count == 0)
     return GL_FALSE;
 
   v->count--;
@@ -81,6 +81,11 @@ GLboolean _math_vector4f_pop_back(SGLvector4f* v, GLfloat* data, GLuint size)
     memcpy(data, v->start, size * sizeof(GLfloat));
 
   return GL_TRUE;
+}
+
+GLboolean _math_vector4f_empty(SGLvector4f* v)
+{
+  return (v->count == 0);
 }
 
 void _math_vector4f_print(SGLvector4f* v)
@@ -97,7 +102,7 @@ void _math_vector4f_print(SGLvector4f* v)
   GLfloat *d = (GLfloat *)v->data;
   GLuint i = 0;
 
-  printf("data-start\n");
+  printf("%p: data-start\n", v);
   for (; d != v->start; d = (GLfloat*)((GLubyte *)d + v->stride), i++)
     printf(t, i, d[0], d[1], d[2], d[3]);
 

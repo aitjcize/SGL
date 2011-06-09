@@ -90,6 +90,6 @@ extern void _math_matrix_set_identity(SGLmatrix* self);
 
 extern void _math_matrix_copy(SGLmatrix* to, const SGLmatrix* from);
 
-extern void _math_matrix_print(SGLmatrix* m);
+extern void _math_matrix_print(SGLmatrix* mat);
 
 #endif /* __SGL_MATH_MATRIX_H__ */

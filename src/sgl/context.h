@@ -74,10 +74,6 @@ do {									\
    FLUSH_VERTICES(ctx, 0);						\
 } while (0)
 
-void _sgl_context_init(struct sgl_context* sc);
-
-void _sgl_context_free(struct sgl_context* sc);
-
 extern void glClear(GLbitfield mask);
 
 extern void glClearColor(GLclampf red, GLclampf green, GLclampf blue,

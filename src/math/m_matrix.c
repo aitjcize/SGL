@@ -47,9 +47,9 @@ void _math_matrix_alloc_inv(SGLmatrix* mat)
 }
 
 
-#define A(row, col) a[(col<<2) + row]
-#define B(row, col) b[(col<<2) + row]
-#define P(row, col) product[(col<<2) + row]
+#define A(row, col) a[(col<<2)+row]
+#define B(row, col) b[(col<<2)+row]
+#define P(row, col) product[(col<<2)+row]
 
 static void matmul4(GLfloat* product, const GLfloat* a, const GLfloat* b)
 {
@@ -72,7 +72,7 @@ static void matrix_multf(SGLmatrix* mat, const GLfloat* m)
   matmul4(mat->m, mat->m, m);
 }
 
-#define MAT(m,r,c) (m)[(c)*4+(r)]
+#define MAT(m,r,c) (m)[(c<<2)+(r)]
 #define SWAP_ROWS(a, b) { GLfloat *_tmp = a; (a)=(b); (b)=_tmp; }
 
 static GLboolean _math_matrix_invert(SGLmatrix* mat)
@@ -398,7 +398,7 @@ void _math_matrix_ortho(SGLmatrix* mat,
 {
    GLfloat m[16];
 
-#define M(row,col)  m[col*4+row]
+#define M(row,col)  m[(col<<2)+row]
    M(0,0) = 2.0F / (right-left);
    M(0,1) = 0.0F;
    M(0,2) = 0.0F;
@@ -435,7 +435,7 @@ void _math_matrix_frustum(SGLmatrix* mat,
    y = (2.0F*nearval) / (top-bottom);
    a = (right+left) / (right-left);
    b = (top+bottom) / (top-bottom);
-   c = -(farval+nearval) / ( farval-nearval);
+   c = -(farval+nearval) / (farval-nearval);
    d = -(2.0F*farval*nearval) / (farval-nearval);  /* error? */
 
 #define M(row,col)  m[(col<<2)+row]
@@ -452,12 +452,13 @@ void _math_matrix_viewport(SGLmatrix *m, GLint x, GLint y,
                            GLint width, GLint height,
                            GLfloat zNear, GLfloat zFar, GLfloat depthMax)
 {
-   m->m[MAT_SX] = (GLfloat) width / 2.0F;
-   m->m[MAT_TX] = m->m[MAT_SX] + x;
-   m->m[MAT_SY] = (GLfloat) height / 2.0F;
-   m->m[MAT_TY] = m->m[MAT_SY] + y;
-   m->m[MAT_SZ] = depthMax * ((zFar - zNear) / 2.0F);
-   m->m[MAT_TZ] = depthMax * ((zFar - zNear) / 2.0F + zNear);
+  _math_matrix_set_identity(m);
+  m->m[MAT_SX] = (GLfloat) width / 2.0F;
+  m->m[MAT_TX] = m->m[MAT_SX] + x;
+  m->m[MAT_SY] = (GLfloat) height / 2.0F;
+  m->m[MAT_TY] = m->m[MAT_SY] + y;
+  m->m[MAT_SZ] = depthMax * ((zFar - zNear) / 2.0F);
+  m->m[MAT_TZ] = depthMax * ((zFar - zNear) / 2.0F + zNear);
 }
 
 void _math_matrix_set_identity(SGLmatrix* mat)
@@ -478,7 +479,16 @@ void _math_matrix_copy(SGLmatrix* to, const SGLmatrix* from)
   }
 }
 
-void _math_matrix_print(SGLmatrix* m)
+void _math_matrix_print(SGLmatrix* mat)
 {
-  
+  int i, j;
+#define M(row, col) mat->m[(col<<2)+row]
+  printf("%p: begin matrix\n", mat);
+  for (i = 0; i < 4; ++i) {
+    for (j = 0; j < 4; ++j)
+      printf("%6.2f ", M(i, j));
+    printf("\n");
+  }
+  printf("end matrix\n");
+#undef M
 }
