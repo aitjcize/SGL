@@ -57,9 +57,7 @@ void glVertex3f(GLfloat x, GLfloat y, GLfloat z)
   data[1] = y;
   data[2] = z;
   data[3] = 1;
-  printf("--bef: %f, %f, %f\n", data[0], data[1], data[2]);
   _vector_transform(&ctx->model_projection_matrix, data);
-  printf("--aft: %f, %f, %f\n", data[0], data[1], data[2]);
   _math_vector4f_push_back(&ctx->vector_point, data, 4);
   _math_vector4f_push_back(&ctx->vector_color, ctx->primitive.color, 4);
   _math_vector4f_push_back(&ctx->vector_normal, ctx->primitive.normal, 4);

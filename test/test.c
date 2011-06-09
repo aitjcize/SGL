@@ -85,6 +85,13 @@ void draw_sphere(GLdouble radius, GLint slices, GLint stacks)
   //glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE );
   //glDrawElements(GL_QUADS, DIV * DIV * 4, GL_UNSIGNED_SHORT, p_indices);
 
+  int i = 0, j = 0;
+  glBegin(GL_QUADS);
+  for (i = 0; i < DIV * DIV *4; ++i) {
+    j = p_indices[i];
+    glVertex3f(p_vertices[j*3+0], p_vertices[j*3+1], p_vertices[j*3+2]);
+  }
+  glEnd();
   glDisableClientState(GL_VERTEX_ARRAY);
 }
 
@@ -94,8 +101,8 @@ void display(void)
 
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  glFrustum (-2.0, 2.0, -2.0, 2.0, 1.0, 20.0);
-  //glOrtho (-2.0, 2.0, -2.0, 2.0, 0.0, 20.0);
+  //glFrustum (-2.0, 2.0, -2.0, 2.0, 1.0, 20.0);
+  glOrtho (-2.0, 2.0, -2.0, 2.0, 0.0, 20.0);
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity();
   glColor3f (1.0, 1.0, 1.0);
@@ -105,12 +112,13 @@ void display(void)
   glRotatef(g_phi, 0.0, 1.0, 0.0);
   glRotatef(g_theta, -cos(RAD(g_phi)), 0.0, sin(RAD(g_phi)));
 
-  glBegin(GL_POINTS);
-    glVertex3f(0, 0, 0);
-    glVertex3f(1, 0, 0);
-    glVertex3f(1, 1, 0);
-  glEnd();
-  //draw_sphere(2.0, DIV, DIV);
+  //glBegin(GL_QUADS);
+  //  glVertex3f(1, 1, 0);
+  //  glVertex3f(1, -1, 0);
+  //  glVertex3f(-1, -1, 0);
+  //  glVertex3f(-1, 1, 0);
+  //glEnd();
+  draw_sphere(2.0, DIV, DIV);
 
   glutSwapBuffers();
 }

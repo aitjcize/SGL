@@ -51,4 +51,9 @@ do {                        \
 #define LEN_SQUARED_3FV( V ) ((V)[0]*(V)[0]+(V)[1]*(V)[1]+(V)[2]*(V)[2])
 #define LEN_SQUARED_2FV( V ) ((V)[0]*(V)[0]+(V)[1]*(V)[1])
 
+#define COLOR_FF(c) (((GLuint)(CLAMP(c[3], 0, 1.0) * 255) << 24) |     \
+                     ((GLuint)(CLAMP(c[0], 0, 1.0) * 255) << 16) |     \
+                     ((GLuint)(CLAMP(c[1], 0, 1.0) * 255) <<  8) |     \
+                     ((GLuint)(CLAMP(c[2], 0, 1.0) * 255)))
+
 #endif /* __SGL_MACROS_H__ */
