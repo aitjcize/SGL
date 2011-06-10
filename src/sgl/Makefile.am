@@ -10,6 +10,7 @@ libSGL_la_SOURCES = \
 		sglapi.h \
 		sglheader.h \
 		types.h \
+		utils.c utils.h \
 		context.c context.h \
 		geometry.c geometry. h \
 		polygon.c polygon. h \

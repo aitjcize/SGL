@@ -6,7 +6,10 @@
  */
 
 #include "m_vector.h"
-#include "utils.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void _math_vector4f_init(SGLvector4f *v, GLbitfield flags,
                          GLfloat (*storage)[4])

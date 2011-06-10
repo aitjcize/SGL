@@ -4,6 +4,7 @@
 #include "logging.h"
 #include "macros.h"
 #include "pipeline.h"
+#include "utils.h"
 #include "math/m_vector.h"
 #include "math/m_matrix.h"
 
@@ -24,7 +25,6 @@ void glBegin(GLenum mode)
 
   ctx->render_state.type = 0;
   ctx->render_state.current_exec_primitive = mode;
-  ctx->render_state.transform_dirty = GL_FALSE;
   _math_matrix_mul_matrix(&ctx->model_projection_matrix,
                           &ctx->viewport.window_map,
                           ctx->projection_matrix_stack.top);
@@ -182,7 +182,8 @@ void glVertexPointer(GLint size, GLenum type, GLsizei stride,
   GET_CURRENT_CONTEXT(ctx);
   if (ctx->clientstate_flags & GL_VERTEX_ARRAY) {
     _math_vector4f_init(&ctx->vertex_pointer, 0, (GLvoid*)ptr);
-    ctx->vertex_pointer.stride = stride;
+    ctx->vertex_pointer.size = size;
+    ctx->vertex_pointer.stride = size * _sgl_sizeof_type(type);
   }
 }
 
@@ -191,7 +192,8 @@ void glNormalPointer(GLenum type, GLsizei stride, const GLvoid *ptr)
   GET_CURRENT_CONTEXT(ctx);
   if (ctx->clientstate_flags & GL_NORMAL_ARRAY) {
     _math_vector4f_init(&ctx->normal_pointer, 0, (GLvoid*)ptr);
-    ctx->vertex_pointer.stride = stride;
+    ctx->normal_pointer.size = 4;
+    ctx->normal_pointer.stride = 4 * _sgl_sizeof_type(type);
   }
 }
 
@@ -201,7 +203,8 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride,
   GET_CURRENT_CONTEXT(ctx);
   if (ctx->clientstate_flags & GL_COLOR_ARRAY) {
     _math_vector4f_init(&ctx->color_pointer, 0, (GLvoid*)ptr);
-    ctx->vertex_pointer.stride = stride;
+    ctx->color_pointer.size = 4;
+    ctx->color_pointer.stride = 4 * _sgl_sizeof_type(type);
   }
 }
 
@@ -231,10 +234,12 @@ void glDrawElements(GLenum mode, GLsizei count,
     return;
   }
 
-  ctx->vertex_pointer.count = count;
-  ctx->render_state.current_exec_primitive = mode;
+  ctx->varray.mode = mode;
+  ctx->varray.count = count;
+  ctx->varray.type = type;
+  /* XXX */
+  ctx->varray.indices_ptr = indices;
+
   ctx->render_state.type = GL_VERTEX_ARRAY;
-  ctx->render_state.transform_dirty = GL_TRUE;
   _sgl_pipeline_iteration();
-  ctx->render_state.current_exec_primitive = PRIM_OUTSIDE_BEGIN_END;
 }

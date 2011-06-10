@@ -1,5 +1,7 @@
 #include "polygon.h"
 
+#include "logging.h"
+
 void glPolygonMode(GLenum face, GLenum mode)
 {
   GET_CURRENT_CONTEXT(ctx);

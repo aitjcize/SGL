@@ -83,7 +83,6 @@ void draw_sphere(GLdouble radius, GLint slices, GLint stacks)
   create_sphere(radius, &p_vertices, &p_indices, NULL, slices, stacks);
   glVertexPointer(3, GL_DOUBLE, 0, p_vertices); 
   //glDrawElements(GL_QUADS, DIV * DIV * 4, GL_UNSIGNED_SHORT, p_indices);
-  //return;
 
   int i = 0, j = 0;
   glBegin(GL_QUADS);

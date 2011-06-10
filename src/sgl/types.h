@@ -68,16 +68,23 @@ struct sgl_viewport_attrib
   SGLmatrix window_map;     /* Mapping transformation as a matrix */
 };
 
+struct sgl_polygon_attrib
+{
+  GLint front;
+  GLint back;
+};
+
 struct sgl_primitive_attrib
 {
   GLfloat color[4];
   GLfloat normal[4];
 };
 
-struct sgl_polygon_attrib
-{
-  GLint front;
-  GLint back;
+struct sgl_vertex_array_attrib {
+  GLenum mode;
+  GLint count;
+  GLenum type;
+  GLvoid* indices_ptr;
 };
 
 struct sgl_render_state
@@ -86,7 +93,6 @@ struct sgl_render_state
   GLint current_exec_primitive;   /* Current executed primitive */
   GLint type;                     /* 0 or GL_VERTEX_ARRAY */
   GLint needflush;
-  GLboolean transform_dirty;      /* Target vertex need to be transform? */
 };
 
 struct sgl_pipeline
@@ -131,8 +137,9 @@ struct sgl_context
   struct sgl_buffer_attrib buffer;
   struct sgl_viewport_attrib viewport;
   struct sgl_depthbuffer_attrib depth;
-  struct sgl_primitive_attrib primitive;
   struct sgl_polygon_attrib polygon;
+  struct sgl_primitive_attrib primitive;
+  struct sgl_vertex_array_attrib varray;
 
   /* States */
   struct sgl_render_state render_state;

@@ -145,7 +145,7 @@ void _sgl_raster_triangle(struct sgl_framebuffer* buf, GLfloat* point,
 }
 
 void _sgl_raster_quads(struct sgl_framebuffer* buf, GLfloat* point,
-                     GLfloat* color)
+                       GLfloat* color)
 {
   GET_CURRENT_CONTEXT(ctx);
   GLfloat wrap_point[8];
@@ -175,25 +175,23 @@ void _sgl_primitive_assembly(void)
 void _sgl_pipeline_draw_list(void)
 {
   GET_CURRENT_CONTEXT(ctx);
-  GLint i = 0, j = 0;
+  GLint i = 0, j = 0, idx = 0, size = 4 * sizeof(GLfloat);
   GLfloat point[16], color[16], normal[16];
-  GLenum prim_type = ctx->render_state.current_exec_primitive;
-  GLint n_data = (prim_type == GL_POINTS) * 1 +
-                 (prim_type == GL_LINES) * 2 +
-                 (prim_type == GL_TRIANGLES) * 3 +
-                 (prim_type == GL_QUADS) * 4;
+  GLenum prim_mode = ctx->render_state.current_exec_primitive;
+  GLint n_data = (prim_mode == GL_POINTS) * 1 +
+                 (prim_mode == GL_LINES) * 2 +
+                 (prim_mode == GL_TRIANGLES) * 3 +
+                 (prim_mode == GL_QUADS) * 4;
 
   for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
     for (j = 0; j < n_data; ++j) {
-      memcpy(point+j*4, VEC_ELT(&ctx->vector_point, GLvoid, i*n_data+j),
-             4 * sizeof(GLfloat));
-      memcpy(normal+j*4, VEC_ELT(&ctx->vector_normal, GLvoid, i*n_data+j),
-             4 * sizeof(GLfloat));
-      memcpy(color+j*4, VEC_ELT(&ctx->vector_color, GLvoid, i*n_data+j),
-             4 * sizeof(GLfloat));
+      idx = i * n_data + j;
+      memcpy(point + j*4, VEC_ELT(&ctx->vector_point, GLvoid, idx), size);
+      memcpy(normal + j*4, VEC_ELT(&ctx->vector_normal, GLvoid, idx), size);
+      memcpy(color + j*4, VEC_ELT(&ctx->vector_color, GLvoid, idx), size);
     }
 
-    switch (prim_type) {
+    switch (prim_mode) {
     case GL_POINTS:
       _sgl_raster_point(ctx->drawbuffer, point, color);
       break;
@@ -212,7 +210,42 @@ void _sgl_pipeline_draw_list(void)
 
 void _sgl_pipeline_draw_array(void)
 {
-  
+  GET_CURRENT_CONTEXT(ctx);
+  GLint i = 0, j = 0, k = 0, idx = 0;
+
+  GLfloat point[16], color[16], normal[16];
+  GLenum prim_mode = ctx->varray.mode;
+  GLint n_data = (prim_mode == GL_POINTS) * 1 +
+                 (prim_mode == GL_LINES) * 2 +
+                 (prim_mode == GL_TRIANGLES) * 3 +
+                 (prim_mode == GL_QUADS) * 4;
+
+  for (i = 0; i < 16; ++i)
+    color[i] = 1;
+
+  for (i = 0; i < ctx->varray.count; ++i) {
+    for (j = 0; j < n_data; ++j) {
+      idx = *((GLshort*)ctx->varray.indices_ptr + i * n_data + j);
+      for (k = 0; k < ctx->vertex_pointer.size; ++k)
+        point[j * 4 + k] = *VEC_ELT(&ctx->vertex_pointer, GLfloat, idx + k);
+      _sgl_affine_transform(&ctx->model_projection_matrix, point + j*n_data);
+    }
+
+    switch (prim_mode) {
+    case GL_POINTS:
+      _sgl_raster_point(ctx->drawbuffer, point, color);
+      break;
+    case GL_LINES:
+      _sgl_raster_line(ctx->drawbuffer, point, color);
+      break;
+    case GL_TRIANGLES:
+      _sgl_raster_triangle(ctx->drawbuffer, point, color);
+      break;
+    case GL_QUADS:
+      _sgl_raster_quads(ctx->drawbuffer, point, color);
+      break;
+    }
+  }
 }
 
 void _sgl_pipeline_rasterize(void)
