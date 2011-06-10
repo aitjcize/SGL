@@ -67,7 +67,7 @@ void glClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
 
   int i = 0;
   for (i = 0; i < ctx->buffer.width * ctx->buffer.height; ++i)
-    *((GLuint*)ctx->drawbuffer->clear_color_buffer.data + i) = ctx->clear_color;
+    *((GLuint*)ctx->drawbuffer->clear_color_buf.data + i) = ctx->clear_color;
 }
 
 void glEnableClientState(GLenum cap)

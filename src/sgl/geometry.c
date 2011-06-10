@@ -7,33 +7,24 @@
 #include "math/m_vector.h"
 #include "math/m_matrix.h"
 
-void _vector_transform(SGLmatrix* mat, GLfloat* vec) {
-  GLfloat v0, v1, v2, v3;
-#define M(row, col) mat->m[(col<<2)+row]
-  v0 = vec[0]; v1 = vec[1]; v2 = vec[2]; v3 = vec[3];
-  vec[0] = M(0, 0) * v0 + M(0, 1) * v1 + M(0, 2) * v2 + M(0, 3) * v3;
-  vec[1] = M(1, 0) * v0 + M(1, 1) * v1 + M(1, 2) * v2 + M(1, 3) * v3;
-  vec[2] = M(2, 0) * v0 + M(2, 1) * v1 + M(2, 2) * v2 + M(2, 3) * v3;
-  vec[3] = M(3, 0) * v0 + M(3, 1) * v1 + M(3, 2) * v2 + M(3, 3) * v3;
-  vec[0] /= vec[3];
-  vec[1] /= vec[3];
-  vec[2] /= vec[3];
-#undef M
-}
-
 void glBegin(GLenum mode)
 {
   GET_CURRENT_CONTEXT(ctx);
 
-  if (mode != GL_POINTS &&
-      mode != GL_LINES &&
-      mode != GL_TRIANGLES &&
-      mode != GL_QUADS) {
+  switch (mode) {
+  case GL_POINTS:
+  case GL_LINES:
+  case GL_TRIANGLES:
+  case GL_QUADS:
+    break;
+  default:
     _sgl_error(ctx, GL_INVALID_ENUM, "glBegin(): Invalid mode\n");
     return;
   }
 
+  ctx->render_state.type = 0;
   ctx->render_state.current_exec_primitive = mode;
+  ctx->render_state.transform_dirty = GL_FALSE;
   _math_matrix_mul_matrix(&ctx->model_projection_matrix,
                           &ctx->viewport.window_map,
                           ctx->projection_matrix_stack.top);
@@ -67,7 +58,7 @@ void glVertex3f(GLfloat x, GLfloat y, GLfloat z)
   data[1] = y;
   data[2] = z;
   data[3] = 1;
-  _vector_transform(&ctx->model_projection_matrix, data);
+  _sgl_affine_transform(&ctx->model_projection_matrix, data);
   _math_vector4f_push_back(&ctx->vector_point, data, 4);
   _math_vector4f_push_back(&ctx->vector_color, ctx->primitive.color, 4);
   _math_vector4f_push_back(&ctx->vector_normal, ctx->primitive.normal, 4);
@@ -96,7 +87,7 @@ void glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
   data[1] = y / w;
   data[2] = z / w;
   data[3] = 1;
-  _vector_transform(&ctx->model_projection_matrix, data);
+  _sgl_affine_transform(&ctx->model_projection_matrix, data);
   _math_vector4f_push_back(&ctx->vector_point, data, 4);
   _math_vector4f_push_back(&ctx->vector_color, ctx->primitive.color, 4);
   _math_vector4f_push_back(&ctx->vector_normal, ctx->primitive.normal, 4);
@@ -168,7 +159,7 @@ void glNormal3f(GLfloat nx, GLfloat ny, GLfloat nz)
   data[1] = ny;
   data[2] = nz;
   data[3] = 1;
-  _vector_transform(&ctx->model_projection_matrix, data);
+  _sgl_affine_transform(&ctx->model_projection_matrix, data);
   ctx->primitive.normal[0] = data[0];
   ctx->primitive.normal[1] = data[1];
   ctx->primitive.normal[2] = data[2];
@@ -212,4 +203,38 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride,
     _math_vector4f_init(&ctx->color_pointer, 0, (GLvoid*)ptr);
     ctx->vertex_pointer.stride = stride;
   }
+}
+
+void glDrawElements(GLenum mode, GLsizei count,
+                    GLenum type, const GLvoid *indices)
+{
+  GET_CURRENT_CONTEXT(ctx);
+  ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
+
+  if (!(ctx->clientstate_flags & GL_VERTEX_ARRAY))
+    return;
+
+  _math_matrix_mul_matrix(&ctx->model_projection_matrix,
+                          &ctx->viewport.window_map,
+                          ctx->projection_matrix_stack.top);
+  _math_matrix_mul_matrix(&ctx->model_projection_matrix,
+                          &ctx->model_projection_matrix,
+                          ctx->modelview_matrix_stack.top);
+  switch (mode) {
+  case GL_POINTS:
+  case GL_LINES:
+  case GL_TRIANGLES:
+  case GL_QUADS:
+    break;
+  default:
+    _sgl_error(ctx, GL_INVALID_ENUM, "glDrawElements(): Invalid mode\n");
+    return;
+  }
+
+  ctx->vertex_pointer.count = count;
+  ctx->render_state.current_exec_primitive = mode;
+  ctx->render_state.type = GL_VERTEX_ARRAY;
+  ctx->render_state.transform_dirty = GL_TRUE;
+  _sgl_pipeline_iteration();
+  ctx->render_state.current_exec_primitive = PRIM_OUTSIDE_BEGIN_END;
 }

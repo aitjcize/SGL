@@ -83,6 +83,7 @@ void draw_sphere(GLdouble radius, GLint slices, GLint stacks)
   create_sphere(radius, &p_vertices, &p_indices, NULL, slices, stacks);
   glVertexPointer(3, GL_DOUBLE, 0, p_vertices); 
   //glDrawElements(GL_QUADS, DIV * DIV * 4, GL_UNSIGNED_SHORT, p_indices);
+  //return;
 
   int i = 0, j = 0;
   glBegin(GL_QUADS);
@@ -110,15 +111,15 @@ void display(void)
   glRotatef(g_phi, 0.0, 1.0, 0.0);
   glRotatef(g_theta, cos(RAD(g_phi)), 0.0, -sin(RAD(g_phi)));
 
-  glColor3f (0.0, 0.0, 1.0);
-  //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
-  glBegin(GL_QUADS);
-    glVertex3f(1, 1, 0);
-    glVertex3f(1, -1, 0);
-    glVertex3f(-1, -1, 0);
-    glVertex3f(-1, 1, 0);
-  glEnd();
-  //draw_sphere(1.0, DIV, DIV);
+  glColor3f (1.0, 1.0, 1.0);
+  glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+  //glBegin(GL_QUADS);
+  //  glVertex3f(1, 1, 0);
+  //  glVertex3f(1, -1, 0);
+  //  glVertex3f(-1, -1, 0);
+  //  glVertex3f(-1, 1, 0);
+  //glEnd();
+  draw_sphere(2.0, DIV, DIV);
 
   glutSwapBuffers();
 }

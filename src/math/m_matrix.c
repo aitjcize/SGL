@@ -479,6 +479,21 @@ void _math_matrix_copy(SGLmatrix* to, const SGLmatrix* from)
   }
 }
 
+void _sgl_affine_transform(SGLmatrix* mat, GLfloat* vec)
+{
+  GLfloat v0, v1, v2, v3;
+#define M(row, col) mat->m[(col<<2)+row]
+  v0 = vec[0]; v1 = vec[1]; v2 = vec[2]; v3 = vec[3];
+  vec[0] = M(0, 0) * v0 + M(0, 1) * v1 + M(0, 2) * v2 + M(0, 3) * v3;
+  vec[1] = M(1, 0) * v0 + M(1, 1) * v1 + M(1, 2) * v2 + M(1, 3) * v3;
+  vec[2] = M(2, 0) * v0 + M(2, 1) * v1 + M(2, 2) * v2 + M(2, 3) * v3;
+  vec[3] = M(3, 0) * v0 + M(3, 1) * v1 + M(3, 2) * v2 + M(3, 3) * v3;
+  vec[0] /= vec[3];
+  vec[1] /= vec[3];
+  vec[2] /= vec[3];
+#undef M
+}
+
 void _math_matrix_print(SGLmatrix* mat)
 {
   int i, j;

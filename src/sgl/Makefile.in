@@ -68,8 +68,8 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libSGL_la_LIBADD =
-am_libSGL_la_OBJECTS = context.lo geometry.lo logging.lo matrix.lo \
-	viewport.lo depth.lo framebuffer.lo renderbuffer.lo \
+am_libSGL_la_OBJECTS = context.lo geometry.lo polygon.lo logging.lo \
+	matrix.lo viewport.lo depth.lo framebuffer.lo renderbuffer.lo \
 	pipeline.lo rasterize.lo m_vector.lo m_matrix.lo
 libSGL_la_OBJECTS = $(am_libSGL_la_OBJECTS)
 libSGL_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -225,6 +225,7 @@ libSGL_la_SOURCES = \
 		types.h \
 		context.c context.h \
 		geometry.c geometry. h \
+		polygon.c polygon. h \
 		logging.c logging.h \
 		matrix.c matrix .h \
 		viewport.c viewport.h \
@@ -319,6 +320,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/matrix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pipeline.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polygon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rasterize.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/renderbuffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/viewport.Plo@am__quote@

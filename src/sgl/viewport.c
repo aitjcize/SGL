@@ -57,8 +57,8 @@ void glDepthRange(GLclampd nearval, GLclampd farval)
   GET_CURRENT_CONTEXT(ctx);
   ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
 
-  ctx->viewport.near = (GLfloat) CLAMP(nearval, 0.0, 1.0);
-  ctx->viewport.far = (GLfloat) CLAMP(farval, 0.0, 1.0);
+  ctx->viewport.near = CLAMP(nearval, 0.0, 1.0);
+  ctx->viewport.far = CLAMP(farval, 0.0, 1.0);
 
   _math_matrix_viewport(&ctx->viewport.window_map,
                         ctx->viewport.x, ctx->viewport.y,

@@ -88,6 +88,8 @@ extern void _math_matrix_viewport(SGLmatrix *m, GLint x, GLint y,
 
 extern void _math_matrix_set_identity(SGLmatrix* self);
 
+extern void _sgl_affine_transform(SGLmatrix* mat, GLfloat* vec);
+
 extern void _math_matrix_copy(SGLmatrix* to, const SGLmatrix* from);
 
 extern void _math_matrix_print(SGLmatrix* mat);

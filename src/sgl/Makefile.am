@@ -12,6 +12,7 @@ libSGL_la_SOURCES = \
 		types.h \
 		context.c context.h \
 		geometry.c geometry. h \
+		polygon.c polygon. h \
 		logging.c logging.h \
 		matrix.c matrix .h \
 		viewport.c viewport.h \

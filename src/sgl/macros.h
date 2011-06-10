@@ -63,4 +63,11 @@ do {                        \
    ((GLuint)(CLAMP(g, 0, 1.0) * 255) <<  8) |     \
    ((GLuint)(CLAMP(b, 0, 1.0) * 255)))
 
+/* Framebuffer access related */
+#define BUF_GET_C(buf, x, y) \
+  (((GLuint*)buf->color_buf.data)[(buf->height-(y)-1)*buf->width+(x)-1])
+
+#define BUF_GET_D(buf, x, y) \
+  (((GLuint*)buf->depth_buf.data)[(buf->height-(y)-1)*buf->width+(x)-1])
+
 #endif /* __SGL_MACROS_H__ */

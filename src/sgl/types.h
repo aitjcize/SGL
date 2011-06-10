@@ -33,15 +33,15 @@ struct sgl_framebuffer
 
   /* Buffers */
   struct sgl_renderbuffer final_buffer;
-  struct sgl_renderbuffer clear_color_buffer;
+  struct sgl_renderbuffer clear_color_buf;
 
-  struct sgl_renderbuffer t_color_buffer;
-  struct sgl_renderbuffer t_normal_buffer;
-  struct sgl_renderbuffer t_depth_buffer;
+  struct sgl_renderbuffer t_color_buf;
+  struct sgl_renderbuffer t_normal_buf;
+  struct sgl_renderbuffer t_depth_buf;
 
-  struct sgl_renderbuffer color_buffer;
-  struct sgl_renderbuffer normal_buffer;
-  struct sgl_renderbuffer depth_buffer;
+  struct sgl_renderbuffer color_buf;
+  struct sgl_renderbuffer normal_buf;
+  struct sgl_renderbuffer depth_buf;
 };
 
 struct sgl_matrix_stack
@@ -83,8 +83,10 @@ struct sgl_polygon_attrib
 struct sgl_render_state
 {
 #define FLUSH_STORED_VERTICES 0x1
-  GLint current_exec_primitive;
+  GLint current_exec_primitive;   /* Current executed primitive */
+  GLint type;                     /* 0 or GL_VERTEX_ARRAY */
   GLint needflush;
+  GLboolean transform_dirty;      /* Target vertex need to be transform? */
 };
 
 struct sgl_pipeline
@@ -93,7 +95,7 @@ struct sgl_pipeline
   void (*vertex_shader)(void);
   void (*rasterize)(void);
   void (*fragment_shader)(void);
-  void (*zbuffer_test)(void);
+  void (*depth_test)(void);
 };
 
 struct sgl_context

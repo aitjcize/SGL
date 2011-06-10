@@ -38,5 +38,7 @@ extern void glVertexPointer(GLint size, GLenum type, GLsizei stride,
 extern void glNormalPointer(GLenum type, GLsizei stride, const GLvoid *ptr);
 extern void glColorPointer(GLint size, GLenum type, GLsizei stride,
                            const GLvoid *ptr);
+extern void glDrawElements(GLenum mode, GLsizei count,
+                           GLenum type, const GLvoid *indices);
 
 #endif /* __SGL_GEOMETRY_H__ */
