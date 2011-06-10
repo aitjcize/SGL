@@ -38,6 +38,9 @@ void glEnd(void)
   GET_CURRENT_CONTEXT(ctx);
   _sgl_pipeline_iteration();
   ctx->render_state.current_exec_primitive = PRIM_OUTSIDE_BEGIN_END;
+  _math_vector4f_lazy_free(&ctx->vector_point);
+  _math_vector4f_lazy_free(&ctx->vector_normal);
+  _math_vector4f_lazy_free(&ctx->vector_color);
 }
 
 void glVertex3s(GLshort x, GLshort y, GLshort z)

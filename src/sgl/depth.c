@@ -1,5 +1,7 @@
 #include "depth.h"
 
+#include <string.h>
+
 #include "context.h"
 #include "logging.h"
 #include "macros.h"
@@ -10,6 +12,17 @@ void _sgl_init_depth(struct sgl_context* ctx)
   ctx->depth.clear = 1.0;
   ctx->depth.func = GL_LESS;
   ctx->depth.mask = GL_TRUE;
+
+  int i = 0;
+  for (i = 0; i < ctx->buffer.width * ctx->buffer.height; ++i)
+    *((GLfloat*)ctx->drawbuffer->clear_depth_buf.data + i) = ctx->depth.clear;
+
+  memcpy(ctx->drawbuffer->depth_buf.data,
+         ctx->drawbuffer->clear_depth_buf.data,
+         ctx->buffer.width * ctx->buffer.height * sizeof(GLfloat));
+  memcpy(ctx->drawbuffer->t_depth_buf.data,
+         ctx->drawbuffer->clear_depth_buf.data,
+         ctx->buffer.width * ctx->buffer.height * sizeof(GLfloat));
 }
 
 void glClearDepth(GLclampd depth)
@@ -17,12 +30,16 @@ void glClearDepth(GLclampd depth)
   GET_CURRENT_CONTEXT(ctx);
   ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-  depth = CLAMP( depth, 0.0, 1.0 );
+  depth = CLAMP(depth, 0.0, 1.0);
 
   if (ctx->depth.clear == depth)
     return;
 
   ctx->depth.clear = depth;
+
+  int i = 0;
+  for (i = 0; i < ctx->buffer.width * ctx->buffer.height; ++i)
+    *((GLfloat*)ctx->drawbuffer->clear_depth_buf.data + i) = ctx->depth.clear;
 }
 
 void glClearDepthf(GLclampf depth)

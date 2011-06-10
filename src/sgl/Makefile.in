@@ -69,9 +69,9 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libSGL_la_LIBADD =
 am_libSGL_la_OBJECTS = utils.lo context.lo geometry.lo polygon.lo \
-	logging.lo matrix.lo viewport.lo depth.lo framebuffer.lo \
-	renderbuffer.lo pipeline.lo rasterize.lo m_vector.lo \
-	m_matrix.lo
+	logging.lo matrix.lo viewport.lo color.lo depth.lo \
+	framebuffer.lo renderbuffer.lo pipeline.lo rasterize.lo \
+	m_vector.lo m_matrix.lo
 libSGL_la_OBJECTS = $(am_libSGL_la_OBJECTS)
 libSGL_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -231,6 +231,7 @@ libSGL_la_SOURCES = \
 		logging.c logging.h \
 		matrix.c matrix .h \
 		viewport.c viewport.h \
+		color.c color.h \
 		depth.c depth.h \
 		framebuffer.c framebuffer.h \
 		renderbuffer.c renderbuffer.h \
@@ -313,6 +314,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/color.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/context.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/depth.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/framebuffer.Plo@am__quote@

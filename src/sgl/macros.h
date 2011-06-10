@@ -64,10 +64,20 @@ do {                        \
    ((GLuint)(CLAMP(b, 0, 1.0) * 255)))
 
 /* Framebuffer access related */
+#define BUF_SET_C(buf, x, y, cc) \
+    ((GLuint*)(buf)->data)[((buf)->height-y-1)*(buf)->width+x-1] = cc;
+
+#define BUF_SET_D(buf, x, y, d) \
+    ((GLfloat*)(buf)->data)[((buf)->height-y-1)*(buf)->width+x-1] = d;
+
 #define BUF_GET_C(buf, x, y) \
-  (((GLuint*)buf->color_buf.data)[(buf->height-(y)-1)*buf->width+(x)-1])
+  (((GLuint*)(buf)->data)[((buf)->height-(y)-1)*(buf)->width+(x)-1])
 
 #define BUF_GET_D(buf, x, y) \
-  (((GLuint*)buf->depth_buf.data)[(buf->height-(y)-1)*buf->width+(x)-1])
+  (((GLfloat*)(buf)->data)[((buf)->height-(y)-1)*(buf)->width+(x)-1])
+
+#define NORMALIZE_Z(ctx, z) \
+  ((z - ctx->drawbuffer->depth_max * ctx->viewport.near) / \
+   (ctx->drawbuffer->depth_max * (ctx->viewport.far - ctx->viewport.near)))
 
 #endif /* __SGL_MACROS_H__ */

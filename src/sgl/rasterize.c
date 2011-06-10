@@ -6,6 +6,7 @@
 
 #include "logging.h"
 #include "macros.h"
+#include "macros.h"
 #include "types.h"
 #include "math/m_matrix.h"
 #include "math/m_vector.h"
@@ -13,9 +14,10 @@
 void _sgl_render_pixel(struct sgl_framebuffer* buf,
                        GLuint x, GLuint y, GLuint z, GLuint cc)
 {
+  GET_CURRENT_CONTEXT(ctx);
   if (x > 0 && y >= 0 && x <= buf->width && y < buf->height) {
-    ((GLuint*)buf->color_buf.data)[(buf->height-y-1)*buf->width+x-1] = cc;
-    ((GLfloat*)buf->depth_buf.data)[(buf->height-y-1)*buf->width+x-1] = z;
+    BUF_SET_C(buf->r_color_buf, x, y, cc);
+    BUF_SET_D(buf->r_depth_buf, x, y, NORMALIZE_Z(ctx, z));
   }
 }
 
@@ -36,22 +38,22 @@ void _flood_fill(struct sgl_framebuffer* buf, GLint sx, GLint sy, GLfloat sz,
 
     _sgl_render_pixel(buf, sx, sy, sz, cc);
     data[3] = cc;
-    if (sx + 1 <= buf->width && BUF_GET_C(buf, sx + 1, sy) != cc) {
+    if (sx + 1 <= buf->width && BUF_GET_C(buf->r_color_buf, sx + 1, sy) != cc) {
       data[0] = sx + 1; data[1] = sy; data[2] = sz;
       _math_vector4f_push_back(&ctx->flood_fill, (GLfloat*)data, 3);
     }
 
-    if (sx - 1 > 0 && BUF_GET_C(buf, sx - 1, sy) != cc) {
+    if (sx - 1 > 0 && BUF_GET_C(buf->r_color_buf, sx - 1, sy) != cc) {
       data[0] = sx - 1; data[1] = sy; data[2] = sz;
       _math_vector4f_push_back(&ctx->flood_fill, (GLfloat*)data, 3);
     }
 
-    if (sy + 1 < buf->height && BUF_GET_C(buf, sx, sy + 1) != cc) {
+    if (sy + 1 < buf->height && BUF_GET_C(buf->r_color_buf, sx, sy + 1) != cc) {
       data[0] = sx; data[1] = sy + 1; data[2] = sz;
       _math_vector4f_push_back(&ctx->flood_fill, (GLfloat*)data, 3);
     }
 
-    if (sy - 1 >= 0 && BUF_GET_C(buf, sx, sy - 1) != cc) {
+    if (sy - 1 >= 0 && BUF_GET_C(buf->r_color_buf, sx, sy - 1) != cc) {
       data[0] = sx; data[1] = sy - 1; data[2] = sz;
       _math_vector4f_push_back(&ctx->flood_fill, (GLfloat*)data, 3);
     }
@@ -205,6 +207,8 @@ void _sgl_pipeline_draw_list(void)
       _sgl_raster_quads(ctx->drawbuffer, point, color);
       break;
     }
+    if (ctx->depth.test)
+      _sgl_pipeline_depth_test();
   }
 }
 

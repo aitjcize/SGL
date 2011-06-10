@@ -17,6 +17,7 @@ libSGL_la_SOURCES = \
 		logging.c logging.h \
 		matrix.c matrix .h \
 		viewport.c viewport.h \
+		color.c color.h \
 		depth.c depth.h \
 		framebuffer.c framebuffer.h \
 		renderbuffer.c renderbuffer.h \

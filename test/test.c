@@ -110,16 +110,26 @@ void display(void)
   glRotatef(g_phi, 0.0, 1.0, 0.0);
   glRotatef(g_theta, cos(RAD(g_phi)), 0.0, -sin(RAD(g_phi)));
 
+  //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+  glEnable(GL_DEPTH_TEST);
   glColor3f (1.0, 1.0, 1.0);
-  glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
-  //glBegin(GL_QUADS);
-  //  glVertex3f(1, 1, 0);
-  //  glVertex3f(1, -1, 0);
-  //  glVertex3f(-1, -1, 0);
-  //  glVertex3f(-1, 1, 0);
-  //glEnd();
-  draw_sphere(2.0, DIV, DIV);
 
+  glBegin(GL_QUADS);
+    glVertex3f(1, 1, 0);
+    glVertex3f(1, -1, 0);
+    glVertex3f(-1, -1, 0);
+    glVertex3f(-1, 1, 0);
+  glEnd();
+  glColor3f (1.0, 0.0, 0.0);
+  glBegin(GL_QUADS);
+    glVertex3f(1.5, 1.5, -1);
+    glVertex3f(1.5, 0.5, -1);
+    glVertex3f(0.5, 0.5, -1);
+    glVertex3f(0.5, 1.5, -1);
+  glEnd();
+  //draw_sphere(2.0, DIV, DIV);
+
+  glDisable(GL_DEPTH_TEST);
   glutSwapBuffers();
 }
 
@@ -176,7 +186,7 @@ void keyboard(unsigned char key, int x, int y)
 int main(int argc, char** argv)
 {
   glutInit(&argc, argv);
-  glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
+  glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutInitWindowSize (500, 500);
   glutInitWindowPosition (100, 100);
   glutCreateWindow (argv[0]);

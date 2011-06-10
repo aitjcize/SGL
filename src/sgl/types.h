@@ -32,8 +32,12 @@ struct sgl_framebuffer
   GLfloat depth_max;
 
   /* Buffers */
+  struct sgl_renderbuffer* r_color_buf;
+  struct sgl_renderbuffer* r_depth_buf;
+
   struct sgl_renderbuffer final_buffer;
   struct sgl_renderbuffer clear_color_buf;
+  struct sgl_renderbuffer clear_depth_buf;
 
   struct sgl_renderbuffer t_color_buf;
   struct sgl_renderbuffer t_normal_buf;
@@ -58,6 +62,11 @@ struct sgl_depthbuffer_attrib
   GLclampd clear;           /* Value to clear depth buffer to */
   GLboolean test;           /* Depth buffering enabled flag */
   GLboolean mask;           /* Depth buffer writable? */
+};
+
+struct sgl_colorbuffer_attrib
+{
+  GLclampd clear;           /* Value to clear depth buffer to */
 };
 
 struct sgl_viewport_attrib
@@ -106,9 +115,6 @@ struct sgl_pipeline
 
 struct sgl_context
 {
-  /* Context */
-  GLuint clear_color;
-
   /* Framebuffers */
   struct sgl_framebuffer* drawbuffer;
 
@@ -136,6 +142,7 @@ struct sgl_context
   /* Attributes */
   struct sgl_buffer_attrib buffer;
   struct sgl_viewport_attrib viewport;
+  struct sgl_colorbuffer_attrib color;
   struct sgl_depthbuffer_attrib depth;
   struct sgl_polygon_attrib polygon;
   struct sgl_primitive_attrib primitive;

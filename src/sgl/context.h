@@ -76,11 +76,11 @@ do {									\
 
 extern void glClear(GLbitfield mask);
 
-extern void glClearColor(GLclampf red, GLclampf green, GLclampf blue,
-                         GLclampf alpha);
-
 extern void glBegin(GLenum mode);
 extern void glEnd(void);
+
+void glEnable(GLenum cap);
+void glDisable(GLenum cap);
 
 extern void glEnableClientState(GLenum cap);
 extern void glDisableClientState(GLenum cap);

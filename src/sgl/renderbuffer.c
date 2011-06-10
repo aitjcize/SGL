@@ -6,7 +6,7 @@
 void _sgl_init_renderbuffer(struct sgl_renderbuffer* buf, int type)
 {
   GET_CURRENT_CONTEXT(ctx);
-  GLuint size = ctx->buffer.width * ctx->buffer.height * sizeof(type);
+  GLuint size = ctx->buffer.width * ctx->buffer.height * _sgl_sizeof_type(type);
   buf->width = ctx->buffer.width;
   buf->height = ctx->buffer.height;
   buf->type = type;

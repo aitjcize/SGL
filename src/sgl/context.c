@@ -9,12 +9,12 @@
 
 struct sgl_context _g_sgl_context;
 
-void  _sgl_init_vector(struct sgl_context* ctx)
+void _sgl_init_vector(struct sgl_context* ctx)
 {
   _math_vector4f_alloc(&ctx->vector_point, 0, VECTOR_INIT_LEN);
   _math_vector4f_alloc(&ctx->vector_normal, 0, VECTOR_INIT_LEN);
   _math_vector4f_alloc(&ctx->vector_color, 0, VECTOR_INIT_LEN);
-  _math_vector4f_alloc(&ctx->flood_fill, 0, VECTOR_INIT_LEN * 10);
+  _math_vector4f_alloc(&ctx->flood_fill, 0, VECTOR_INIT_LEN * 100);
 }
 
 void _sgl_init_misc_attrib(struct sgl_context* ctx, int w, int h)
@@ -32,8 +32,9 @@ void _sgl_context_init(struct sgl_context* ctx, int w, int h)
   _sgl_init_vector(ctx);
   _sgl_init_matrix(ctx);
   _sgl_init_viewport(ctx);
-  _sgl_init_depth(ctx);
   _sgl_init_framebuffer(ctx);
+  _sgl_init_color(ctx);
+  _sgl_init_depth(ctx);
   _sgl_init_pipeline(ctx);
 
   ctx->flags = 0;
@@ -60,14 +61,28 @@ void glClear(GLbitfield mask)
   _math_vector4f_lazy_free(&ctx->vector_color);
 }
 
-void glClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
+void glEnable(GLenum cap)
 {
   GET_CURRENT_CONTEXT(ctx);
-  ctx->clear_color = COLOR_FE(red, green, blue, alpha);
+  ctx->flags |= cap;
 
-  int i = 0;
-  for (i = 0; i < ctx->buffer.width * ctx->buffer.height; ++i)
-    *((GLuint*)ctx->drawbuffer->clear_color_buf.data + i) = ctx->clear_color;
+  switch (cap) {
+  case GL_DEPTH_TEST:
+    _sgl_framebuffer_depth(GL_TRUE);
+  break;
+  }
+}
+
+void glDisable(GLenum cap)
+{
+  GET_CURRENT_CONTEXT(ctx);
+  ctx->flags |= cap;
+
+  switch (cap) {
+  case GL_DEPTH_TEST:
+    _sgl_framebuffer_depth(GL_FALSE);
+  break;
+  }
 }
 
 void glEnableClientState(GLenum cap)
