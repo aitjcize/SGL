@@ -1,5 +1,6 @@
 #include "context.h"
 
+#include "color.h"
 #include "depth.h"
 #include "framebuffer.h"
 #include "macros.h"

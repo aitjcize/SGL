@@ -9,4 +9,6 @@ extern void _sgl_free_framebuffer_data(struct sgl_context* ctx);
 
 extern void _sgl_clear_framebuffer(GLenum mask);
 
+extern void _sgl_framebuffer_depth(GLboolean status);
+
 #endif /* __SGL_FRAMEBUFFER_H__ */

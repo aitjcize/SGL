@@ -1,5 +1,7 @@
 #include "color.h"
 
+#include <string.h>
+
 #include "macros.h"
 
 void _sgl_init_color(struct sgl_context* ctx)
