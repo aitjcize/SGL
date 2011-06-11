@@ -167,6 +167,11 @@ void glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
   _math_matrix_rotate(ctx->current_stack->top, angle, x, y, z);
 }
 
+void glScaled(GLdouble x, GLdouble y, GLdouble z)
+{
+  glScalef(x, y, z);
+}
+
 void glScalef(GLfloat x, GLfloat y, GLfloat z)
 {
   GET_CURRENT_CONTEXT(ctx);

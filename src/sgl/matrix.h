@@ -34,6 +34,7 @@ extern void glTranslatef(GLfloat x, GLfloat y, GLfloat z);
 extern void glRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z);
 extern void glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z);
 
+extern void glScaled(GLdouble x, GLdouble y, GLdouble z);
 extern void glScalef(GLfloat x, GLfloat y, GLfloat z);
 
 #endif /* __SGL_MATRIX_H__ */

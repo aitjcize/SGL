@@ -16,6 +16,7 @@ void glBegin(GLenum mode)
   case GL_POINTS:
   case GL_LINES:
   case GL_TRIANGLES:
+  case GL_TRIANGLE_STRIP:
   case GL_QUADS:
     break;
   default:
@@ -72,6 +73,26 @@ void glVertex3d(GLdouble x, GLdouble y, GLdouble z)
   glVertex3f(x, y, z);
 }
 
+void glVertex3dv(const GLdouble *v)
+{
+  glVertex3f(v[0], v[1], v[2]);
+}
+
+void glVertex3fv(const GLfloat *v)
+{
+  glVertex3f(v[0], v[1], v[2]);
+}
+
+void glVertex3iv(const GLint *v)
+{
+  glVertex3f(v[0], v[1], v[2]);
+}
+
+void glVertex3sv(const GLshort *v)
+{
+  glVertex3f(v[0], v[1], v[2]);
+}
+
 void glVertex4s(GLshort x, GLshort y, GLshort z, GLshort w)
 {
   glVertex4f(x, y, z, w);
@@ -101,6 +122,26 @@ void glVertex4d(GLdouble x, GLdouble y, GLdouble z, GLdouble w)
   glVertex4f(x, y, z, w);
 }
 
+void glVertex4dv(const GLdouble *v)
+{
+  glVertex4f(v[0], v[1], v[2], v[3]);
+}
+
+void glVertex4fv(const GLfloat *v)
+{
+  glVertex4f(v[0], v[1], v[2], v[3]);
+}
+
+void glVertex4iv(const GLint *v)
+{
+  glVertex4f(v[0], v[1], v[2], v[3]);
+}
+
+void glVertex4sv(const GLshort *v)
+{
+  glVertex4f(v[0], v[1], v[2], v[3]);
+}
+
 void glColor3d(GLdouble red, GLdouble green, GLdouble blue)
 {
   glColor3f(red, green, blue);
@@ -125,6 +166,26 @@ void glColor3s(GLshort red, GLshort green, GLshort blue)
   glColor3f(red, green, blue);
 }
 
+void glColor3dv(const GLdouble *v)
+{
+  glColor3f(v[0], v[1], v[2]);
+}
+
+void glColor3fv(const GLfloat *v)
+{
+  glColor3f(v[0], v[1], v[2]);
+}
+
+void glColor3iv(const GLint *v)
+{
+  glColor3f(v[0], v[1], v[2]);
+}
+
+void glColor3sv(const GLshort *v)
+{
+  glColor3f(v[0], v[1], v[2]);
+}
+
 void glColor4d(GLdouble red, GLdouble green, GLdouble blue, GLdouble alpha)
 {
   glColor4f(red, green, blue, alpha);
@@ -147,6 +208,26 @@ void glColor4i(GLint red, GLint green, GLint blue, GLint alpha)
 void glColor4s(GLshort red, GLshort green, GLshort blue, GLshort alpha)
 {
   glColor4f(red, green, blue, alpha);
+}
+
+void glColor4dv(const GLdouble *v)
+{
+  glColor4f(v[0], v[1], v[2], v[3]);
+}
+
+void glColor4fv(const GLfloat *v)
+{
+  glColor4f(v[0], v[1], v[2], v[3]);
+}
+
+void glColor4iv(const GLint *v)
+{
+  glColor4f(v[0], v[1], v[2], v[3]);
+}
+
+void glColor4sv(const GLshort *v)
+{
+  glColor4f(v[0], v[1], v[2], v[3]);
 }
 
 void glNormal3d(GLdouble nx, GLdouble ny, GLdouble nz)
@@ -177,6 +258,26 @@ void glNormal3i(GLint nx, GLint ny, GLint nz)
 void glNormal3s(GLshort nx, GLshort ny, GLshort nz)
 {
   glNormal3f(nx, ny, nz);
+}
+
+void glNormal3dv(const GLdouble *v)
+{
+  glNormal3f(v[0], v[1], v[2]);
+}
+
+void glNormal3fv(const GLfloat *v)
+{
+  glNormal3f(v[0], v[1], v[2]);
+}
+
+void glNormal3iv(const GLint *v)
+{
+  glNormal3f(v[0], v[1], v[2]);
+}
+
+void glNormal3sv(const GLshort *v)
+{
+  glNormal3f(v[0], v[1], v[2]);
 }
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride,
@@ -241,7 +342,7 @@ void glDrawElements(GLenum mode, GLsizei count,
   ctx->varray.count = count;
   ctx->varray.type = type;
   /* XXX */
-  ctx->varray.indices_ptr = indices;
+  //ctx->varray.indices_ptr = indices;
 
   ctx->render_state.type = GL_VERTEX_ARRAY;
   _sgl_pipeline_iteration();

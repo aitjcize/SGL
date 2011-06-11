@@ -9,10 +9,20 @@ extern void glVertex3i(GLint x, GLint y, GLint z);
 extern void glVertex3f(GLfloat x, GLfloat y, GLfloat z);
 extern void glVertex3d(GLdouble x, GLdouble y, GLdouble z);
 
+extern void glVertex3dv(const GLdouble *v);
+extern void glVertex3fv(const GLfloat *v);
+extern void glVertex3iv(const GLint *v);
+extern void glVertex3sv(const GLshort *v);
+
 extern void glVertex4s(GLshort x, GLshort y, GLshort z, GLshort w);
 extern void glVertex4i(GLint x, GLint y, GLint z, GLint w);
 extern void glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 extern void glVertex4d(GLdouble x, GLdouble y, GLdouble z, GLdouble w);
+
+extern void glVertex4dv(const GLdouble *v);
+extern void glVertex4fv(const GLfloat *v);
+extern void glVertex4iv(const GLint *v);
+extern void glVertex4sv(const GLshort *v);
 
 /* glColor */
 extern void glColor3d(GLdouble red, GLdouble green, GLdouble blue);
@@ -20,17 +30,32 @@ extern void glColor3f(GLfloat red, GLfloat green, GLfloat blue);
 extern void glColor3i(GLint red, GLint green, GLint blue);
 extern void glColor3s(GLshort red, GLshort green, GLshort blue);
 
+extern void glColor3dv(const GLdouble *v);
+extern void glColor3fv(const GLfloat *v);
+extern void glColor3iv(const GLint *v);
+extern void glColor3sv(const GLshort *v);
+
 extern void glColor4d(GLdouble red, GLdouble green, GLdouble blue,
                       GLdouble alpha);
 extern void glColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
 extern void glColor4i(GLint red, GLint green, GLint blue, GLint alpha);
 extern void glColor4s(GLshort red, GLshort green, GLshort blue, GLshort alpha);
 
+extern void glColor4dv(const GLdouble *v);
+extern void glColor4fv(const GLfloat *v);
+extern void glColor4iv(const GLint *v);
+extern void glColor4sv(const GLshort *v);
+
 /* glNormal */
 extern void glNormal3d(GLdouble nx, GLdouble ny, GLdouble nz);
 extern void glNormal3f(GLfloat nx, GLfloat ny, GLfloat nz);
 extern void glNormal3i(GLint nx, GLint ny, GLint nz);
 extern void glNormal3s(GLshort nx, GLshort ny, GLshort nz);
+
+extern void glNormal3dv(const GLdouble *v);
+extern void glNormal3fv(const GLfloat *v);
+extern void glNormal3iv(const GLint *v);
+extern void glNormal3sv(const GLshort *v);
 
 /* Pointer */
 extern void glVertexPointer(GLint size, GLenum type, GLsizei stride,

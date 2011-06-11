@@ -61,25 +61,25 @@ void _flood_fill(struct sgl_framebuffer* buf, GLint sx, GLint sy, GLfloat sz,
   _math_vector4f_lazy_free(&ctx->flood_fill);
 }
 
-void _sgl_raster_point(struct sgl_framebuffer* buf, GLfloat* point,
-                       GLfloat* color)
+void _sgl_draw_point(struct sgl_framebuffer* buf, GLfloat* point,
+                     GLfloat* color)
 {
   _sgl_render_pixel(buf, point[0], point[1], point[2], COLOR_FF(color));
 }
 
-void _sgl_raster_line(struct sgl_framebuffer* buf, GLfloat* point,
-                      GLfloat* color)
+void _sgl_draw_line(struct sgl_framebuffer* buf,
+                    GLfloat* point1, GLfloat* point2,
+                    GLfloat* color1, GLfloat* color2)
 {
-  GLint x1 = point[0], y1 = point[1], z1 = point[2],
-        x2 = point[4], y2 = point[5], z2 = point[6];
-
+  GLint x1 = point1[0], y1 = point1[1], z1 = point1[2],
+        x2 = point2[0], y2 = point2[1], z2 = point2[2];
   /* Bresenham's Algorithm */
   int dx, dy, i, err;
   int incx, incy, incz, inc1, inc2;
   int x = x1; 
   int y = y1;
   int z = z1;
-  int cc = COLOR_FF(color);
+  int cc = COLOR_FF(color1);
 
   dx = abs(x2 - x1);
   dy = abs(y2 - y1);
@@ -125,17 +125,14 @@ void _sgl_raster_line(struct sgl_framebuffer* buf, GLfloat* point,
   }
 }
 
-void _sgl_raster_triangle(struct sgl_framebuffer* buf, GLfloat* point,
-                          GLfloat* color)
+void _sgl_draw_triangle(struct sgl_framebuffer* buf, GLfloat* point,
+                        GLfloat* color)
 {
   GET_CURRENT_CONTEXT(ctx);
-  GLfloat wrap_point[8];
-  memcpy(wrap_point, point + 8, sizeof(GLfloat) * 4);
-  memcpy(wrap_point + 4, point, sizeof(GLfloat) * 4);
 
-  _sgl_raster_line(buf, point, color);
-  _sgl_raster_line(buf, point + 4, color);
-  _sgl_raster_line(buf, wrap_point, color);
+  _sgl_draw_line(buf, point    , point + 4, color    , color + 4);
+  _sgl_draw_line(buf, point + 4, point + 8, color + 4, color + 8);
+  _sgl_draw_line(buf, point + 8, point    , color + 8, color);
 
   if (ctx->polygon.front == GL_FILL) {
     GLint sx = 0, sy = 0, sz = 0;
@@ -146,18 +143,46 @@ void _sgl_raster_triangle(struct sgl_framebuffer* buf, GLfloat* point,
   }
 }
 
-void _sgl_raster_quads(struct sgl_framebuffer* buf, GLfloat* point,
-                       GLfloat* color)
+void _sgl_draw_triangle_strip(struct sgl_framebuffer* buf, GLfloat* point,
+                              GLfloat* color, GLuint count)
 {
   GET_CURRENT_CONTEXT(ctx);
-  GLfloat wrap_point[8];
-  memcpy(wrap_point, point + 12, sizeof(GLfloat) * 4);
-  memcpy(wrap_point + 4, point, sizeof(GLfloat) * 4);
+  static GLfloat prev_point[8], prev_color[4];
 
-  _sgl_raster_line(buf, point, color);
-  _sgl_raster_line(buf, point + 4, color);
-  _sgl_raster_line(buf, point + 8, color);
-  _sgl_raster_line(buf, wrap_point, color);
+  if (count == 0) {
+    memcpy(prev_point, point, 4 * sizeof(GLfloat));
+    memcpy(prev_color, color, 4 * sizeof(GLfloat));
+  } else if (count == 1) {
+    memcpy(prev_point + 4, point, 4 * sizeof(GLfloat));
+    memcpy(prev_color + 4, color, 4 * sizeof(GLfloat));
+    _sgl_draw_line(buf, prev_point, prev_point + 4, prev_color, prev_color + 4);
+  } else {
+    _sgl_draw_line(buf, prev_point, point, prev_color, color);
+    _sgl_draw_line(buf, prev_point + 4, point, prev_color + 4, color);
+
+    if (ctx->polygon.front == GL_FILL) {
+      GLint sx = 0, sy = 0, sz = 0;
+      sx = (prev_point[0] + prev_point[4] + point[0]) / 3;
+      sy = (prev_point[1] + prev_point[5] + point[1]) / 3;
+      sz = (prev_point[2] + prev_point[6] + point[2]) / 3;
+      _flood_fill(buf, sx, sy, sz, COLOR_FF(color));
+    }
+
+    memcpy(prev_point, prev_point + 4, 4 * sizeof(GLfloat));
+    memcpy(prev_color, prev_color + 4, 4 * sizeof(GLfloat));
+    memcpy(prev_point + 4, point, 4 * sizeof(GLfloat));
+    memcpy(prev_color + 4, color, 4 * sizeof(GLfloat));
+  }
+}
+
+void _sgl_draw_quads(struct sgl_framebuffer* buf, GLfloat* point,
+                     GLfloat* color)
+{
+  GET_CURRENT_CONTEXT(ctx);
+  _sgl_draw_line(buf, point     , point + 4 , color     , color + 4);
+  _sgl_draw_line(buf, point + 4 , point + 8 , color + 4 , color + 8);
+  _sgl_draw_line(buf, point + 8 , point + 12, color + 8 , color + 12);
+  _sgl_draw_line(buf, point + 12, point,      color + 12, color);
 
   if (ctx->polygon.front == GL_FILL) {
     GLint sx = 0, sy = 0, sz = 0;
@@ -183,6 +208,7 @@ void _sgl_pipeline_draw_list(void)
   GLint n_data = (prim_mode == GL_POINTS) * 1 +
                  (prim_mode == GL_LINES) * 2 +
                  (prim_mode == GL_TRIANGLES) * 3 +
+                 (prim_mode == GL_TRIANGLE_STRIP) * 1 +
                  (prim_mode == GL_QUADS) * 4;
 
   for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
@@ -195,16 +221,19 @@ void _sgl_pipeline_draw_list(void)
 
     switch (prim_mode) {
     case GL_POINTS:
-      _sgl_raster_point(ctx->drawbuffer, point, color);
+      _sgl_draw_point(ctx->drawbuffer, point, color);
       break;
     case GL_LINES:
-      _sgl_raster_line(ctx->drawbuffer, point, color);
+      _sgl_draw_line(ctx->drawbuffer, point, point + 4, color, color + 4);
       break;
     case GL_TRIANGLES:
-      _sgl_raster_triangle(ctx->drawbuffer, point, color);
+      _sgl_draw_triangle(ctx->drawbuffer, point, color);
+      break;
+    case GL_TRIANGLE_STRIP:
+      _sgl_draw_triangle_strip(ctx->drawbuffer, point, color, i);
       break;
     case GL_QUADS:
-      _sgl_raster_quads(ctx->drawbuffer, point, color);
+      _sgl_draw_quads(ctx->drawbuffer, point, color);
       break;
     }
     if (ctx->depth.test)
@@ -214,42 +243,6 @@ void _sgl_pipeline_draw_list(void)
 
 void _sgl_pipeline_draw_array(void)
 {
-  GET_CURRENT_CONTEXT(ctx);
-  GLint i = 0, j = 0, k = 0, idx = 0;
-
-  GLfloat point[16], color[16], normal[16];
-  GLenum prim_mode = ctx->varray.mode;
-  GLint n_data = (prim_mode == GL_POINTS) * 1 +
-                 (prim_mode == GL_LINES) * 2 +
-                 (prim_mode == GL_TRIANGLES) * 3 +
-                 (prim_mode == GL_QUADS) * 4;
-
-  for (i = 0; i < 16; ++i)
-    color[i] = 1;
-
-  for (i = 0; i < ctx->varray.count; ++i) {
-    for (j = 0; j < n_data; ++j) {
-      idx = *((GLshort*)ctx->varray.indices_ptr + i * n_data + j);
-      for (k = 0; k < ctx->vertex_pointer.size; ++k)
-        point[j * 4 + k] = *VEC_ELT(&ctx->vertex_pointer, GLfloat, idx + k);
-      _sgl_affine_transform(&ctx->model_projection_matrix, point + j*n_data);
-    }
-
-    switch (prim_mode) {
-    case GL_POINTS:
-      _sgl_raster_point(ctx->drawbuffer, point, color);
-      break;
-    case GL_LINES:
-      _sgl_raster_line(ctx->drawbuffer, point, color);
-      break;
-    case GL_TRIANGLES:
-      _sgl_raster_triangle(ctx->drawbuffer, point, color);
-      break;
-    case GL_QUADS:
-      _sgl_raster_quads(ctx->drawbuffer, point, color);
-      break;
-    }
-  }
 }
 
 void _sgl_pipeline_rasterize(void)

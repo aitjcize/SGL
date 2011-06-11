@@ -6,4 +6,5 @@ libSGLUT_la_LDFLAGS = \
 libSGLUT_la_SOURCES = \
 		sglutapi.h \
 		types.h \
-		context.c context.h
+		context.c context.h \
+		teapot.c teapot_data.h

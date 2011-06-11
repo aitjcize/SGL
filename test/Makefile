@@ -1,6 +1,6 @@
 CFLAGS = -g -Wall
 LDFLAGS = -L../lib -lSGLUT -lSGL -lSGLU
-BINS = test test_depth test_quads
+BINS = test test_depth test_quads test_teapot
 
 all: $(BINS)
 	$(CC) test.c -o test $(LDFLAGS) $(CFLAGS)

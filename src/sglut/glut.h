@@ -42,6 +42,10 @@ extern void glutPassiveMotionFunc(void (*func)(int x, int y));
 
 extern void glutMainLoop(void);
 
+extern void glutWireTeapot(GLdouble size);
+
+extern void glutSolidTeapot(GLdouble size);
+
 #ifdef __cplusplus
 }
 #endif
