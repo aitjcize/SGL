@@ -218,7 +218,7 @@ void _sgl_primitive_assembly(void)
 void _sgl_pipeline_draw_list(void)
 {
   GET_CURRENT_CONTEXT(ctx);
-  GLint i = 0, j = 0, idx = 0;
+  GLint i = 0, idx = 0;
   GLfloat *point, *color, *normal;
   GLenum prim_mode = ctx->render_state.current_exec_primitive;
   GLint n_data = (prim_mode == GL_POINTS) * 1 +
