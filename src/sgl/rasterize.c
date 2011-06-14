@@ -219,7 +219,7 @@ void _sgl_pipeline_draw_list(void)
 {
   GET_CURRENT_CONTEXT(ctx);
   GLint i = 0, idx = 0;
-  GLfloat *point, *color, *normal;
+  GLfloat *point, *color;
   GLenum prim_mode = ctx->render_state.current_exec_primitive;
   GLint n_data = (prim_mode == GL_POINTS) * 1 +
                  (prim_mode == GL_LINES) * 2 +
@@ -227,31 +227,58 @@ void _sgl_pipeline_draw_list(void)
                  (prim_mode == GL_TRIANGLE_STRIP) * 1 +
                  (prim_mode == GL_QUADS) * 4;
 
-  for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
-    idx = i * n_data;
-    point = VEC_ELT(&ctx->vector_point, GLvoid, idx);
-    color = VEC_ELT(&ctx->vector_color, GLvoid, idx);
-    normal = VEC_ELT(&ctx->vector_normal, GLvoid, idx);
-
-    switch (prim_mode) {
-    case GL_POINTS:
-      _sgl_draw_point(ctx->drawbuffer, point, color);
-      break;
-    case GL_LINES:
-      _sgl_draw_line(ctx->drawbuffer, point, point + 4, color, color + 4);
-      break;
-    case GL_TRIANGLES:
-      _sgl_draw_triangle_v(ctx->drawbuffer, point, color);
-      break;
-    case GL_TRIANGLE_STRIP:
-      _sgl_draw_triangle_strip(ctx->drawbuffer, point, color, i);
-      break;
-    case GL_QUADS:
-      _sgl_draw_quad_v(ctx->drawbuffer, point, color);
-      break;
+  /* Move for inside to reduce branching */
+  switch (prim_mode) {
+  case GL_POINTS:
+    for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
+      idx = i * n_data;
+      _sgl_draw_point(ctx->drawbuffer,
+                      VEC_ELT(&ctx->vector_point, GLvoid, idx),
+                      VEC_ELT(&ctx->vector_color, GLvoid, idx));
+      if (ctx->depth.test)
+        _sgl_pipeline_depth_test();
     }
-    if (ctx->depth.test)
-      _sgl_pipeline_depth_test();
+    break;
+  case GL_LINES:
+    for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
+      idx = i * n_data;
+      point = VEC_ELT(&ctx->vector_point, GLvoid, idx);
+      color = VEC_ELT(&ctx->vector_color, GLvoid, idx);
+      _sgl_draw_line(ctx->drawbuffer, point, point + 4, color, color + 4);
+      if (ctx->depth.test)
+        _sgl_pipeline_depth_test();
+    }
+    break;
+  case GL_TRIANGLES:
+    for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
+      idx = i * n_data;
+      _sgl_draw_triangle_v(ctx->drawbuffer,
+                           VEC_ELT(&ctx->vector_point, GLvoid, idx),
+                           VEC_ELT(&ctx->vector_color, GLvoid, idx));
+      if (ctx->depth.test)
+        _sgl_pipeline_depth_test();
+    }
+    break;
+  case GL_TRIANGLE_STRIP:
+    for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
+      idx = i * n_data;
+      _sgl_draw_triangle_strip(ctx->drawbuffer,
+                               VEC_ELT(&ctx->vector_point, GLvoid, idx),
+                               VEC_ELT(&ctx->vector_color, GLvoid, idx), i);
+      if (ctx->depth.test)
+        _sgl_pipeline_depth_test();
+    }
+    break;
+  case GL_QUADS:
+    for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
+      idx = i * n_data;
+      _sgl_draw_quad_v(ctx->drawbuffer,
+                       VEC_ELT(&ctx->vector_point, GLvoid, idx),
+                       VEC_ELT(&ctx->vector_color, GLvoid, idx));
+      if (ctx->depth.test)
+        _sgl_pipeline_depth_test();
+    }
+    break;
   }
 }
 
