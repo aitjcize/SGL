@@ -80,4 +80,12 @@ do {                        \
   ((z - ctx->drawbuffer->depth_max * ctx->viewport.near) / \
    (ctx->drawbuffer->depth_max * (ctx->viewport.far - ctx->viewport.near)))
 
+#define MOVE_FLOAT_4(dst, src) \
+  do {                         \
+    ((GLfloat*)(dst))[0] = ((GLfloat*)(src))[0];           \
+    ((GLfloat*)(dst))[1] = ((GLfloat*)(src))[1];           \
+    ((GLfloat*)(dst))[2] = ((GLfloat*)(src))[2];           \
+    ((GLfloat*)(dst))[3] = ((GLfloat*)(src))[3];           \
+  } while (0)
+
 #endif /* __SGL_MACROS_H__ */

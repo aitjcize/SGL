@@ -147,14 +147,14 @@ void _sgl_draw_triangle_strip(struct sgl_framebuffer* buf, GLfloat* point,
                               GLfloat* color, GLuint count)
 {
   GET_CURRENT_CONTEXT(ctx);
-  static GLfloat prev_point[8], prev_color[4];
+  static GLfloat prev_point[8], prev_color[8];
 
   if (count == 0) {
-    memcpy(prev_point, point, 4 * sizeof(GLfloat));
-    memcpy(prev_color, color, 4 * sizeof(GLfloat));
+    MOVE_FLOAT_4(prev_point, point);
+    MOVE_FLOAT_4(prev_color, color);
   } else if (count == 1) {
-    memcpy(prev_point + 4, point, 4 * sizeof(GLfloat));
-    memcpy(prev_color + 4, color, 4 * sizeof(GLfloat));
+    MOVE_FLOAT_4(prev_point + 4, point);
+    MOVE_FLOAT_4(prev_color + 4, color);
     _sgl_draw_line(buf, prev_point, prev_point + 4, prev_color, prev_color + 4);
   } else {
     _sgl_draw_line(buf, prev_point, point, prev_color, color);
@@ -168,10 +168,10 @@ void _sgl_draw_triangle_strip(struct sgl_framebuffer* buf, GLfloat* point,
       _flood_fill(buf, sx, sy, sz, COLOR_FF(color));
     }
 
-    memcpy(prev_point, prev_point + 4, 4 * sizeof(GLfloat));
-    memcpy(prev_color, prev_color + 4, 4 * sizeof(GLfloat));
-    memcpy(prev_point + 4, point, 4 * sizeof(GLfloat));
-    memcpy(prev_color + 4, color, 4 * sizeof(GLfloat));
+    MOVE_FLOAT_4(prev_point, prev_point + 4);
+    MOVE_FLOAT_4(prev_color, prev_color + 4);
+    MOVE_FLOAT_4(prev_point + 4, point);
+    MOVE_FLOAT_4(prev_color + 4, color);
   }
 }
 
@@ -202,8 +202,8 @@ void _sgl_primitive_assembly(void)
 void _sgl_pipeline_draw_list(void)
 {
   GET_CURRENT_CONTEXT(ctx);
-  GLint i = 0, j = 0, idx = 0, size = 4 * sizeof(GLfloat);
-  GLfloat point[16], color[16], normal[16];
+  GLint i = 0, j = 0, idx = 0;
+  GLfloat *point, *color, *normal;
   GLenum prim_mode = ctx->render_state.current_exec_primitive;
   GLint n_data = (prim_mode == GL_POINTS) * 1 +
                  (prim_mode == GL_LINES) * 2 +
@@ -212,12 +212,10 @@ void _sgl_pipeline_draw_list(void)
                  (prim_mode == GL_QUADS) * 4;
 
   for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
-    for (j = 0; j < n_data; ++j) {
-      idx = i * n_data + j;
-      memcpy(point + j*4, VEC_ELT(&ctx->vector_point, GLvoid, idx), size);
-      memcpy(normal + j*4, VEC_ELT(&ctx->vector_normal, GLvoid, idx), size);
-      memcpy(color + j*4, VEC_ELT(&ctx->vector_color, GLvoid, idx), size);
-    }
+    idx = i * n_data;
+    point = VEC_ELT(&ctx->vector_point, GLvoid, idx);
+    color = VEC_ELT(&ctx->vector_color, GLvoid, idx);
+    normal = VEC_ELT(&ctx->vector_normal, GLvoid, idx);
 
     switch (prim_mode) {
     case GL_POINTS:
