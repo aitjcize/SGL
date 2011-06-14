@@ -9,23 +9,27 @@
 
 void _sgl_init_framebuffer(struct sgl_context* ctx)
 {
-  ctx->drawbuffer = malloc(sizeof(struct sgl_framebuffer));
-  ctx->drawbuffer->width = ctx->buffer.width;
-  ctx->drawbuffer->height = ctx->buffer.height;
-  ctx->drawbuffer->depth_max = 65535;
-  _sgl_init_renderbuffer(&ctx->drawbuffer->clear_color_buf, GL_UNSIGNED_INT);
-  _sgl_init_renderbuffer(&ctx->drawbuffer->clear_depth_buf, GL_FLOAT);
+  struct sgl_framebuffer* buf = NULL;
+  buf = malloc(sizeof(struct sgl_framebuffer));
+  buf->width = ctx->buffer.width;
+  buf->height = ctx->buffer.height;
+  buf->depth_max = 65535;
 
-  _sgl_init_renderbuffer(&ctx->drawbuffer->t_color_buf, GL_UNSIGNED_INT);
-  _sgl_init_renderbuffer(&ctx->drawbuffer->t_depth_buf, GL_FLOAT);
-  _sgl_init_renderbuffer(&ctx->drawbuffer->t_normal_buf, GL_UNSIGNED_INT);
+  _sgl_init_renderbuffer(&buf->clear_color_buf, GL_UNSIGNED_INT, GL_TRUE);
+  _sgl_init_renderbuffer(&buf->clear_depth_buf, GL_FLOAT, GL_TRUE);
 
-  _sgl_init_renderbuffer(&ctx->drawbuffer->color_buf, GL_UNSIGNED_INT);
-  _sgl_init_renderbuffer(&ctx->drawbuffer->depth_buf, GL_FLOAT);
-  _sgl_init_renderbuffer(&ctx->drawbuffer->normal_buf, GL_UNSIGNED_INT);
+  _sgl_init_renderbuffer(&buf->t_color_buf, GL_UNSIGNED_INT, GL_TRUE);
+  _sgl_init_renderbuffer(&buf->t_depth_buf, GL_FLOAT, GL_TRUE);
+  _sgl_init_renderbuffer(&buf->t_normal_buf, GL_UNSIGNED_INT, GL_TRUE);
 
-  ctx->drawbuffer->r_color_buf = &ctx->drawbuffer->color_buf;
-  ctx->drawbuffer->r_depth_buf = &ctx->drawbuffer->depth_buf;
+  _sgl_init_renderbuffer(&buf->color_buf, GL_UNSIGNED_INT, GL_FALSE);
+  _sgl_init_renderbuffer(&buf->depth_buf, GL_FLOAT, GL_TRUE);
+  _sgl_init_renderbuffer(&buf->normal_buf, GL_UNSIGNED_INT, GL_TRUE);
+
+  buf->r_color_buf = &buf->color_buf;
+  buf->r_depth_buf = &buf->depth_buf;
+
+  ctx->drawbuffer = buf;
 }
 
 void _sgl_free_framebuffer_data(struct sgl_context* ctx)

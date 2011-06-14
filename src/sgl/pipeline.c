@@ -23,16 +23,12 @@ void _sgl_pipeline_iteration(void)
     ctx->pipeline.rasterize();
   if (ctx->pipeline.fragment_shader)
     ctx->pipeline.fragment_shader();
-
-  memcpy(ctx->drawbuffer->final_buffer.data,
-         ctx->drawbuffer->color_buf.data,
-         ctx->buffer.width * ctx->buffer.height * 4);
 }
 
 void sglPipelineIter(char* buffer)
 {
   GET_CURRENT_CONTEXT(ctx);
-  ctx->drawbuffer->final_buffer.data = buffer;
+  ctx->drawbuffer->color_buf.data = buffer;
 }
 
 void _sgl_pipeline_depth_test(void)

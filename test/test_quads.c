@@ -6,7 +6,7 @@
 
 #define RAD(x) (x * M_PI / 180.0)
 
-#define DIV 20
+#define DIV 30
 
 static double g_theta = 0;
 static double g_phi = 0;
@@ -111,7 +111,7 @@ void display(void)
 
   glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
   glColor3f(1.0, 1.0, 1.0);
-  draw_sphere(2.0, DIV, DIV);
+  draw_sphere(1.5, DIV, DIV);
 
   glutSwapBuffers();
 }

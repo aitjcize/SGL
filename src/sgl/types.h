@@ -21,7 +21,8 @@ struct sgl_renderbuffer
 {
   GLuint width, height;     /* Dimemsion */
   GLuint type;              /* Storage type */
-  GLchar* data;            /* Buffer data */
+  GLchar* data;             /* Buffer data */
+  GLboolean allocated;      /* Buffer allocated */
 };
 
 struct sgl_framebuffer
@@ -35,7 +36,6 @@ struct sgl_framebuffer
   struct sgl_renderbuffer* r_color_buf;
   struct sgl_renderbuffer* r_depth_buf;
 
-  struct sgl_renderbuffer final_buffer;
   struct sgl_renderbuffer clear_color_buf;
   struct sgl_renderbuffer clear_depth_buf;
 
