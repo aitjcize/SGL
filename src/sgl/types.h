@@ -93,7 +93,7 @@ struct sgl_vertex_array_attrib {
   GLenum mode;
   GLint count;
   GLenum type;
-  GLvoid* indices_ptr;
+  const GLvoid* indices_ptr;
 };
 
 struct sgl_render_state

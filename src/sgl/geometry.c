@@ -341,8 +341,7 @@ void glDrawElements(GLenum mode, GLsizei count,
   ctx->varray.mode = mode;
   ctx->varray.count = count;
   ctx->varray.type = type;
-  /* XXX */
-  //ctx->varray.indices_ptr = indices;
+  ctx->varray.indices_ptr = indices;
 
   ctx->render_state.type = GL_VERTEX_ARRAY;
   _sgl_pipeline_iteration();
