@@ -1,0 +1,6 @@
+================================================================================
+SGL - Software GL
+================================================================================
+
+SGL implements a subset of standard OpenGL APIs with pure software simulation
+(without GPU)
