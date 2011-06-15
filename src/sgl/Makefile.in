@@ -68,10 +68,10 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libSGL_la_LIBADD =
-am_libSGL_la_OBJECTS = utils.lo context.lo geometry.lo polygon.lo \
-	logging.lo matrix.lo viewport.lo color.lo depth.lo \
-	framebuffer.lo renderbuffer.lo pipeline.lo rasterize.lo \
-	m_vector.lo m_matrix.lo
+am_libSGL_la_OBJECTS = color.lo context.lo depth.lo framebuffer.lo \
+	geometry.lo logging.lo matrix.lo pipeline.lo polygon.lo \
+	rasterize.lo renderbuffer.lo utils.lo viewport.lo m_vector.lo \
+	m_matrix.lo
 libSGL_la_OBJECTS = $(am_libSGL_la_OBJECTS)
 libSGL_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -220,23 +220,24 @@ libSGL_la_LDFLAGS = \
 
 libSGL_la_SOURCES = \
 		config.h \
-		macro.h \
+		gl.h \
+		macros.h \
 		sglapi.h \
 		sglheader.h \
 		types.h \
-		utils.c utils.h \
-		context.c context.h \
-		geometry.c geometry. h \
-		polygon.c polygon. h \
-		logging.c logging.h \
-		matrix.c matrix .h \
-		viewport.c viewport.h \
 		color.c color.h \
+		context.c context.h \
 		depth.c depth.h \
 		framebuffer.c framebuffer.h \
-		renderbuffer.c renderbuffer.h \
+		geometry.c geometry.h \
+		logging.c logging.h \
+		matrix.c matrix.h \
 		pipeline.c pipeline.h \
+		polygon.c polygon.h \
 		rasterize.c rasterize.h \
+		renderbuffer.c renderbuffer.h \
+		utils.c utils.h \
+		viewport.c viewport.h \
 		$(SRC_ROOT)/math/m_vector.c $(SRC_ROOT)/math/m_vector.h \
 		$(SRC_ROOT)/math/m_matrix.c $(SRC_ROOT)/math/m_matrix.h
 

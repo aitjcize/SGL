@@ -6,22 +6,23 @@ libSGL_la_LDFLAGS = \
 		-version-info $(LIBSGL_CURRENT):$(LIBSGL_REVISION):$(LIBSGL_AGE)
 libSGL_la_SOURCES = \
 		config.h \
-		macro.h \
+		gl.h \
+		macros.h \
 		sglapi.h \
 		sglheader.h \
 		types.h \
-		utils.c utils.h \
-		context.c context.h \
-		geometry.c geometry. h \
-		polygon.c polygon. h \
-		logging.c logging.h \
-		matrix.c matrix .h \
-		viewport.c viewport.h \
 		color.c color.h \
+		context.c context.h \
 		depth.c depth.h \
 		framebuffer.c framebuffer.h \
-		renderbuffer.c renderbuffer.h \
+		geometry.c geometry.h \
+		logging.c logging.h \
+		matrix.c matrix.h \
 		pipeline.c pipeline.h \
+		polygon.c polygon.h \
 		rasterize.c rasterize.h \
+		renderbuffer.c renderbuffer.h \
+		utils.c utils.h \
+		viewport.c viewport.h \
 		$(SRC_ROOT)/math/m_vector.c $(SRC_ROOT)/math/m_vector.h \
 		$(SRC_ROOT)/math/m_matrix.c $(SRC_ROOT)/math/m_matrix.h

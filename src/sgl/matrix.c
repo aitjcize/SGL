@@ -7,7 +7,7 @@
 #include "logging.h"
 #include "math/m_matrix.h"
 
-static void init_matrix_stack(struct sgl_matrix_stack* stack, GLuint max_depth)
+static void _init_matrix_stack(struct sgl_matrix_stack* stack, GLuint max_depth)
 {
   GLuint i = 0;
   stack->depth = 0;
@@ -21,7 +21,7 @@ static void init_matrix_stack(struct sgl_matrix_stack* stack, GLuint max_depth)
   stack->top = stack->stack;
 }
 
-static void free_matrix_stack(struct sgl_matrix_stack* stack)
+static void _free_matrix_stack(struct sgl_matrix_stack* stack)
 {
   GLuint i = 0;
 
@@ -33,16 +33,16 @@ static void free_matrix_stack(struct sgl_matrix_stack* stack)
 
 void _sgl_init_matrix(struct sgl_context* ctx)
 {
-  init_matrix_stack(&ctx->modelview_matrix_stack, MAX_MODELVIEW_STACK_DEPTH);
-  init_matrix_stack(&ctx->projection_matrix_stack, MAX_PROJECTION_STACK_DEPTH);
+  _init_matrix_stack(&ctx->modelview_matrix_stack, MAX_MODELVIEW_STACK_DEPTH);
+  _init_matrix_stack(&ctx->projection_matrix_stack, MAX_PROJECTION_STACK_DEPTH);
   ctx->current_stack = &ctx->modelview_matrix_stack;
   _math_matrix_init(&ctx->model_projection_matrix);
 }
 
 void _sgl_free_matrix_data(struct sgl_context* ctx)
 {
-  free_matrix_stack(&ctx->modelview_matrix_stack);
-  free_matrix_stack(&ctx->projection_matrix_stack);
+  _free_matrix_stack(&ctx->modelview_matrix_stack);
+  _free_matrix_stack(&ctx->projection_matrix_stack);
   _math_matrix_free(&ctx->model_projection_matrix);
 }
 
