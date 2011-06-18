@@ -110,17 +110,17 @@ void display(void)
   glRotatef(g_phi, 0.0, 1.0, 0.0);
   glRotatef(g_theta, cos(RAD(g_phi)), 0.0, -sin(RAD(g_phi)));
 
-  glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+  //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
   //glEnable(GL_DEPTH_TEST);
   glColor3f (1.0, 1.0, 1.0);
 
-  //glBegin(GL_TRIANGLE_STRIP);
+  glutWireSphere(1.5, 30, 30);
+  //glBegin(GL_LINE_LOOP);
   //  glVertex3f(1, 1, 0);
   //  glVertex3f(1, -1, 0);
   //  glVertex3f(-1, -1, 0);
   //  glVertex3f(-1, 1, 0);
   //glEnd();
-  glutWireTeapot(1.0);
 
   glDisable(GL_DEPTH_TEST);
   glutSwapBuffers();

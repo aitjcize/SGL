@@ -1,3 +1,24 @@
+/**
+ * @file   rasterize.c
+ *
+ * Copyright (C) 2011 - SGL Authors <aitjcize@gmail.com>
+ * All Rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 #include "rasterize.h"
 
 #include <stdio.h>
@@ -125,6 +146,27 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
   }
 }
 
+void _sgl_draw_line_loop(struct sgl_framebuffer* buf,
+                         GLfloat* point, GLfloat* color,
+                         GLint count) 
+{
+  static GLfloat first_point[4], first_color[4];
+  static GLfloat prev_point[4], prev_color[4];
+
+  if (count == 0) {
+    MOVE_FLOAT_4(first_point, point);
+    MOVE_FLOAT_4(first_color, color);
+    MOVE_FLOAT_4(prev_point, point);
+    MOVE_FLOAT_4(prev_color, color);
+  } else if (count == -1) {
+    _sgl_draw_line(buf, prev_point, first_point, prev_color, first_color);
+  } else {
+    _sgl_draw_line(buf, prev_point, point, prev_color, color);
+    MOVE_FLOAT_4(prev_point, point);
+    MOVE_FLOAT_4(prev_color, color);
+  }
+}
+
 void _sgl_draw_triangle(struct sgl_framebuffer* buf,
                         GLfloat* p1, GLfloat* p2, GLfloat* p3,
                         GLfloat* c1, GLfloat* c2, GLfloat* c3)
@@ -223,11 +265,12 @@ void _sgl_pipeline_draw_list(void)
   GLenum prim_mode = ctx->render_state.current_exec_primitive;
   GLint n_data = (prim_mode == GL_POINTS) * 1 +
                  (prim_mode == GL_LINES) * 2 +
+                 (prim_mode == GL_LINE_LOOP) * 1 +
                  (prim_mode == GL_TRIANGLES) * 3 +
                  (prim_mode == GL_TRIANGLE_STRIP) * 1 +
                  (prim_mode == GL_QUADS) * 4;
 
-  /* Move for inside to reduce branching */
+  /* Move for-loop inside to reduce branching */
   switch (prim_mode) {
   case GL_POINTS:
     for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
@@ -249,6 +292,17 @@ void _sgl_pipeline_draw_list(void)
         _sgl_pipeline_depth_test();
     }
     break;
+  case GL_LINE_LOOP:
+    for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
+      idx = i * n_data;
+      _sgl_draw_line_loop(ctx->drawbuffer,
+                          VEC_ELT(&ctx->vector_point, GLvoid, idx),
+                          VEC_ELT(&ctx->vector_color, GLvoid, idx), i);
+    }
+    _sgl_draw_line_loop(ctx->drawbuffer, point = 0, color = 0, -1);
+    if (ctx->depth.test)
+      _sgl_pipeline_depth_test();
+    break;
   case GL_TRIANGLES:
     for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
       idx = i * n_data;
@@ -265,9 +319,9 @@ void _sgl_pipeline_draw_list(void)
       _sgl_draw_triangle_strip(ctx->drawbuffer,
                                VEC_ELT(&ctx->vector_point, GLvoid, idx),
                                VEC_ELT(&ctx->vector_color, GLvoid, idx), i);
-      if (ctx->depth.test)
-        _sgl_pipeline_depth_test();
     }
+    if (ctx->depth.test)
+      _sgl_pipeline_depth_test();
     break;
   case GL_QUADS:
     for (i = 0; i < ctx->vector_point.count / n_data; ++i) {

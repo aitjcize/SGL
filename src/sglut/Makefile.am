@@ -7,4 +7,5 @@ libSGLUT_la_SOURCES = \
 		sglutapi.h \
 		types.h \
 		context.c context.h \
+		geometry.c geometry.h \
 		teapot.c teapot_data.h
