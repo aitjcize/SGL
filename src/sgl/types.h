@@ -32,6 +32,21 @@
 #define PRIM_INSIDE_UNKNOW_PRIM  (GL_POLYGON+2)
 #define PRIM_UNKNOWN             (GL_POLYGON+3)
 
+/* Material Bit flags */
+#define MAT_ATTRIB_FRONT_AMBIENT           0 
+#define MAT_ATTRIB_BACK_AMBIENT            1
+#define MAT_ATTRIB_FRONT_DIFFUSE           2 
+#define MAT_ATTRIB_BACK_DIFFUSE            3
+#define MAT_ATTRIB_FRONT_SPECULAR          4 
+#define MAT_ATTRIB_BACK_SPECULAR           5
+#define MAT_ATTRIB_FRONT_EMISSION          6
+#define MAT_ATTRIB_BACK_EMISSION           7
+#define MAT_ATTRIB_FRONT_SHININESS         8
+#define MAT_ATTRIB_BACK_SHININESS          9
+#define MAT_ATTRIB_FRONT_INDEXES           10
+#define MAT_ATTRIB_BACK_INDEXES            11
+#define MAT_ATTRIB_MAX                     12
+
 struct sgl_buffer_attrib
 {
   GLuint width, height;
@@ -79,7 +94,7 @@ struct sgl_matrix_stack
 
 struct sgl_depthbuffer_attrib
 {
-  GLenum func;	            /* Function for depth buffer compare */
+  GLenum func;              /* Function for depth buffer compare */
   GLclampd clear;           /* Value to clear depth buffer to */
   GLboolean test;           /* Depth buffering enabled flag */
   GLboolean mask;           /* Depth buffer writable? */
@@ -123,6 +138,52 @@ struct sgl_render_state
   GLint current_exec_primitive;   /* Current executed primitive */
   GLint type;                     /* 0 or GL_VERTEX_ARRAY */
   GLint needflush;
+};
+
+struct sgl_light
+{
+   struct gl_light *next;       /* double linked list with sentinel */
+   struct gl_light *prev;
+
+   GLfloat ambient[4];          /* ambient color */
+   GLfloat diffuse[4];          /* diffuse color */
+   GLfloat specular[4];         /* specular color */
+   GLfloat eye_position[4];     /* position in eye coordinates */
+   GLfloat spot_direction[4];   /* spotlight direction in eye coordinates */
+   
+   GLfloat spot_exponent;
+   GLfloat spot_cutoff;         /* in degrees */
+   GLfloat _cos_cutoff_neg;     /* cos(SpotCutoff) */
+   GLfloat _cos_cutoff;         /* MAX(0, cos(SpotCutoff)) */
+   
+   GLfloat constant_attenuation;
+   GLfloat linear_attenuation;
+   GLfloat quadratic_attenuation;
+   GLboolean enabled;           /* On/off flag */
+
+   GLfloat _position[4];        /* position in eye/obj coordinates */
+   GLfloat _vp_inf_norm[3];     /* Norm direction to infinite light */
+   GLfloat _h_inf_norm[3];      /* Norm( _VP_inf_norm + <0,0,1> ) */
+   GLfloat _normspot_direction[4]; /* normalized spotlight direction */
+   GLfloat _vp_inf_spot_attenuation;
+
+   GLfloat _mat_ambient[2][3];  /* material ambient * light ambient */
+   GLfloat _mat_diffuse[2][3];  /* material diffuse * light diffuse */
+   GLfloat _mat_specular[2][3]; /* material spec * light specular */
+};
+
+struct sgl_lightmodel
+{
+   GLfloat Ambient[4];     /* ambient color */
+   GLboolean LocalViewer;  /* Local (or infinite) view point */
+   GLboolean TwoSide;      /* Two (or one) sided lighting */
+   GLenum ColorControl;    /* either GL_SINGLE_COLOR or
+                            * GL_SEPARATE_SPECULAR_COLOR */
+};
+
+struct sgl_material
+{
+   GLfloat Attrib[MAT_ATTRIB_MAX][4];
 };
 
 struct sgl_pipeline

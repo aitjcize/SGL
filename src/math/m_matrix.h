@@ -94,4 +94,42 @@ extern void _math_matrix_copy(SGLmatrix* to, const SGLmatrix* from);
 
 extern void _math_matrix_print(SGLmatrix* mat);
 
+/*
+ * Transform a point (column vector) by a matrix:   Q = M * P
+ */
+#define TRANSFORM_POINT( Q, M, P )					\
+   Q[0] = M[0] * P[0] + M[4] * P[1] + M[8] *  P[2] + M[12] * P[3];	\
+   Q[1] = M[1] * P[0] + M[5] * P[1] + M[9] *  P[2] + M[13] * P[3];	\
+   Q[2] = M[2] * P[0] + M[6] * P[1] + M[10] * P[2] + M[14] * P[3];	\
+   Q[3] = M[3] * P[0] + M[7] * P[1] + M[11] * P[2] + M[15] * P[3];
+
+
+#define TRANSFORM_POINT3( Q, M, P )				\
+   Q[0] = M[0] * P[0] + M[4] * P[1] + M[8] *  P[2] + M[12];	\
+   Q[1] = M[1] * P[0] + M[5] * P[1] + M[9] *  P[2] + M[13];	\
+   Q[2] = M[2] * P[0] + M[6] * P[1] + M[10] * P[2] + M[14];	\
+   Q[3] = M[3] * P[0] + M[7] * P[1] + M[11] * P[2] + M[15];
+
+
+/*
+ * Transform a normal (row vector) by a matrix:  [NX NY NZ] = N * MAT
+ */
+#define TRANSFORM_NORMAL( TO, N, MAT )				\
+do {								\
+   TO[0] = N[0] * MAT[0] + N[1] * MAT[1] + N[2] * MAT[2];	\
+   TO[1] = N[0] * MAT[4] + N[1] * MAT[5] + N[2] * MAT[6];	\
+   TO[2] = N[0] * MAT[8] + N[1] * MAT[9] + N[2] * MAT[10];	\
+} while (0)
+
+
+/**
+ * Transform a direction by a matrix.
+ */
+#define TRANSFORM_DIRECTION( TO, DIR, MAT )			\
+do {								\
+   TO[0] = DIR[0] * MAT[0] + DIR[1] * MAT[4] + DIR[2] * MAT[8];	\
+   TO[1] = DIR[0] * MAT[1] + DIR[1] * MAT[5] + DIR[2] * MAT[9];	\
+   TO[2] = DIR[0] * MAT[2] + DIR[1] * MAT[6] + DIR[2] * MAT[10];\
+} while (0)
+
 #endif /* __SGL_MATH_MATRIX_H__ */
