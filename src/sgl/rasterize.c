@@ -124,6 +124,7 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
       else
         err += inc2;
       x += incx;
+      z += incz;
       _sgl_render_pixel(buf, x, y, z, cc);
     }
   } else {
@@ -141,6 +142,7 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
         err += inc2;
 
       y += incy;
+      z += incz;
       _sgl_render_pixel(buf, x, y, z, cc);
     }
   }

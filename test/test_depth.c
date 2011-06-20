@@ -35,7 +35,7 @@ void display(void)
   glRotatef(g_theta, cos(RAD(g_phi)), 0.0, -sin(RAD(g_phi)));
 
   //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
-  //glEnable(GL_DEPTH_TEST);
+  glEnable(GL_DEPTH_TEST);
   glColor3f (1.0, 1.0, 1.0);
 
   glBegin(GL_QUADS);
@@ -51,6 +51,22 @@ void display(void)
     glVertex3f(0.5, 0.5, -1);
     glVertex3f(0.5, 1.5, -1);
   glEnd();
+
+#if 0
+  glBegin(GL_QUADS);
+    glVertex3f(1, 1, 1);
+    glVertex3f(1, -1, 1);
+    glVertex3f(-1, -1, -1);
+    glVertex3f(-1, 1, -1);
+  glEnd();
+  glColor3f (1.0, 0.0, 0.0);
+  glBegin(GL_QUADS);
+    glVertex3f(1.5, 1.5, -1);
+    glVertex3f(1.5, 0.5, -1);
+    glVertex3f(0.5, 0.5, 1);
+    glVertex3f(0.5, 1.5, 1);
+  glEnd();
+#endif
 
   glDisable(GL_DEPTH_TEST);
   glutSwapBuffers();
