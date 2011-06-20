@@ -144,7 +144,6 @@ void glutCreateWindow(char* name)
                                     ctx->win_width, ctx->win_height,
                                     0, blackColor, blackColor);
 
-  // register interest in the delete window message
   Atom wmDeleteMessage = XInternAtom(ctx->display, "WM_DELETE_WINDOW",False);
   XSetWMProtocols(ctx->display, ctx->window, &wmDeleteMessage, 1);
 
