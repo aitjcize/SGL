@@ -138,6 +138,7 @@ struct sgl_render_state
   GLint current_exec_primitive;   /* Current executed primitive */
   GLint type;                     /* 0 or GL_VERTEX_ARRAY */
   GLint needflush;
+  GLint* gfill;                   /* Wether a geometry needs to be fill */
   GLint* edge_tab;
 };
 

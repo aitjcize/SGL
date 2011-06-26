@@ -32,7 +32,7 @@
 #include "math/m_matrix.h"
 #include "math/m_vector.h"
 
-void _sgl_insert_edge(GLuint x, GLuint y)
+void _insert_edge(GLuint x, GLuint y)
 {
   GET_CURRENT_CONTEXT(ctx);
   GLint* et = ctx->render_state.edge_tab;
@@ -40,7 +40,7 @@ void _sgl_insert_edge(GLuint x, GLuint y)
   GLint oidx = EDGE_TABLE_SIZE -2;
   GLuint count = ET_GET(et, y, cidx);
 
-  if (ET_GET(et, y, count -1) == x)
+  if (ET_GET(et, y, count -1) == x || count >= EDGE_TABLE_SIZE - 2)
     return;
 
   switch (count % 2) {
@@ -71,6 +71,8 @@ void _sgl_render_pixel(struct sgl_framebuffer* buf,
   if (x > 0 && y >= 0 && x <= buf->width && y < buf->height) {
     BUF_SET_C(buf->r_color_buf, x, y, cc);
     BUF_SET_D(buf->r_depth_buf, x, y, NORMALIZE_Z(ctx, z));
+    if (ctx->render_state.gfill)
+      _insert_edge(x, y);
   }
 }
 
@@ -130,7 +132,6 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
   /* Draw m <= 1 Line */
   if(dx > dy) {
     _sgl_render_pixel(buf, x, y, z, cc);
-    _sgl_insert_edge(x, y);
     err = (2 * dy) - dx;
     inc1 = 2 * (dy - dx);
     inc2 = 2 * dy;
@@ -145,11 +146,9 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
       x += incx;
       z += incz;
       _sgl_render_pixel(buf, x, y, z, cc);
-      _sgl_insert_edge(x, y);
     }
   } else {
     _sgl_render_pixel(buf, x, y, z, cc);
-    _sgl_insert_edge(x, y);
     err = (2 * dx) - dy;
     inc1 = 2 * (dx - dy);
     inc2 = 2 * dx;
@@ -165,7 +164,6 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
       y += incy;
       z += incz;
       _sgl_render_pixel(buf, x, y, z, cc);
-      _sgl_insert_edge(x, y);
     }
   }
 }
@@ -282,6 +280,7 @@ void _sgl_pipeline_draw_list(void)
   /* Move for-loop inside to reduce branching */
   switch (prim_mode) {
   case GL_POINTS:
+    ctx->render_state.gfill = GL_FALSE;
     for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
       idx = i * n_data;
       _sgl_draw_point(ctx->drawbuffer,
@@ -292,6 +291,7 @@ void _sgl_pipeline_draw_list(void)
     }
     break;
   case GL_LINES:
+    ctx->render_state.gfill = GL_FALSE;
     for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
       idx = i * n_data;
       point = VEC_ELT(&ctx->vector_point, GLvoid, idx);
@@ -302,6 +302,7 @@ void _sgl_pipeline_draw_list(void)
     }
     break;
   case GL_LINE_LOOP:
+    ctx->render_state.gfill = GL_FALSE;
     for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
       idx = i * n_data;
       _sgl_draw_line_loop(ctx->drawbuffer,
@@ -313,6 +314,7 @@ void _sgl_pipeline_draw_list(void)
       _sgl_pipeline_depth_test();
     break;
   case GL_TRIANGLES:
+    ctx->render_state.gfill = GL_TRUE;
     for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
       idx = i * n_data;
       _sgl_draw_triangle_v(ctx->drawbuffer,
@@ -323,6 +325,7 @@ void _sgl_pipeline_draw_list(void)
     }
     break;
   case GL_TRIANGLE_STRIP:
+    ctx->render_state.gfill = GL_TRUE;
     for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
       idx = i * n_data;
       _sgl_draw_triangle_strip(ctx->drawbuffer,
@@ -333,6 +336,7 @@ void _sgl_pipeline_draw_list(void)
       _sgl_pipeline_depth_test();
     break;
   case GL_QUADS:
+    ctx->render_state.gfill = GL_TRUE;
     for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
       idx = i * n_data;
       _sgl_draw_quad_v(ctx->drawbuffer,
