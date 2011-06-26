@@ -79,4 +79,7 @@ void _sgl_pipeline_depth_test(void)
   memcpy(ctx->drawbuffer->t_depth_buf.data,
          ctx->drawbuffer->clear_depth_buf.data,
          size * sizeof(GLfloat));
+
+  memset(ctx->render_state.edge_tab, 0,
+         buf->height * EDGE_TABLE_SIZE * sizeof(GLint));
 }

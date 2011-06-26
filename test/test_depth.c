@@ -36,37 +36,29 @@ void display(void)
 
   //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
   glEnable(GL_DEPTH_TEST);
-  glColor3f (1.0, 1.0, 1.0);
 
+  glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+  glColor3f (1.0, 0.0, 0.0);
   glBegin(GL_QUADS);
     glVertex3f(1, 1, 0);
     glVertex3f(1, -1, 0);
     glVertex3f(-1, -1, 0);
     glVertex3f(-1, 1, 0);
   glEnd();
-  glColor3f (1.0, 0.0, 0.0);
-  glBegin(GL_QUADS);
-    glVertex3f(1.5, 1.5, -1);
-    glVertex3f(1.5, 0.5, -1);
-    glVertex3f(0.5, 0.5, -1);
-    glVertex3f(0.5, 1.5, -1);
-  glEnd();
-
-#if 0
-  glBegin(GL_QUADS);
-    glVertex3f(1, 1, 0);
-    glVertex3f(1, -1, 0);
-    glVertex3f(-1, -1, 0);
-    glVertex3f(-1, 1, 0);
-  glEnd();
-  glColor3f (1.0, 0.0, 0.0);
+  glColor3f (0.0, 1.0, 0.0);
   glBegin(GL_QUADS);
     glVertex3f(0.0, 1, 1);
     glVertex3f(0.0, 1, -1);
     glVertex3f(0.0, -1, -1);
     glVertex3f(0.0, -1, 1);
   glEnd();
-#endif
+  glColor3f (0.0, 0.0, 1.0);
+  glBegin(GL_QUADS);
+    glVertex3f(1, 0, 1);
+    glVertex3f(1, 0, -1);
+    glVertex3f(-1, 0, -1);
+    glVertex3f(-1, 0, 1);
+  glEnd();
 
   glDisable(GL_DEPTH_TEST);
   glutSwapBuffers();

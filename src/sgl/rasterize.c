@@ -133,7 +133,7 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
         x2 = point2[0], y2 = point2[1], z2 = point2[2];
 
   GLint dx, dy, i, err;
-  GLint incx, incy, incz, inc1, inc2;
+  GLint incx, incy, inc1, inc2;
   GLfloat a = LEN_2(x2 - x1, y2 - y1), x = x1, y = y1, z = z1;
   GLint cc1 = COLOR_FF(color1);
   GLint cc2 = COLOR_FF(color2);
@@ -143,11 +143,11 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
 
   incx = (x2 > x1) - (x2 < x1);
   incy = (y2 > y1) - (y2 < y1);
-  incz = (z2 > z1) - (z2 < z1);
 
   /* Draw m <= 1 Line */
   if(dx > dy) {
-    _sgl_render_pixel(buf, x, y, z, COLOR_IP(cc1, cc2, LEN_2(x-x1, y-y1), a));
+    _sgl_render_pixel(buf, x, y, LINEAR_IP(z1, z2, LEN_2(x-x1, y-y1), a),
+                      COLOR_IP(cc1, cc2, LEN_2(x-x1, y-y1), a));
     err = (2 * dy) - dx;
     inc1 = 2 * (dy - dx);
     inc2 = 2 * dy;
@@ -160,11 +160,12 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
       else
         err += inc2;
       x += incx;
-      z += incz;
-      _sgl_render_pixel(buf, x, y, z, COLOR_IP(cc1, cc2, LEN_2(x-x1, y-y1), a));
+      _sgl_render_pixel(buf, x, y, LINEAR_IP(z1, z2, LEN_2(x-x1, y-y1), a),
+                        COLOR_IP(cc1, cc2, LEN_2(x-x1, y-y1), a));
     }
   } else {
-    _sgl_render_pixel(buf, x, y, z, COLOR_IP(cc1, cc2, LEN_2(x-x1, y-y1), a));
+    _sgl_render_pixel(buf, x, y, LINEAR_IP(z1, z2, LEN_2(x-x1, y-y1), a),
+                      COLOR_IP(cc1, cc2, LEN_2(x-x1, y-y1), a));
     err = (2 * dx) - dy;
     inc1 = 2 * (dx - dy);
     inc2 = 2 * dx;
@@ -178,8 +179,8 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
         err += inc2;
 
       y += incy;
-      z += incz;
-      _sgl_render_pixel(buf, x, y, z, COLOR_IP(cc1, cc2, LEN_2(x-x1, y-y1), a));
+      _sgl_render_pixel(buf, x, y, LINEAR_IP(z1, z2, LEN_2(x-x1, y-y1), a),
+                        COLOR_IP(cc1, cc2, LEN_2(x-x1, y-y1), a));
     }
   }
 }
