@@ -40,6 +40,7 @@ AC_CONFIG_FILES([Makefile
 		 src/sgl/Makefile
 		 src/sglu/Makefile
 		 src/sglut/Makefile
+		 test/Makefile
 		 ])
 
 AC_OUTPUT

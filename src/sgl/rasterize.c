@@ -134,7 +134,7 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
 
   GLint dx, dy, i, err;
   GLint incx, incy, inc1, inc2;
-  GLfloat a = LEN_2(x2 - x1, y2 - y1), x = x1, y = y1, z = z1;
+  GLfloat a = LEN_2(x2 - x1, y2 - y1), x = x1, y = y1;
   GLint cc1 = COLOR_FF(color1);
   GLint cc2 = COLOR_FF(color2);
 
