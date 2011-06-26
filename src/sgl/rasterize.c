@@ -32,20 +32,25 @@
 #include "math/m_matrix.h"
 #include "math/m_vector.h"
 
-void _insert_edge(GLuint x, GLuint y)
+void _insert_edge(GLint x, GLint y)
 {
   GET_CURRENT_CONTEXT(ctx);
   GLint* et = ctx->render_state.edge_tab;
   GLint cidx = EDGE_TABLE_SIZE -1;
   GLint oidx = EDGE_TABLE_SIZE -2;
   GLuint count = ET_GET(et, y, cidx);
+  GLint l = 0;
 
-  if (ET_GET(et, y, count -1) == x || count >= EDGE_TABLE_SIZE - 2)
+  if (count >= EDGE_TABLE_SIZE - 2)
     return;
+
+  for (l = 0; l < count; ++l)
+    if (ET_GET(et, y, l) == x)
+      return;
 
   switch (count % 2) {
     case 0:
-      if (abs(ET_GET(et, y, count -1) -x) == ET_GET(et, y, oidx))
+      if (count && abs(ET_GET(et, y, count -1) -x) == ET_GET(et, y, oidx))
         ++ET_GET(et, y, oidx);
       else {
         ET_GET(et, y, oidx) = 1;
@@ -54,7 +59,7 @@ void _insert_edge(GLuint x, GLuint y)
       }
       break;
     case 1:
-      if (abs(ET_GET(et, y, count -1) -x) == ET_GET(et, y, oidx)) {
+      if (abs(ET_GET(et, y, count -1) -x) == 1) {
         ET_GET(et, y, count -1) = x;
       } else {
         ET_GET(et, y, count) = x;
@@ -65,36 +70,37 @@ void _insert_edge(GLuint x, GLuint y)
 }
 
 void _sgl_render_pixel(struct sgl_framebuffer* buf,
-                       GLuint x, GLuint y, GLuint z, GLuint cc)
+                       GLint x, GLint y, GLint z, GLint cc)
 {
   GET_CURRENT_CONTEXT(ctx);
-  if (x > 0 && y >= 0 && x <= buf->width && y < buf->height) {
-    BUF_SET_C(buf->r_color_buf, x, y, cc);
-    BUF_SET_D(buf->r_depth_buf, x, y, NORMALIZE_Z(ctx, z));
-    if (ctx->render_state.gfill)
-      _insert_edge(x, y);
-  }
+  x = CLAMP(x, 1, buf->width);
+  y = CLAMP(y, 0, buf->height -1);
+  BUF_SET_C(buf->r_color_buf, x, y, cc);
+  BUF_SET_D(buf->r_depth_buf, x, y, NORMALIZE_Z(ctx, z));
+  if (ctx->render_state.gfill)
+    _insert_edge(x, y);
 }
 
 void _scanline_fill(struct sgl_framebuffer* buf)
 {
   GET_CURRENT_CONTEXT(ctx);
   GLint* et = ctx->render_state.edge_tab;
-  GLint y = 0, x = 0, d = 0, dx = 0, start = 0, end = 0, cc = 0, z = 0;
+  GLint y = 0, x = 0, d = 0, dx = 0, start = 0, end = 0, cc = 0;
+  GLfloat z = 0;
 
   for (y = 0; y < buf->height; ++y) {
-    for (x = 0; x < ET_GET(et, y, EDGE_TABLE_SIZE -1); x += 2) {
+    for (x = 0; x + 1 < ET_GET(et, y, EDGE_TABLE_SIZE -1); x += 2) {
       start = ET_GET(et, y, x);
       end = ET_GET(et, y, x + 1);
-      if (!end)
-        break;
 
       dx = (end > start)? 1: -1;
       for (d = start + dx; d != end; d += dx) {
-        cc = BUF_GET_C(buf->r_color_buf, start, y);
-        z = BUF_GET_D(buf->r_color_buf, start, y);
+        cc = BUF_GET_C(buf->r_color_buf, CLAMP(start, 1, buf->width),
+                                         CLAMP(y, 0, buf->height-1));
+        z = BUF_GET_D(buf->r_depth_buf, CLAMP(start, 1, buf->width),
+                                        CLAMP(y, 0, buf->height-1));
         BUF_SET_C(buf->r_color_buf, d, y, cc);
-        BUF_SET_D(buf->r_depth_buf, d, y, NORMALIZE_Z(ctx, z));
+        BUF_SET_D(buf->r_depth_buf, d, y, z);
       }
     }
   }
@@ -112,15 +118,17 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
                     GLfloat* point1, GLfloat* point2,
                     GLfloat* color1, GLfloat* color2)
 {
+  /* Bresenham's Algorithm */
+
   GLint x1 = point1[0], y1 = point1[1], z1 = point1[2],
         x2 = point2[0], y2 = point2[1], z2 = point2[2];
-  /* Bresenham's Algorithm */
-  int dx, dy, i, err;
-  int incx, incy, incz, inc1, inc2;
-  int x = x1; 
-  int y = y1;
-  int z = z1;
-  int cc = COLOR_FF(color1);
+
+  GLint dx, dy, i, err;
+  GLint incx, incy, incz, inc1, inc2;
+  GLint x = x1;
+  GLint y = y1;
+  GLint z = z1;
+  GLint cc = COLOR_FF(color1);
 
   dx = abs(x2 - x1);
   dy = abs(y2 - y1);
