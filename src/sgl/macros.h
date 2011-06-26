@@ -101,6 +101,9 @@ do {                        \
   ((z - ctx->drawbuffer->depth_max * ctx->viewport.near) / \
    (ctx->drawbuffer->depth_max * (ctx->viewport.far - ctx->viewport.near)))
 
+/* Edge Table related */
+#define ET_GET(et, y, x) et[(y) * EDGE_TABLE_SIZE + (x)]
+
 #define MOVE_FLOAT_4(dst, src) \
   do {                         \
     ((GLfloat*)(dst))[0] = ((GLfloat*)(src))[0];           \

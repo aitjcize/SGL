@@ -29,6 +29,9 @@
 #include "pipeline.h"
 #include "viewport.h"
 
+#include <stdlib.h>
+#include <string.h>
+
 struct sgl_context _g_sgl_context;
 
 void _sgl_init_vector(struct sgl_context* ctx)
@@ -45,12 +48,20 @@ void _sgl_init_misc_attrib(struct sgl_context* ctx, int w, int h)
   ctx->polygon.front = ctx->polygon.back = GL_FILL;
   ctx->buffer.width = w;
   ctx->buffer.height = h;
+}
+
+void _sgl_init_render_state(struct sgl_context* ctx)
+{
+  GLuint size = ctx->buffer.height * EDGE_TABLE_SIZE * sizeof(GLint);
+  ctx->render_state.edge_tab = malloc(size);
+  memset(ctx->render_state.edge_tab, 0, size);
   ctx->render_state.current_exec_primitive = PRIM_OUTSIDE_BEGIN_END;
 }
 
 void _sgl_context_init(struct sgl_context* ctx, int w, int h)
 {
   _sgl_init_misc_attrib(ctx, w, h);
+  _sgl_init_render_state(ctx);
   _sgl_init_vector(ctx);
   _sgl_init_matrix(ctx);
   _sgl_init_viewport(ctx);

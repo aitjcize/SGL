@@ -32,6 +32,38 @@
 #include "math/m_matrix.h"
 #include "math/m_vector.h"
 
+void _sgl_insert_edge(GLuint x, GLuint y)
+{
+  GET_CURRENT_CONTEXT(ctx);
+  GLint* et = ctx->render_state.edge_tab;
+  GLint cidx = EDGE_TABLE_SIZE -1;
+  GLint oidx = EDGE_TABLE_SIZE -2;
+  GLuint count = ET_GET(et, y, cidx);
+
+  if (ET_GET(et, y, count -1) == x)
+    return;
+
+  switch (count % 2) {
+    case 0:
+      if (abs(ET_GET(et, y, count -1) -x) == ET_GET(et, y, oidx))
+        ++ET_GET(et, y, oidx);
+      else {
+        ET_GET(et, y, oidx) = 1;
+        ET_GET(et, y, count) = x;
+        ++ET_GET(et, y, cidx);
+      }
+      break;
+    case 1:
+      if (abs(ET_GET(et, y, count -1) -x) == ET_GET(et, y, oidx)) {
+        ET_GET(et, y, count -1) = x;
+      } else {
+        ET_GET(et, y, count) = x;
+        ++ET_GET(et, y, cidx);
+      }
+      break;
+  }
+}
+
 void _sgl_render_pixel(struct sgl_framebuffer* buf,
                        GLuint x, GLuint y, GLuint z, GLuint cc)
 {
@@ -42,44 +74,30 @@ void _sgl_render_pixel(struct sgl_framebuffer* buf,
   }
 }
 
-void _flood_fill(struct sgl_framebuffer* buf, GLint sx, GLint sy, GLfloat sz,
-                 GLuint cc)
+void _scanline_fill(struct sgl_framebuffer* buf)
 {
   GET_CURRENT_CONTEXT(ctx);
-  if (sx < 0 || sy < 0 || sx > buf->width || sy > buf->height)
-    return;
+  GLint* et = ctx->render_state.edge_tab;
+  GLint y = 0, x = 0, d = 0, dx = 0, start = 0, end = 0, cc = 0, z = 0;
 
-  GLuint data[4];
+  for (y = 0; y < buf->height; ++y) {
+    for (x = 0; x < ET_GET(et, y, EDGE_TABLE_SIZE -1); x += 2) {
+      start = ET_GET(et, y, x);
+      end = ET_GET(et, y, x + 1);
+      if (!end)
+        break;
 
-  data[0] = sx; data[1] = sy; data[2] = sz; data[3] = cc;
-
-  _math_vector4f_push_back(&ctx->flood_fill, (GLfloat*)data, 3);
-  while (_math_vector4f_pop_back(&ctx->flood_fill, (GLfloat*)data, 3)) {
-    sx = data[0]; sy = data[1]; sz = data[2]; cc = data[3];
-
-    _sgl_render_pixel(buf, sx, sy, sz, cc);
-    data[3] = cc;
-    if (sx + 1 <= buf->width && BUF_GET_C(buf->r_color_buf, sx + 1, sy) != cc) {
-      data[0] = sx + 1; data[1] = sy; data[2] = sz;
-      _math_vector4f_push_back(&ctx->flood_fill, (GLfloat*)data, 3);
-    }
-
-    if (sx - 1 > 0 && BUF_GET_C(buf->r_color_buf, sx - 1, sy) != cc) {
-      data[0] = sx - 1; data[1] = sy; data[2] = sz;
-      _math_vector4f_push_back(&ctx->flood_fill, (GLfloat*)data, 3);
-    }
-
-    if (sy + 1 < buf->height && BUF_GET_C(buf->r_color_buf, sx, sy + 1) != cc) {
-      data[0] = sx; data[1] = sy + 1; data[2] = sz;
-      _math_vector4f_push_back(&ctx->flood_fill, (GLfloat*)data, 3);
-    }
-
-    if (sy - 1 >= 0 && BUF_GET_C(buf->r_color_buf, sx, sy - 1) != cc) {
-      data[0] = sx; data[1] = sy - 1; data[2] = sz;
-      _math_vector4f_push_back(&ctx->flood_fill, (GLfloat*)data, 3);
+      dx = (end > start)? 1: -1;
+      for (d = start + dx; d != end; d += dx) {
+        cc = BUF_GET_C(buf->r_color_buf, start, y);
+        z = BUF_GET_D(buf->r_color_buf, start, y);
+        BUF_SET_C(buf->r_color_buf, d, y, cc);
+        BUF_SET_D(buf->r_depth_buf, d, y, NORMALIZE_Z(ctx, z));
+      }
     }
   }
-  _math_vector4f_lazy_free(&ctx->flood_fill);
+  memset(ctx->render_state.edge_tab, 0,
+         buf->height * EDGE_TABLE_SIZE * sizeof(GLint));
 }
 
 void _sgl_draw_point(struct sgl_framebuffer* buf, GLfloat* point,
@@ -112,6 +130,7 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
   /* Draw m <= 1 Line */
   if(dx > dy) {
     _sgl_render_pixel(buf, x, y, z, cc);
+    _sgl_insert_edge(x, y);
     err = (2 * dy) - dx;
     inc1 = 2 * (dy - dx);
     inc2 = 2 * dy;
@@ -126,9 +145,11 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
       x += incx;
       z += incz;
       _sgl_render_pixel(buf, x, y, z, cc);
+      _sgl_insert_edge(x, y);
     }
   } else {
     _sgl_render_pixel(buf, x, y, z, cc);
+    _sgl_insert_edge(x, y);
     err = (2 * dx) - dy;
     inc1 = 2 * (dx - dy);
     inc2 = 2 * dx;
@@ -144,6 +165,7 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
       y += incy;
       z += incz;
       _sgl_render_pixel(buf, x, y, z, cc);
+      _sgl_insert_edge(x, y);
     }
   }
 }
@@ -179,13 +201,8 @@ void _sgl_draw_triangle(struct sgl_framebuffer* buf,
   _sgl_draw_line(buf, p2, p3, c2, c3);
   _sgl_draw_line(buf, p3, p1, c3, c1);
 
-  if (ctx->polygon.front == GL_FILL) {
-    GLint sx = 0, sy = 0, sz = 0;
-    sx = (p1[0] + p2[0] + p3[0]) / 3;
-    sy = (p1[1] + p2[1] + p3[1]) / 3;
-    sz = (p1[2] + p2[2] + p3[2]) / 3;
-    _flood_fill(buf, sx, sy, sz, COLOR_FF(c1));
-  }
+  if (ctx->polygon.front == GL_FILL)
+    _scanline_fill(buf);
 }
 
 void _sgl_draw_triangle_v(struct sgl_framebuffer* buf, GLfloat* point,
@@ -212,13 +229,8 @@ void _sgl_draw_triangle_strip(struct sgl_framebuffer* buf, GLfloat* point,
     _sgl_draw_line(buf, prev_point, point, prev_color, color);
     _sgl_draw_line(buf, prev_point + 4, point, prev_color + 4, color);
 
-    if (ctx->polygon.front == GL_FILL) {
-      GLint sx = 0, sy = 0, sz = 0;
-      sx = (prev_point[0] + prev_point[4] + point[0]) / 3;
-      sy = (prev_point[1] + prev_point[5] + point[1]) / 3;
-      sz = (prev_point[2] + prev_point[6] + point[2]) / 3;
-      _flood_fill(buf, sx, sy, sz, COLOR_FF(color));
-    }
+    if (ctx->polygon.front == GL_FILL)
+      _scanline_fill(buf);
 
     MOVE_FLOAT_4(prev_point, prev_point + 4);
     MOVE_FLOAT_4(prev_color, prev_color + 4);
@@ -237,13 +249,8 @@ void _sgl_draw_quad(struct sgl_framebuffer* buf,
   _sgl_draw_line(buf, p3, p4, c3, c4);
   _sgl_draw_line(buf, p4, p1, c4, c1);
 
-  if (ctx->polygon.front == GL_FILL) {
-    GLint sx = 0, sy = 0, sz = 0;
-    sx = (p1[0] + p2[0] + p3[0] + p4[0]) / 4;
-    sy = (p1[1] + p2[1] + p3[1] + p4[1]) / 4;
-    sz = (p1[2] + p2[2] + p3[2] + p4[2]) / 4;
-    _flood_fill(buf, sx, sy, sz, COLOR_FF(c1));
-  }
+  if (ctx->polygon.front == GL_FILL)
+    _scanline_fill(buf);
 }
 
 void _sgl_draw_quad_v(struct sgl_framebuffer* buf, GLfloat* point,
