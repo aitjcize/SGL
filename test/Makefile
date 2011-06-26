@@ -1,7 +1,7 @@
 CFLAGS = -g -Wall -O3
 LDFLAGS = -L../lib -lSGLUT -lSGL -lSGLU
 #LDFLAGS = $(shell pkg-config --libs --cflags gl glu) -lglut
-BINS = test test_depth test_quads test_teapot
+BINS = test test_depth test_quads test_teapot test_color
 
 all: $(BINS)
 	$(CC) test.c -o test $(LDFLAGS) $(CFLAGS)

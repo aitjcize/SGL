@@ -85,8 +85,9 @@ void _scanline_fill(struct sgl_framebuffer* buf)
 {
   GET_CURRENT_CONTEXT(ctx);
   GLint* et = ctx->render_state.edge_tab;
-  GLint y = 0, x = 0, d = 0, dx = 0, start = 0, end = 0, cc = 0;
-  GLfloat z = 0;
+  GLint y = 0, x = 0, d = 0, dx = 0, start = 0, end = 0,
+        cc1 = 0, cc2 = 0;
+  GLfloat z1 = 0, z2 = 0;
 
   for (y = 0; y < buf->height; ++y) {
     for (x = 0; x + 1 < ET_GET(et, y, EDGE_TABLE_SIZE -1); x += 2) {
@@ -95,12 +96,20 @@ void _scanline_fill(struct sgl_framebuffer* buf)
 
       dx = (end > start)? 1: -1;
       for (d = start + dx; d != end; d += dx) {
-        cc = BUF_GET_C(buf->r_color_buf, CLAMP(start, 1, buf->width),
+        cc1 = BUF_GET_C(buf->r_color_buf, CLAMP(start, 1, buf->width),
                                          CLAMP(y, 0, buf->height-1));
-        z = BUF_GET_D(buf->r_depth_buf, CLAMP(start, 1, buf->width),
-                                        CLAMP(y, 0, buf->height-1));
-        BUF_SET_C(buf->r_color_buf, d, y, cc);
-        BUF_SET_D(buf->r_depth_buf, d, y, z);
+        cc2 = BUF_GET_C(buf->r_color_buf, CLAMP(end, 1, buf->width),
+                                          CLAMP(y, 0, buf->height-1));
+
+        z1 = BUF_GET_D(buf->r_depth_buf, CLAMP(start, 1, buf->width),
+                                         CLAMP(y, 0, buf->height-1));
+        z2 = BUF_GET_D(buf->r_depth_buf, CLAMP(end, 1, buf->width),
+                                         CLAMP(y, 0, buf->height-1));
+
+        BUF_SET_C(buf->r_color_buf, d, y,
+                  COLOR_IP(cc1, cc2, abs(d - start), abs(end - start)));
+        BUF_SET_D(buf->r_depth_buf, d, y,
+                  LINEAR_IP(z1, z2, abs(d - start), abs(end - start)));
       }
     }
   }
@@ -125,10 +134,9 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
 
   GLint dx, dy, i, err;
   GLint incx, incy, incz, inc1, inc2;
-  GLint x = x1;
-  GLint y = y1;
-  GLint z = z1;
-  GLint cc = COLOR_FF(color1);
+  GLfloat a = LEN_2(x2 - x1, y2 - y1), x = x1, y = y1, z = z1;
+  GLint cc1 = COLOR_FF(color1);
+  GLint cc2 = COLOR_FF(color2);
 
   dx = abs(x2 - x1);
   dy = abs(y2 - y1);
@@ -139,7 +147,7 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
 
   /* Draw m <= 1 Line */
   if(dx > dy) {
-    _sgl_render_pixel(buf, x, y, z, cc);
+    _sgl_render_pixel(buf, x, y, z, COLOR_IP(cc1, cc2, LEN_2(x-x1, y-y1), a));
     err = (2 * dy) - dx;
     inc1 = 2 * (dy - dx);
     inc2 = 2 * dy;
@@ -153,10 +161,10 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
         err += inc2;
       x += incx;
       z += incz;
-      _sgl_render_pixel(buf, x, y, z, cc);
+      _sgl_render_pixel(buf, x, y, z, COLOR_IP(cc1, cc2, LEN_2(x-x1, y-y1), a));
     }
   } else {
-    _sgl_render_pixel(buf, x, y, z, cc);
+    _sgl_render_pixel(buf, x, y, z, COLOR_IP(cc1, cc2, LEN_2(x-x1, y-y1), a));
     err = (2 * dx) - dy;
     inc1 = 2 * (dx - dy);
     inc2 = 2 * dx;
@@ -171,7 +179,7 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
 
       y += incy;
       z += incz;
-      _sgl_render_pixel(buf, x, y, z, cc);
+      _sgl_render_pixel(buf, x, y, z, COLOR_IP(cc1, cc2, LEN_2(x-x1, y-y1), a));
     }
   }
 }
@@ -232,6 +240,7 @@ void _sgl_draw_triangle_strip(struct sgl_framebuffer* buf, GLfloat* point,
     MOVE_FLOAT_4(prev_color + 4, color);
     _sgl_draw_line(buf, prev_point, prev_point + 4, prev_color, prev_color + 4);
   } else {
+    _sgl_draw_line(buf, prev_point, prev_point + 4, prev_color, prev_color + 4);
     _sgl_draw_line(buf, prev_point, point, prev_color, color);
     _sgl_draw_line(buf, prev_point + 4, point, prev_color + 4, color);
 

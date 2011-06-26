@@ -66,8 +66,10 @@ do {                        \
    }                        \
 } while(0)
 
-#define LEN_3FV( V ) (SQRTF((V)[0]*(V)[0]+(V)[1]*(V)[1]+(V)[2]*(V)[2]))
-#define LEN_2FV( V ) (SQRTF((V)[0]*(V)[0]+(V)[1]*(V)[1]))
+#define LEN_2(x, y) (sqrtf((x)*(x) + (y)*(y)))
+
+#define LEN_3FV( V ) (sqrtf((V)[0]*(V)[0]+(V)[1]*(V)[1]+(V)[2]*(V)[2]))
+#define LEN_2FV( V ) (sqrtf((V)[0]*(V)[0]+(V)[1]*(V)[1]))
 
 #define LEN_SQUARED_3FV( V ) ((V)[0]*(V)[0]+(V)[1]*(V)[1]+(V)[2]*(V)[2])
 #define LEN_SQUARED_2FV( V ) ((V)[0]*(V)[0]+(V)[1]*(V)[1])
@@ -83,6 +85,19 @@ do {                        \
    ((GLuint)(CLAMP(r, 0, 1.0) * 255) << 16) |     \
    ((GLuint)(CLAMP(g, 0, 1.0) * 255) <<  8) |     \
    ((GLuint)(CLAMP(b, 0, 1.0) * 255)))
+
+#define LINEAR_IP(val1, val2, f, a) \
+  ((val1) + ((val2) - (val1)) * (GLfloat)f / a)
+
+#define COLOR_IP(cc1, cc2, f, a)                              \
+  ((GLint)LINEAR_IP((cc1 & 0xff000000) >> 24,                 \
+                    (cc2 & 0xff000000) >> 24, f, a) << 24 |   \
+   (GLint)LINEAR_IP((cc1 & 0x00ff0000) >> 16,                 \
+                    (cc2 & 0x00ff0000) >> 16, f, a) << 16 |   \
+   (GLint)LINEAR_IP((cc1 & 0x0000ff00) >> 8 ,                 \
+                    (cc2 & 0x0000ff00) >> 8 , f, a) << 8  |   \
+   (GLint)LINEAR_IP((cc1 & 0x000000ff) >> 0 ,                 \
+                    (cc2 & 0x000000ff) >> 0 , f, a))
 
 /* Framebuffer access related */
 #define BUF_SET_C(buf, x, y, cc) \
@@ -100,6 +115,10 @@ do {                        \
 #define NORMALIZE_Z(ctx, z) \
   ((z - ctx->drawbuffer->depth_max * ctx->viewport.near) / \
    (ctx->drawbuffer->depth_max * (ctx->viewport.far - ctx->viewport.near)))
+
+#define DNORMALIZE_Z(ctx, z) \
+   (z * (ctx->drawbuffer->depth_max * (ctx->viewport.far-ctx->viewport.near)) \
+     + ctx->drawbuffer->depth_max * ctx->viewport.near)
 
 /* Edge Table related */
 #define ET_GET(et, y, x) et[(y) * EDGE_TABLE_SIZE + (x)]

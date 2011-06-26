@@ -34,7 +34,7 @@ void display(void)
   glRotatef(g_phi, 0.0, 1.0, 0.0);
   glRotatef(g_theta, cos(RAD(g_phi)), 0.0, -sin(RAD(g_phi)));
 
-  glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+  //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
   glColor3f (1.0, 1.0, 1.0);
   glutWireTeapot(1.0);
 
