@@ -82,6 +82,9 @@ struct sgl_framebuffer
   struct sgl_renderbuffer color_buf;
   struct sgl_renderbuffer normal_buf;
   struct sgl_renderbuffer depth_buf;
+
+  /* Edge Table */
+  GLint* edge_tab;
 };
 
 struct sgl_matrix_stack
@@ -139,7 +142,6 @@ struct sgl_render_state
   GLint type;                     /* 0 or GL_VERTEX_ARRAY */
   GLint needflush;
   GLboolean gfill;                /* Wether a geometry needs to be fill */
-  GLint* edge_tab;
 };
 
 struct sgl_light
@@ -190,7 +192,6 @@ struct sgl_material
 
 struct sgl_pipeline
 {
-  void (*primitive_assembly)(void);
   void (*vertex_shader)(void);
   void (*rasterize)(void);
   void (*fragment_shader)(void);

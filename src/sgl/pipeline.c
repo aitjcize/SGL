@@ -29,15 +29,12 @@
 
 void _sgl_init_pipeline(struct sgl_context* ctx)
 {
-  //ctx->pipeline.primitive_assembly = _sgl_primitive_assembly;
   ctx->pipeline.rasterize = _sgl_pipeline_rasterize;
 }
 
 void _sgl_pipeline_iteration(void)
 {
   GET_CURRENT_CONTEXT(ctx);
-  if (ctx->pipeline.primitive_assembly)
-    ctx->pipeline.primitive_assembly();
   if (ctx->pipeline.vertex_shader)
     ctx->pipeline.vertex_shader();
   if (ctx->pipeline.rasterize)
@@ -80,6 +77,5 @@ void _sgl_pipeline_depth_test(void)
          ctx->drawbuffer->clear_depth_buf.data,
          size * sizeof(GLfloat));
 
-  memset(ctx->render_state.edge_tab, 0,
-         buf->height * EDGE_TABLE_SIZE * sizeof(GLint));
+  _sgl_framebuffer_edge_table_clear();
 }

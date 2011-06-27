@@ -52,9 +52,6 @@ void _sgl_init_misc_attrib(struct sgl_context* ctx, int w, int h)
 
 void _sgl_init_render_state(struct sgl_context* ctx)
 {
-  GLuint size = ctx->buffer.height * EDGE_TABLE_SIZE * sizeof(GLint);
-  ctx->render_state.edge_tab = malloc(size);
-  memset(ctx->render_state.edge_tab, 0, size);
   ctx->render_state.current_exec_primitive = PRIM_OUTSIDE_BEGIN_END;
 }
 

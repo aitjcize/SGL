@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "framebuffer.h"
 #include "logging.h"
 #include "macros.h"
 #include "macros.h"
@@ -35,7 +36,7 @@
 void _insert_edge(GLint x, GLint y)
 {
   GET_CURRENT_CONTEXT(ctx);
-  GLint* et = ctx->render_state.edge_tab;
+  GLint* et = ctx->drawbuffer->edge_tab;
   GLint cidx = EDGE_TABLE_SIZE -1;
   GLint oidx = EDGE_TABLE_SIZE -2;
   GLuint count = ET_GET(et, y, cidx);
@@ -83,8 +84,7 @@ void _sgl_render_pixel(struct sgl_framebuffer* buf,
 
 void _scanline_fill(struct sgl_framebuffer* buf)
 {
-  GET_CURRENT_CONTEXT(ctx);
-  GLint* et = ctx->render_state.edge_tab;
+  GLint* et = buf->edge_tab;
   GLint y = 0, x = 0, d = 0, dx = 0, start = 0, end = 0,
         cc1 = 0, cc2 = 0;
   GLfloat z1 = 0, z2 = 0;
@@ -113,8 +113,7 @@ void _scanline_fill(struct sgl_framebuffer* buf)
       }
     }
   }
-  memset(ctx->render_state.edge_tab, 0,
-         buf->height * EDGE_TABLE_SIZE * sizeof(GLint));
+  _sgl_framebuffer_edge_table_clear();
 }
 
 void _sgl_draw_point(struct sgl_framebuffer* buf, GLfloat* point,
@@ -274,12 +273,6 @@ void _sgl_draw_quad_v(struct sgl_framebuffer* buf, GLfloat* point,
 {
   _sgl_draw_quad(buf, &point[0], &point[4], &point[8], &point[12],
                       &color[0], &color[4], &color[8], &color[12]);
-}
-
-void _sgl_primitive_assembly(void)
-{
-  //GET_CURRENT_CONTEXT(ctx);
-  
 }
 
 void _sgl_pipeline_draw_list(void)

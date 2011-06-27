@@ -95,6 +95,8 @@ do {									\
    FLUSH_VERTICES(ctx, 0);						\
 } while (0)
 
+extern void _sgl_render_state_edge_table_clear(struct sgl_render_state* rd);
+
 extern void glClear(GLbitfield mask);
 
 extern void glBegin(GLenum mode);

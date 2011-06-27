@@ -35,6 +35,9 @@ void display(void)
   glRotatef(g_theta, cos(RAD(g_phi)), 0.0, -sin(RAD(g_phi)));
 
   //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+  //glEnable(GL_MULTISAMPLE);
+  //glEnable(GL_POLYGON_SMOOTH);
+  //glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
   glEnable(GL_DEPTH_TEST);
 
   glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
@@ -117,7 +120,7 @@ void keyboard(unsigned char key, int x, int y)
 int main(int argc, char** argv)
 {
   glutInit(&argc, argv);
-  glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+  glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
   glutInitWindowSize (500, 500);
   glutInitWindowPosition (100, 100);
   glutCreateWindow (argv[0]);

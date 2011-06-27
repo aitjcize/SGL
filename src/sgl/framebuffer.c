@@ -31,6 +31,8 @@
 void _sgl_init_framebuffer(struct sgl_context* ctx)
 {
   struct sgl_framebuffer* buf = NULL;
+  GLuint et_size = ctx->buffer.height * EDGE_TABLE_SIZE * sizeof(GLint);
+
   buf = malloc(sizeof(struct sgl_framebuffer));
   buf->width = ctx->buffer.width;
   buf->height = ctx->buffer.height;
@@ -49,6 +51,10 @@ void _sgl_init_framebuffer(struct sgl_context* ctx)
 
   buf->r_color_buf = &buf->color_buf;
   buf->r_depth_buf = &buf->depth_buf;
+
+  /* Clear Edge Table */
+  buf->edge_tab = malloc(et_size);
+  memset(buf->edge_tab, 0, et_size);
 
   ctx->drawbuffer = buf;
 }
@@ -95,4 +101,12 @@ void _sgl_framebuffer_depth(GLboolean status)
     ctx->drawbuffer->r_color_buf = &ctx->drawbuffer->color_buf;
     ctx->drawbuffer->r_depth_buf = &ctx->drawbuffer->depth_buf;
   }
+}
+
+void _sgl_framebuffer_edge_table_clear(void)
+{
+  GET_CURRENT_CONTEXT(ctx);
+
+  memset(ctx->drawbuffer->edge_tab, 0,
+         ctx->drawbuffer->height * EDGE_TABLE_SIZE * sizeof(GLint));
 }

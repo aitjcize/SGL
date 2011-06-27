@@ -32,4 +32,6 @@ extern void _sgl_clear_framebuffer(GLenum mask);
 
 extern void _sgl_framebuffer_depth(GLboolean status);
 
+extern void _sgl_framebuffer_edge_table_clear(void);
+
 #endif /* __SGL_FRAMEBUFFER_H__ */
