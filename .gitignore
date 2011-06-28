@@ -1,6 +1,27 @@
 *.swp
+Makefile
 Makefile.in
 configure
 aclocal.m4
 config.h.in
+config.h
+config.log
+config.status
 autom4te.cache
+libtool
+mkinstalldirs
+stamp-h1
+.deps
+.libs
+
+# intermediate files
+*.o
+*.lo
+*.la
+
+# test programs
+test/test
+test/test_color
+test/test_depth
+test/test_quads
+test/test_teapot
