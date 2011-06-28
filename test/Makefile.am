@@ -1,5 +1,10 @@
 AM_CFLAGS = -Wall -O2 -g
-AM_LDFLAGS = -L../lib -lSGLUT -lSGL -lSGLU
+
+AM_LDFLAGS = \
+	$(top_builddir)/src/sglut/libSGLUT.la \
+	$(top_builddir)/src/sglu/libSGLU.la \
+	$(top_builddir)/src/sgl/libSGL.la
+
 bin_PROGRAMS =  test test_depth test_quads test_color test_teapot
 
 test_SOURCES = test.c
