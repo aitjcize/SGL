@@ -1,5 +1,7 @@
-SRC_ROOT = ..
-AM_CFLAGS = -I$(SRC_ROOT) -Wall -O2 -g
+AM_CFLAGS = \
+	-I$(top_srcdir)/include/GL \
+	-I$(top_srcdir)/src \
+	-Wall -O2 -g
 lib_LTLIBRARIES = libSGL.la
 libSGL_la_LDFLAGS = \
 		-lm \
@@ -24,5 +26,7 @@ libSGL_la_SOURCES = \
 		renderbuffer.c renderbuffer.h \
 		utils.c utils.h \
 		viewport.c viewport.h \
-		$(SRC_ROOT)/math/m_vector.c $(SRC_ROOT)/math/m_vector.h \
-		$(SRC_ROOT)/math/m_matrix.c $(SRC_ROOT)/math/m_matrix.h
+		$(top_srcdir)/src/math/m_vector.c \
+		$(top_srcdir)/src/math/m_vector.h \
+		$(top_srcdir)/src/math/m_matrix.c \
+		$(top_srcdir)/src/math/m_matrix.h

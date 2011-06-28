@@ -1,4 +1,7 @@
-AM_CFLAGS = -Wall -O2 -I$(top_builddir)/src/sgl -g
+AM_CFLAGS = \
+	-I$(top_srcdir)/include/GL \
+	-I$(top_srcdir)/src/sgl \
+	-Wall -O2 -g
 lib_LTLIBRARIES = libSGLUT.la
 libSGLUT_la_LDFLAGS = \
 		-lX11 \

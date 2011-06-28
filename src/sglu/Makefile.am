@@ -1,4 +1,6 @@
-AM_CFLAGS = -Wall -O2
+AM_CFLAGS = \
+	-I$(top_srcdir)/include/GL \
+	-Wall -O2
 lib_LTLIBRARIES = libSGLU.la
 libSGLU_la_LDFLAGS = \
 		-version-info $(LIBSGL_CURRENT):$(LIBSGL_REVISION):$(LIBSGL_AGE)
