@@ -78,12 +78,12 @@ void _sgl_clear_framebuffer(GLenum mask)
   GET_CURRENT_CONTEXT(ctx);
   GLint size = ctx->buffer.width * ctx->buffer.height;
 
-  if (mask & GL_COLOR_BUFFER_BIT)
+  if ((mask & GL_COLOR_BUFFER_BIT) == GL_COLOR_BUFFER_BIT)
     memcpy(ctx->drawbuffer->color_buf.data,
            ctx->drawbuffer->clear_color_buf.data,
            size * sizeof(GLuint));
 
-  if (mask & GL_DEPTH_BUFFER_BIT)
+  if ((mask & GL_DEPTH_BUFFER_BIT) == GL_DEPTH_BUFFER_BIT)
     memcpy(ctx->drawbuffer->depth_buf.data,
            ctx->drawbuffer->clear_depth_buf.data,
            size * sizeof(GLfloat));

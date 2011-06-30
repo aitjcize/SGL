@@ -25,6 +25,8 @@
 #include "types.h"
 #include "logging.h"
 
+#define GL_ENABLED(ctx, type) ((ctx->flags & type) == type)
+
 /*
  * @brief Flush vertices.
  *
