@@ -69,14 +69,10 @@ struct sgl_framebuffer
   GLfloat depth_max;
 
   /* Buffers */
-  struct sgl_renderbuffer* r_color_buf;
-  struct sgl_renderbuffer* r_depth_buf;
-
   struct sgl_renderbuffer clear_color_buf;
   struct sgl_renderbuffer clear_depth_buf;
 
   struct sgl_renderbuffer t_color_buf;
-  struct sgl_renderbuffer t_normal_buf;
   struct sgl_renderbuffer t_depth_buf;
 
   struct sgl_renderbuffer color_buf;

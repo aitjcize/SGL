@@ -43,14 +43,10 @@ void _sgl_init_framebuffer(struct sgl_context* ctx)
 
   _sgl_init_renderbuffer(&buf->t_color_buf, GL_UNSIGNED_INT, GL_TRUE);
   _sgl_init_renderbuffer(&buf->t_depth_buf, GL_FLOAT, GL_TRUE);
-  _sgl_init_renderbuffer(&buf->t_normal_buf, GL_UNSIGNED_INT, GL_TRUE);
 
   _sgl_init_renderbuffer(&buf->color_buf, GL_UNSIGNED_INT, GL_FALSE);
   _sgl_init_renderbuffer(&buf->depth_buf, GL_FLOAT, GL_TRUE);
   _sgl_init_renderbuffer(&buf->normal_buf, GL_UNSIGNED_INT, GL_TRUE);
-
-  buf->r_color_buf = &buf->color_buf;
-  buf->r_depth_buf = &buf->depth_buf;
 
   /* Clear Edge Table */
   buf->edge_tab = malloc(et_size);
@@ -66,7 +62,6 @@ void _sgl_free_framebuffer_data(struct sgl_context* ctx)
 
   _sgl_free_renderbuffer(&ctx->drawbuffer->t_color_buf);
   _sgl_free_renderbuffer(&ctx->drawbuffer->t_depth_buf);
-  _sgl_free_renderbuffer(&ctx->drawbuffer->t_normal_buf);
 
   _sgl_free_renderbuffer(&ctx->drawbuffer->color_buf);
   _sgl_free_renderbuffer(&ctx->drawbuffer->depth_buf);
@@ -93,14 +88,6 @@ void _sgl_framebuffer_depth(GLboolean status)
 {
   GET_CURRENT_CONTEXT(ctx);
   ctx->depth.test = status;
-
-  if (status) {
-    ctx->drawbuffer->r_color_buf = &ctx->drawbuffer->t_color_buf;
-    ctx->drawbuffer->r_depth_buf = &ctx->drawbuffer->t_depth_buf;
-  } else {
-    ctx->drawbuffer->r_color_buf = &ctx->drawbuffer->color_buf;
-    ctx->drawbuffer->r_depth_buf = &ctx->drawbuffer->depth_buf;
-  }
 }
 
 void _sgl_framebuffer_edge_table_clear(void)
@@ -109,4 +96,8 @@ void _sgl_framebuffer_edge_table_clear(void)
 
   memset(ctx->drawbuffer->edge_tab, 0,
          ctx->drawbuffer->height * EDGE_TABLE_SIZE * sizeof(GLint));
+  memset(ctx->drawbuffer->t_color_buf.data, 0,
+         ctx->drawbuffer->height * ctx->drawbuffer->width * sizeof(GLint));
+  memset(ctx->drawbuffer->t_depth_buf.data, 0,
+         ctx->drawbuffer->height * ctx->drawbuffer->width * sizeof(GLfloat));
 }

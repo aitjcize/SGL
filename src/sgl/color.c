@@ -32,10 +32,6 @@ void _sgl_init_color(struct sgl_context* ctx)
   int i = 0;
   for (i = 0; i < ctx->buffer.width * ctx->buffer.height; ++i)
     *((GLuint*)ctx->drawbuffer->clear_color_buf.data + i) = ctx->color.clear;
-
-  memcpy(ctx->drawbuffer->t_color_buf.data,
-         ctx->drawbuffer->clear_color_buf.data,
-         ctx->buffer.width * ctx->buffer.height * sizeof(GLfloat));
 }
 
 

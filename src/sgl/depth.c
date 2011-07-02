@@ -41,9 +41,6 @@ void _sgl_init_depth(struct sgl_context* ctx)
   memcpy(ctx->drawbuffer->depth_buf.data,
          ctx->drawbuffer->clear_depth_buf.data,
          ctx->buffer.width * ctx->buffer.height * sizeof(GLfloat));
-  memcpy(ctx->drawbuffer->t_depth_buf.data,
-         ctx->drawbuffer->clear_depth_buf.data,
-         ctx->buffer.width * ctx->buffer.height * sizeof(GLfloat));
 }
 
 void glClearDepth(GLclampd depth)

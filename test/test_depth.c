@@ -40,7 +40,6 @@ void display(void)
   //glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
   glEnable(GL_DEPTH_TEST);
 
-  glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
   glColor3f (1.0, 0.0, 0.0);
   glBegin(GL_QUADS);
     glVertex3f(1, 1, 0);

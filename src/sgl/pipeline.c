@@ -49,6 +49,7 @@ void sglPipelineIter(char* buffer)
   ctx->drawbuffer->color_buf.data = buffer;
 }
 
+#if 0
 void _sgl_pipeline_depth_test(void)
 {
   GET_CURRENT_CONTEXT(ctx);
@@ -68,14 +69,6 @@ void _sgl_pipeline_depth_test(void)
       }
     }
 
-  /* Clear temporal buffer */
-  memcpy(ctx->drawbuffer->t_color_buf.data,
-         ctx->drawbuffer->clear_color_buf.data,
-         size * sizeof(GLuint));
-
-  memcpy(ctx->drawbuffer->t_depth_buf.data,
-         ctx->drawbuffer->clear_depth_buf.data,
-         size * sizeof(GLfloat));
-
   _sgl_framebuffer_edge_table_clear();
 }
+#endif

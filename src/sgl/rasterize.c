@@ -74,20 +74,32 @@ void _sgl_render_pixel(struct sgl_framebuffer* buf,
                        GLint x, GLint y, GLint z, GLint cc)
 {
   GET_CURRENT_CONTEXT(ctx);
+  GLfloat fz = NORMALIZE_Z(ctx, z);
+
   x = CLAMP(x, 1, buf->width);
   y = CLAMP(y, 0, buf->height -1);
-  BUF_SET_C(buf->r_color_buf, x, y, cc);
-  BUF_SET_D(buf->r_depth_buf, x, y, NORMALIZE_Z(ctx, z));
+
+  BUF_SET_C(&buf->t_color_buf, x, y, cc);
+  BUF_SET_D(&buf->t_depth_buf, x, y, fz);
+
   if (ctx->render_state.gfill)
     _insert_edge(x, y);
+
+  if (ctx->depth.test && fz >= BUF_GET_D(&buf->depth_buf, x, y))
+    return;
+
+  BUF_SET_C(&buf->color_buf, x, y, cc);
+  BUF_SET_D(&buf->depth_buf, x, y, fz);
 }
 
 void _scanline_fill(struct sgl_framebuffer* buf)
 {
+  GET_CURRENT_CONTEXT(ctx);
+
   GLint* et = buf->edge_tab;
   GLint y = 0, x = 0, d = 0, dx = 0, start = 0, end = 0,
         cc1 = 0, cc2 = 0;
-  GLfloat z1 = 0, z2 = 0;
+  GLfloat z1 = 0, z2 = 0, zi = 0;
 
   for (y = 0; y < buf->height; ++y) {
     for (x = 0; x + 1 < ET_GET(et, y, EDGE_TABLE_SIZE -1); x += 2) {
@@ -96,20 +108,24 @@ void _scanline_fill(struct sgl_framebuffer* buf)
 
       dx = (end > start)? 1: -1;
       for (d = start + dx; d != end; d += dx) {
-        cc1 = BUF_GET_C(buf->r_color_buf, CLAMP(start, 1, buf->width),
-                                         CLAMP(y, 0, buf->height-1));
-        cc2 = BUF_GET_C(buf->r_color_buf, CLAMP(end, 1, buf->width),
+        z1 = BUF_GET_D(&buf->t_depth_buf, CLAMP(start, 1, buf->width),
+                                          CLAMP(y, 0, buf->height-1));
+        z2 = BUF_GET_D(&buf->t_depth_buf, CLAMP(end, 1, buf->width),
                                           CLAMP(y, 0, buf->height-1));
 
-        z1 = BUF_GET_D(buf->r_depth_buf, CLAMP(start, 1, buf->width),
-                                         CLAMP(y, 0, buf->height-1));
-        z2 = BUF_GET_D(buf->r_depth_buf, CLAMP(end, 1, buf->width),
-                                         CLAMP(y, 0, buf->height-1));
+        zi = LINEAR_IP(z1, z2, abs(d - start), abs(end - start));
 
-        BUF_SET_C(buf->r_color_buf, d, y,
+        if (ctx->depth.test && zi >= BUF_GET_D(&buf->depth_buf, d, y))
+          continue;
+
+        cc1 = BUF_GET_C(&buf->t_color_buf, CLAMP(start, 1, buf->width),
+                                           CLAMP(y, 0, buf->height-1));
+        cc2 = BUF_GET_C(&buf->t_color_buf, CLAMP(end, 1, buf->width),
+                                           CLAMP(y, 0, buf->height-1));
+
+        BUF_SET_C(&buf->color_buf, d, y,
                   COLOR_IP(cc1, cc2, abs(d - start), abs(end - start)));
-        BUF_SET_D(buf->r_depth_buf, d, y,
-                  LINEAR_IP(z1, z2, abs(d - start), abs(end - start)));
+        BUF_SET_D(&buf->depth_buf, d, y, zi);
       }
     }
   }
@@ -297,8 +313,6 @@ void _sgl_pipeline_draw_list(void)
       _sgl_draw_point(ctx->drawbuffer,
                       VEC_ELT(&ctx->vector_point, GLvoid, idx),
                       VEC_ELT(&ctx->vector_color, GLvoid, idx));
-      if (ctx->depth.test)
-        _sgl_pipeline_depth_test();
     }
     break;
   case GL_LINES:
@@ -308,8 +322,6 @@ void _sgl_pipeline_draw_list(void)
       point = VEC_ELT(&ctx->vector_point, GLvoid, idx);
       color = VEC_ELT(&ctx->vector_color, GLvoid, idx);
       _sgl_draw_line(ctx->drawbuffer, point, point + 4, color, color + 4);
-      if (ctx->depth.test)
-        _sgl_pipeline_depth_test();
     }
     break;
   case GL_LINE_LOOP:
@@ -321,8 +333,6 @@ void _sgl_pipeline_draw_list(void)
                           VEC_ELT(&ctx->vector_color, GLvoid, idx), i);
     }
     _sgl_draw_line_loop(ctx->drawbuffer, point = 0, color = 0, -1);
-    if (ctx->depth.test)
-      _sgl_pipeline_depth_test();
     break;
   case GL_TRIANGLES:
     ctx->render_state.gfill = GL_TRUE;
@@ -331,8 +341,6 @@ void _sgl_pipeline_draw_list(void)
       _sgl_draw_triangle_v(ctx->drawbuffer,
                            VEC_ELT(&ctx->vector_point, GLvoid, idx),
                            VEC_ELT(&ctx->vector_color, GLvoid, idx));
-      if (ctx->depth.test)
-        _sgl_pipeline_depth_test();
     }
     break;
   case GL_TRIANGLE_STRIP:
@@ -343,8 +351,6 @@ void _sgl_pipeline_draw_list(void)
                                VEC_ELT(&ctx->vector_point, GLvoid, idx),
                                VEC_ELT(&ctx->vector_color, GLvoid, idx), i);
     }
-    if (ctx->depth.test)
-      _sgl_pipeline_depth_test();
     break;
   case GL_QUADS:
     ctx->render_state.gfill = GL_TRUE;
@@ -353,8 +359,6 @@ void _sgl_pipeline_draw_list(void)
       _sgl_draw_quad_v(ctx->drawbuffer,
                        VEC_ELT(&ctx->vector_point, GLvoid, idx),
                        VEC_ELT(&ctx->vector_color, GLvoid, idx));
-      if (ctx->depth.test)
-        _sgl_pipeline_depth_test();
     }
     break;
   }
@@ -387,7 +391,6 @@ void _sgl_pipeline_draw_array(void)
                       VEC_ELT(&ctx->vector_point, GLvoid, idx),
                       VEC_ELT(&ctx->vector_color, GLvoid, idx));
       if (ctx->depth.test)
-        _sgl_pipeline_depth_test();
     }
     break;
   case GL_LINES:
@@ -398,7 +401,6 @@ void _sgl_pipeline_draw_array(void)
                       VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 1),
                       VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 2));
       if (ctx->depth.test)
-        _sgl_pipeline_depth_test();
     }
     break;
   case GL_TRIANGLES:
@@ -411,7 +413,6 @@ void _sgl_pipeline_draw_array(void)
                            VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 2),
                            VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 3));
       if (ctx->depth.test)
-        _sgl_pipeline_depth_test();
     }
     break;
   case GL_TRIANGLE_STRIP:
@@ -421,7 +422,6 @@ void _sgl_pipeline_draw_array(void)
                                VEC_ELT(&ctx->vector_point, GLvoid, pidx + ts),
                                VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts));
       if (ctx->depth.test)
-        _sgl_pipeline_depth_test();
     }
     break;
   case GL_QUADS:
@@ -437,7 +437,6 @@ void _sgl_pipeline_draw_array(void)
                        VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 3),
                        VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 4));
       if (ctx->depth.test)
-        _sgl_pipeline_depth_test();
     }
     break;
   }
