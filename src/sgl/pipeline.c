@@ -48,27 +48,3 @@ void sglPipelineIter(char* buffer)
   GET_CURRENT_CONTEXT(ctx);
   ctx->drawbuffer->color_buf.data = buffer;
 }
-
-#if 0
-void _sgl_pipeline_depth_test(void)
-{
-  GET_CURRENT_CONTEXT(ctx);
-  GLint x = 0, y = 0;
-  GLfloat dz = 0.0, nz = 0.0;
-  struct sgl_framebuffer* buf = ctx->drawbuffer;
-  GLint size = ctx->buffer.width * ctx->buffer.height;
-
-  for (y = 0; y < buf->height; ++y)
-    for (x = 0; x < buf->width; ++x) {
-      dz = NORMALIZE_Z(ctx, BUF_GET_D(&buf->depth_buf, x, y));
-      nz = NORMALIZE_Z(ctx, BUF_GET_D(&buf->t_depth_buf, x, y));
-
-      if (nz < dz) {
-        BUF_SET_C(&buf->color_buf, x, y, BUF_GET_C(&buf->t_color_buf, x, y));
-        BUF_SET_D(&buf->depth_buf, x, y, BUF_GET_D(&buf->t_depth_buf, x, y));
-      }
-    }
-
-  _sgl_framebuffer_edge_table_clear();
-}
-#endif
