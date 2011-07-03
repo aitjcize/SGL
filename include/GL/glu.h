@@ -19,19 +19,19 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __SGLU_GLUT_H__
-#define __SGLU_GLUT_H__
+#ifndef __SGL_GLU_H__
+#define __SGL_GLU_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void gluLookAt(GLdouble eyex, GLdouble eyey, GLdouble eyez, 
-          GLdouble cenx, GLdouble ceny, GLdouble cenz, 
-          GLdouble upx,  GLdouble upy,  GLdouble upz)
+               GLdouble cenx, GLdouble ceny, GLdouble cenz,
+               GLdouble upx,  GLdouble upy,  GLdouble upz);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __SGLU_GLUT_H__ */
+#endif /* __SGL_GLU_H__ */

@@ -1,4 +1,4 @@
-AM_CFLAGS = -Wall -O2 -g
+AM_CFLAGS = -Wall -O2 -g -I$(top_srcdir)/include
 
 AM_LDFLAGS = \
 	$(top_builddir)/src/sglut/libSGLUT.la \
