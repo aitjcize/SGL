@@ -1,5 +1,5 @@
 /**
- * @file   types.h
+ * @file   sglut/types.h
  *
  * Copyright (C) 2011 - SGL Authors <aitjcize@gmail.com>
  * All Rights reserved.

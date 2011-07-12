@@ -27,6 +27,9 @@
 
 #include "types.h"
 
+/**
+ * @brief Initialize the colorbuffer in struct sgl_context
+ */
 extern void _sgl_init_color(struct sgl_context* ctx);
 
 extern void glClearColor(GLclampf red, GLclampf green, GLclampf blue,

@@ -1,8 +1,12 @@
 /**
- * @file   types.h
+ * @file   sgl/types.h
  *
  * Copyright (C) 2011 - SGL Authors <aitjcize@gmail.com>
  * All Rights reserved.
+ *
+ * This file is partially modified from the Mesa 3D project
+ * Copyright (C) 1999-2008  Brian Paul   All Rights Reserved.
+ * Copyright (C) 2009  VMware, Inc.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -56,63 +60,68 @@ struct sgl_buffer_attrib
   GLuint type;
 };
 
+/**
+ * @struct sgl_renderbuffer
+ */
 struct sgl_renderbuffer
 {
-  GLuint width, height;     /* Dimemsion */
-  GLuint type;              /* Storage type */
-  GLchar* data;             /* Buffer data */
-  GLboolean allocated;      /* Buffer allocated */
+  GLuint width, height;     /**< Dimemsion */
+  GLuint type;              /**< Storage type */
+  GLchar* data;             /**< Buffer data */
+  GLboolean allocated;      /**< Buffer allocated */
 };
 
+/**
+ * @brief structure to store all colorbuffers
+ * @struct sgl_framebuffer
+ */
 struct sgl_framebuffer
 {
   GLboolean initialized;
 
   GLuint width, height;
-  GLfloat depth_max;
+  GLfloat depth_max;                        /**< Max depth buffer depth */
 
   /* Buffers */
-  struct sgl_renderbuffer clear_color_buf;
-  struct sgl_renderbuffer clear_depth_buf;
+  struct sgl_renderbuffer clear_color_buf;  /**< clear colorbuffer */
+  struct sgl_renderbuffer clear_depth_buf;  /**< clear depthbuffer */
 
-  struct sgl_renderbuffer t_color_buf;
-  struct sgl_renderbuffer t_depth_buf;
+  struct sgl_renderbuffer t_color_buf;      /**< Temp colorbuffer */
+  struct sgl_renderbuffer t_depth_buf;      /**< Temp depthbuffer */
 
-  struct sgl_renderbuffer color_buf;
-  struct sgl_renderbuffer normal_buf;
-  struct sgl_renderbuffer depth_buf;
+  struct sgl_renderbuffer color_buf;        /**< Colorbuffer */
+  struct sgl_renderbuffer depth_buf;        /**< Depthbuffer */
 
-  /* Edge Table */
-  GLint* edge_tab;
+  GLint* edge_tab;                          /**< Edge table for scanline fill */
 };
 
 struct sgl_matrix_stack
 {
-  SGLmatrix* top;           /* points into stack */
-  SGLmatrix* stack;         /* array of [max_depth] of SGLMatrix */
-  GLuint depth;             /* 0 <= depth < max_depth */
-  GLuint max_depth;         /* size of stack[] array */
+  SGLmatrix* top;           /**< points into stack */
+  SGLmatrix* stack;         /**< array of [max_depth] of SGLMatrix */
+  GLuint depth;             /**< 0 <= depth < max_depth */
+  GLuint max_depth;         /**< size of stack[] array */
 };
 
 struct sgl_depthbuffer_attrib
 {
-  GLenum func;              /* Function for depth buffer compare */
-  GLclampd clear;           /* Value to clear depth buffer to */
-  GLboolean test;           /* Depth buffering enabled flag */
-  GLboolean mask;           /* Depth buffer writable? */
+  GLenum func;              /**< Function for depth buffer compare */
+  GLclampd clear;           /**< Value to clear depth buffer to */
+  GLboolean test;           /**< Depth buffering enabled flag */
+  GLboolean mask;           /**< Depth buffer writable? */
 };
 
 struct sgl_colorbuffer_attrib
 {
-  GLclampd clear;           /* Value to clear depth buffer to */
+  GLclampd clear;           /**< Value to clear depth buffer to */
 };
 
 struct sgl_viewport_attrib
 {
-  GLint x, y;               /* possition */
-  GLsizei width, height;    /* dimenssion */
-  GLfloat near, far;        /* near, far value */
-  SGLmatrix window_map;     /* Mapping transformation as a matrix */
+  GLint x, y;               /**< possition */
+  GLsizei width, height;    /**< dimenssion */
+  GLfloat near, far;        /**< near, far value */
+  SGLmatrix window_map;     /**< Mapping transformation as a matrix */
 };
 
 struct sgl_polygon_attrib
@@ -137,50 +146,50 @@ struct sgl_vertex_array_attrib {
 struct sgl_render_state
 {
 #define FLUSH_STORED_VERTICES 0x1
-  GLint current_exec_primitive;   /* Current executed primitive */
-  GLint type;                     /* 0 or GL_VERTEX_ARRAY */
-  GLint needflush;
-  GLboolean gfill;                /* Wether a geometry needs to be fill */
+  GLint current_exec_primitive;   /**< Current executed primitive */
+  GLint type;                     /**< 0 or GL_VERTEX_ARRAY */
+  GLint needflush;                /**< Where we need to flush the vertices */
+  GLboolean gfill;                /**< Wether a geometry needs to be fill */
 };
 
 struct sgl_light
 {
-   struct gl_light *next;       /* double linked list with sentinel */
+   struct gl_light *next;       /**< double linked list with sentinel */
    struct gl_light *prev;
 
-   GLfloat ambient[4];          /* ambient color */
-   GLfloat diffuse[4];          /* diffuse color */
-   GLfloat specular[4];         /* specular color */
-   GLfloat eye_position[4];     /* position in eye coordinates */
-   GLfloat spot_direction[4];   /* spotlight direction in eye coordinates */
+   GLfloat ambient[4];          /**< ambient color */
+   GLfloat diffuse[4];          /**< diffuse color */
+   GLfloat specular[4];         /**< specular color */
+   GLfloat eye_position[4];     /**< position in eye coordinates */
+   GLfloat spot_direction[4];   /**< spotlight direction in eye coordinates */
    
    GLfloat spot_exponent;
-   GLfloat spot_cutoff;         /* in degrees */
-   GLfloat _cos_cutoff_neg;     /* cos(SpotCutoff) */
-   GLfloat _cos_cutoff;         /* MAX(0, cos(SpotCutoff)) */
+   GLfloat spot_cutoff;         /**< in degrees */
+   GLfloat _cos_cutoff_neg;     /**< cos(SpotCutoff) */
+   GLfloat _cos_cutoff;         /**< MAX(0, cos(SpotCutoff)) */
    
    GLfloat constant_attenuation;
    GLfloat linear_attenuation;
    GLfloat quadratic_attenuation;
-   GLboolean enabled;           /* On/off flag */
+   GLboolean enabled;           /**< On/off flag */
 
-   GLfloat _position[4];        /* position in eye/obj coordinates */
-   GLfloat _vp_inf_norm[3];     /* Norm direction to infinite light */
-   GLfloat _h_inf_norm[3];      /* Norm( _VP_inf_norm + <0,0,1> ) */
-   GLfloat _normspot_direction[4]; /* normalized spotlight direction */
+   GLfloat _position[4];        /**< position in eye/obj coordinates */
+   GLfloat _vp_inf_norm[3];     /**< Norm direction to infinite light */
+   GLfloat _h_inf_norm[3];      /**< Norm( _VP_inf_norm + <0,0,1> ) */
+   GLfloat _normspot_direction[4]; /**< normalized spotlight direction */
    GLfloat _vp_inf_spot_attenuation;
 
-   GLfloat _mat_ambient[2][3];  /* material ambient * light ambient */
-   GLfloat _mat_diffuse[2][3];  /* material diffuse * light diffuse */
-   GLfloat _mat_specular[2][3]; /* material spec * light specular */
+   GLfloat _mat_ambient[2][3];  /**< material ambient * light ambient */
+   GLfloat _mat_diffuse[2][3];  /**< material diffuse * light diffuse */
+   GLfloat _mat_specular[2][3]; /**< material spec * light specular */
 };
 
 struct sgl_lightmodel
 {
-   GLfloat Ambient[4];     /* ambient color */
-   GLboolean LocalViewer;  /* Local (or infinite) view point */
-   GLboolean TwoSide;      /* Two (or one) sided lighting */
-   GLenum ColorControl;    /* either GL_SINGLE_COLOR or
+   GLfloat Ambient[4];     /**< ambient color */
+   GLboolean LocalViewer;  /**< Local (or infinite) view point */
+   GLboolean TwoSide;      /**< Two (or one) sided lighting */
+   GLenum ColorControl;    /**< either GL_SINGLE_COLOR or
                             * GL_SEPARATE_SPECULAR_COLOR */
 };
 
@@ -197,6 +206,10 @@ struct sgl_pipeline
   void (*depth_test)(void);
 };
 
+/**
+ * @brief SGL state machine main context
+ * @sturct sgl_context
+ */
 struct sgl_context
 {
   /* Framebuffers */

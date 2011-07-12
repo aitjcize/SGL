@@ -1,4 +1,6 @@
-/*
+/**
+ * @file m_matrix.c
+ *
  * Matrix Math Library
  *
  * Copyright (C) 2011 - SGL Authors <aitjcize@gmail.com>

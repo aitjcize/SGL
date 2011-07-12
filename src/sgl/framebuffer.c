@@ -49,7 +49,6 @@ void _sgl_init_framebuffer(struct sgl_context* ctx)
 
   _sgl_init_renderbuffer(&buf->color_buf, GL_UNSIGNED_INT, GL_FALSE);
   _sgl_init_renderbuffer(&buf->depth_buf, GL_FLOAT, GL_TRUE);
-  _sgl_init_renderbuffer(&buf->normal_buf, GL_UNSIGNED_INT, GL_TRUE);
 
   /* Clear Edge Table */
   buf->edge_tab = malloc(et_size);
@@ -68,7 +67,6 @@ void _sgl_free_framebuffer_data(struct sgl_context* ctx)
 
   _sgl_free_renderbuffer(&ctx->drawbuffer->color_buf);
   _sgl_free_renderbuffer(&ctx->drawbuffer->depth_buf);
-  _sgl_free_renderbuffer(&ctx->drawbuffer->normal_buf);
 }
 
 void _sgl_clear_framebuffer(GLenum mask)

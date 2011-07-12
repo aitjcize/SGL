@@ -29,6 +29,7 @@ void display(void)
   glLoadIdentity();
   gluLookAt (0.0, 0.0, g_radius, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
+  glEnable(GL_DEPTH_TEST);
   glScalef (1.0, 1.0, 1.0);
   glRotatef(g_phi, 0.0, 1.0, 0.0);
   glRotatef(g_theta, cos(RAD(g_phi)), 0.0, -sin(RAD(g_phi)));

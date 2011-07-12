@@ -4,6 +4,9 @@
  * Copyright (C) 2011 - SGL Authors <aitjcize@gmail.com>
  * All Rights reserved.
  *
+ * This file is taken from the Mesa-3D project and partially modified.
+ * Copyright (C) 2009  VMware, Inc.  All Rights Reserved.
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation

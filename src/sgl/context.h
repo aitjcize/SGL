@@ -1,8 +1,11 @@
 /**
- * @file   context.h
+ * @file   sgl/context.h
  *
  * Copyright (C) 2011 - SGL Authors <aitjcize@gmail.com>
  * All Rights reserved.
+ *
+ * Some macros are taken from the Mesa 3D project
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -30,7 +33,7 @@
 
 #define GL_ENABLED(ctx, type) ((ctx->flags & type) == type)
 
-/*
+/**
  * @brief Flush vertices.
  *
  * @param ctx GL context.
@@ -46,7 +49,7 @@ do {								\
 /*   if (ctx->render_state.needflush & FLUSH_STORED_VERTICES)		\
        ctx->render_state.flushvertices(ctx, FLUSH_STORED_VERTICES);	\*/
 
-/*
+/**
  * @brief Macro to assert that the API call was made outside the
  * glBegin()/glEnd() pair and flush the vertices, with return value.
  *
@@ -61,7 +64,7 @@ do {                                                                        \
   }                                                                         \
 } while(0)
 
-/*
+/**
  * @brief Macro to assert that the API call was made outside the
  * glBegin()/glEnd() pair.
  *
@@ -75,7 +78,7 @@ do {                                                                        \
   }                                                                         \
 } while(0)
 
-/*
+/**
  * @brief Macro to assert that the API call was made outside the
  * glBegin()/glEnd() pair and flush the vertices.
  *
@@ -87,7 +90,7 @@ do {									\
    FLUSH_VERTICES(ctx, 0);						\
 } while (0)
 
-/*
+/**
  * @breif Macro to assert that the API call was made outside the
  * glBegin()/glEnd() pair and flush the vertices, with return value.
  *

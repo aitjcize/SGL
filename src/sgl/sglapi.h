@@ -30,6 +30,11 @@ extern struct sgl_context _g_sgl_context;
 #define GET_CURRENT_CONTEXT(C) \
   struct sgl_context* C = (struct sgl_context*) &_g_sgl_context
 
+/**
+ * @brief Initialize SGL
+ * @param w framebuffer width 
+ * @param h framebuffer height 
+ */
 extern void sglInit(int w, int h);
 
 extern void sglPipelineIter(char* buffer);

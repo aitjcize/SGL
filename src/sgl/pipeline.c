@@ -1,5 +1,6 @@
 /**
  * @file   pipeline.c
+ * @breif  SGL software pipeline
  *
  * Copyright (C) 2011 - SGL Authors <aitjcize@gmail.com>
  * All Rights reserved.

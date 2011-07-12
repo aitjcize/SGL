@@ -1,5 +1,5 @@
 /**
- * @file   context.h
+ * @file   sglut/context.h
  *
  * Copyright (C) 2011 - SGL Authors <aitjcize@gmail.com>
  * All Rights reserved.

@@ -41,6 +41,7 @@ AC_CONFIG_FILES([Makefile
 		 src/sglu/Makefile
 		 src/sglut/Makefile
 		 test/Makefile
+		 Doxyfile
 		 ])
 
 AC_OUTPUT

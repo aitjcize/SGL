@@ -1,5 +1,10 @@
-/*
+/**
+ * @file m_vector.c
+ *
  * Vector Math Library
+ *
+ * Trimmed and partially modified from the Mesa 3D project
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Copyright (C) 2011 - SGL Authors <aitjcize@gmail.com>
  * All Rights reserved.

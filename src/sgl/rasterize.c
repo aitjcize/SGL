@@ -36,6 +36,12 @@
 #include "math/m_matrix.h"
 #include "math/m_vector.h"
 
+
+/**
+ * @brief Insert an edge to the edge table
+ * @param x x component
+ * @param y y component
+ */
 void _insert_edge(GLint x, GLint y)
 {
   GET_CURRENT_CONTEXT(ctx);
@@ -73,6 +79,14 @@ void _insert_edge(GLint x, GLint y)
   }
 }
 
+/**
+ * @brief Render a pixel and if GL_DEPTH_TEST is enabled, perform depth test.
+ * @param buf a struct sgl_framebuffer
+ * @param x x component
+ * @param y y component
+ * @param z z component
+ * @param cc color component
+ */
 void _sgl_render_pixel(struct sgl_framebuffer* buf,
                        GLint x, GLint y, GLint z, GLint cc)
 {
@@ -95,6 +109,10 @@ void _sgl_render_pixel(struct sgl_framebuffer* buf,
   BUF_SET_D(&buf->depth_buf, x, y, fz);
 }
 
+/**
+ * @brief Perfrom scanline fill given a edge table
+ * @param buf a struct sgl_framebuffer
+ */
 void _scanline_fill(struct sgl_framebuffer* buf)
 {
   GET_CURRENT_CONTEXT(ctx);
@@ -135,12 +153,29 @@ void _scanline_fill(struct sgl_framebuffer* buf)
   _sgl_framebuffer_edge_table_clear();
 }
 
+/**
+ * @brief Draw a single point
+ * @param buf a struct sgl_framebuffer
+ * @param point point (x, y, z) specified by a float array
+ * @param color color (r, g, b, a) specified by a float array
+ */
 void _sgl_draw_point(struct sgl_framebuffer* buf, GLfloat* point,
                      GLfloat* color)
 {
   _sgl_render_pixel(buf, point[0], point[1], point[2], COLOR_FF(color));
 }
 
+/**
+ * @brief Draw a line
+ * @param buf a struct sgl_framebuffer
+ * @param point1 first point (x, y, z) specified by a float array
+ * @param point2 second point (x, y, z) specified by a float array
+ * @param color1 first color (r, g, b, a) specified by a float array
+ * @param color2 second color (r, g, b, a) specified by a float array
+ *
+ * Draw a line between point1 and point2, if glShadeModel is GL_SMOOTH, color
+ * between these two point is interpolated with color1 and color2
+ */
 void _sgl_draw_line(struct sgl_framebuffer* buf,
                     GLfloat* point1, GLfloat* point2,
                     GLfloat* color1, GLfloat* color2)
@@ -203,6 +238,13 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
   }
 }
 
+/**
+ * @brief Draw line loop
+ * @param buf a struct sgl_framebuffer
+ * @param point point (x, y, z) specified by a float array
+ * @param color color (r, g, b, a) specified by a float array
+ * @param count the current number of vertices that is passed to the function
+ */
 void _sgl_draw_line_loop(struct sgl_framebuffer* buf,
                          GLfloat* point, GLfloat* color,
                          GLint count) 
@@ -224,6 +266,19 @@ void _sgl_draw_line_loop(struct sgl_framebuffer* buf,
   }
 }
 
+/**
+ * @brief Draw a triangle
+ * @param buf a struct sgl_framebuffer
+ * @param p1 point (x, y, z) specified by a float array
+ * @param p2 point (x, y, z) specified by a float array
+ * @param p3 point (x, y, z) specified by a float array
+ * @param c1 color (r, g, b, a) specified by a float array
+ * @param c2 color (r, g, b, a) specified by a float array
+ * @param c3 color (r, g, b, a) specified by a float array
+ *
+ * Draw a triangle specified by three point: p1, p2, p3, if glShadeModel is
+ * GL_SMOOTH, color in between are interpolated.
+ */
 void _sgl_draw_triangle(struct sgl_framebuffer* buf,
                         GLfloat* p1, GLfloat* p2, GLfloat* p3,
                         GLfloat* c1, GLfloat* c2, GLfloat* c3)
@@ -238,6 +293,12 @@ void _sgl_draw_triangle(struct sgl_framebuffer* buf,
     _scanline_fill(buf);
 }
 
+/**
+ * @brief Draw a triangle specified by an varaiable list
+ * @param buf a struct sgl_framebuffer
+ * @param point a 12 element float array specifing three point
+ * @param color a 12 element float array specifing three color
+ */
 void _sgl_draw_triangle_v(struct sgl_framebuffer* buf, GLfloat* point,
                           GLfloat* color)
 {
@@ -245,6 +306,13 @@ void _sgl_draw_triangle_v(struct sgl_framebuffer* buf, GLfloat* point,
                           &color[0], &color[4], &color[8]);
 }
 
+/**
+ * @brief Draw triangle strip
+ * @param buf a struct sgl_framebuffer
+ * @param point a 4 element float array specifing a point
+ * @param color a 4 element float array specifing a color
+ * @param count the current number of vertices that is passed to the function
+ */
 void _sgl_draw_triangle_strip(struct sgl_framebuffer* buf, GLfloat* point,
                               GLfloat* color, GLuint count)
 {
@@ -273,6 +341,18 @@ void _sgl_draw_triangle_strip(struct sgl_framebuffer* buf, GLfloat* point,
   }
 }
 
+/**
+ * @brief Draw a quad
+ * @param buf a struct sgl_framebuffer
+ * @param p1 point (x, y, z) specified by a float array
+ * @param p2 point (x, y, z) specified by a float array
+ * @param p3 point (x, y, z) specified by a float array
+ * @param p4 point (x, y, z) specified by a float array
+ * @param c1 color (r, g, b, a) specified by a float array
+ * @param c2 color (r, g, b, a) specified by a float array
+ * @param c3 color (r, g, b, a) specified by a float array
+ * @param c4 color (r, g, b, a) specified by a float array
+ */
 void _sgl_draw_quad(struct sgl_framebuffer* buf,
                     GLfloat* p1, GLfloat* p2, GLfloat* p3, GLfloat* p4,
                     GLfloat* c1, GLfloat* c2, GLfloat* c3, GLfloat* c4)
@@ -287,6 +367,12 @@ void _sgl_draw_quad(struct sgl_framebuffer* buf,
     _scanline_fill(buf);
 }
 
+/**
+ * @brief Draw a quad specified by an varaiable list
+ * @param buf a struct sgl_framebuffer
+ * @param point a 16 element float array specifing three point
+ * @param color a 16 element float array specifing three color
+ */
 void _sgl_draw_quad_v(struct sgl_framebuffer* buf, GLfloat* point,
                       GLfloat* color)
 {
@@ -294,6 +380,9 @@ void _sgl_draw_quad_v(struct sgl_framebuffer* buf, GLfloat* point,
                       &color[0], &color[4], &color[8], &color[12]);
 }
 
+/**
+ * @brief Draw a list of vertices and perform input assembly
+ */
 void _sgl_pipeline_draw_list(void)
 {
   GET_CURRENT_CONTEXT(ctx);
@@ -446,6 +535,9 @@ void _sgl_pipeline_draw_array(void)
 #endif
 }
 
+/**
+ * @brief Rasterization stage in SGL pipeline
+ */
 void _sgl_pipeline_rasterize(void)
 {
   GET_CURRENT_CONTEXT(ctx);

@@ -1,5 +1,5 @@
 /**
- * @file   context.c
+ * @file   sgl/context.c
  *
  * Copyright (C) 2011 - SGL Authors <aitjcize@gmail.com>
  * All Rights reserved.
@@ -35,6 +35,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * Global SGL context
+ */
 struct sgl_context _g_sgl_context;
 
 void _sgl_init_vector(struct sgl_context* ctx)

@@ -1,5 +1,5 @@
 /**
- * @file   geometry.c
+ * @file   sgl/geometry.c
  *
  * Copyright (C) 2011 - SGL Authors <aitjcize@gmail.com>
  * All Rights reserved.

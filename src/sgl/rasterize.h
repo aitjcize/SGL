@@ -27,6 +27,9 @@
 
 #include "types.h"
 
+/**
+ * @brief Perform pipeline rasterization
+ */
 extern void _sgl_pipeline_rasterize(void);
 
 #endif /* __SGL_RASTERIZE_H__ */

@@ -1,5 +1,10 @@
-/*
+/**
+ * @file m_vector.h
+ *
  * Vector Math Library
+ *
+ * Trimmed and partially modified from the Mesa 3D project
+ * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
  *
  * Copyright (C) 2011 - SGL Authors <aitjcize@gmail.com>
  * All Rights reserved.
@@ -45,7 +50,7 @@ struct _SGLvector4f
   GLbitfield flags;       /* VEC_X flags */
 };
 
-/*
+/**
  * @brief Initialize vector with storage
  * @param v points to a SGLvector4f
  * @param flags flags to set for SGLvector4f
@@ -54,7 +59,7 @@ struct _SGLvector4f
 extern void _math_vector4f_init(SGLvector4f *v, GLbitfield flags,
                                 GLfloat (*storage)[4]);
 
-/*
+/**
  * @brief Initialize vector and allocate <count> storage of elemnts
  * @param v points to a SGLvector4f
  * @param flags flags to set for SGLvector4f
@@ -63,25 +68,25 @@ extern void _math_vector4f_init(SGLvector4f *v, GLbitfield flags,
 extern void _math_vector4f_alloc(SGLvector4f *v, GLbitfield flags,
                                  GLuint count);
 
-/*
+/**
  * @brief Double the storage of an existing self-allocated vector
  * @param v points to a vector
  */
 extern void _math_vector4f_alloc_double(SGLvector4f *v);
 
-/*
+/**
  * @brief free storage for a SGLvector4f
  * @param v points to a SGLvector4f
  */
 extern void _math_vector4f_free(SGLvector4f* v);
 
-/*
+/**
  * @brief lazy free
  * @param v points to a SGLvector4f
  */
 extern void _math_vector4f_lazy_free(SGLvector4f* v);
 
-/*
+/**
  * @brief push a vector into a SGLvector4f
  * @param v points to a SGLvector4f
  * @param data point to a vector
@@ -91,7 +96,7 @@ extern void _math_vector4f_lazy_free(SGLvector4f* v);
 extern GLboolean _math_vector4f_push_back(SGLvector4f* v, GLfloat* data,
                                           GLuint size);
 
-/*
+/**
  * @brief pop last vector from a SGLvector4f
  * @param v points to a SGLvector4f
  * @param data place to store the popped data, allow NULL
@@ -105,7 +110,7 @@ extern GLboolean _math_vector4f_empty(SGLvector4f* v);
 
 extern void _math_vector4f_print(SGLvector4f* v);
 
-/*
+/**
  * Given vector <v>, return <type> pointer of the <i>-th element.
  */
 #define VEC_ELT(v, type, i) \

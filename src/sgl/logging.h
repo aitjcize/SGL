@@ -27,8 +27,22 @@
 
 #include "types.h"
 
+/**
+ * @brief Output debug message
+ * @param ctx points to sgl context
+ * @param fmtstr formtat like printf
+ * @param ... printf parameters
+ * @return 
+ */
 extern void _sgl_debug(struct sgl_context* ctx, const char* fmtstr, ...);
 
+/**
+ * @brief Output error message
+ * @param ctx points to sgl context
+ * @param fmtstr formtat like printf
+ * @param ... printf parameters
+ * @return 
+ */
 extern void _sgl_error(struct sgl_context* ctx, GLenum error,
                        const char* fmtstr, ...);
 
