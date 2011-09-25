@@ -34,15 +34,15 @@ void display(void)
   glRotatef(g_phi, 0.0, 1.0, 0.0);
   glRotatef(g_theta, cos(RAD(g_phi)), 0.0, -sin(RAD(g_phi)));
 
-  glBegin(GL_QUADS);
+  glBegin(GL_TRIANGLE_STRIP);
     glColor3f(1.0, 1.0, 0.0);
-    glVertex3f(-1, 1, 0);
-    glColor3f(0.0, 1.0, 0.0);
-    glVertex3f(-1, -1, 0);
-    glColor3f(0.0, 0.0, 1.0);
-    glVertex3f(1, -1, 0);
-    glColor3f(1.0, 0.0, 0.0);
     glVertex3f(1, 1, 0);
+    glColor3f(0.0, 1.0, 0.0);
+    glVertex3f(1, -1, 0);
+    glColor3f(0.0, 0.0, 1.0);
+    glVertex3f(-1, 1, 0);
+    glColor3f(1.0, 0.0, 0.0);
+    glVertex3f(-1, -1, 0);
   glEnd();
 
   glDisable(GL_DEPTH_TEST);

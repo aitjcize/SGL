@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
+#include <math.h>
 
 #include "framebuffer.h"
 #include "logging.h"
@@ -36,47 +38,81 @@
 #include "math/m_matrix.h"
 #include "math/m_vector.h"
 
+static GLfloat _ll_first_point[4], _ll_first_color[4];
+static GLfloat _ll_prev_point[4], _ll_prev_color[4];
+
+static GLint _ts_count;
+static GLfloat _ts_prev_point[8], _ts_prev_color[8];
 
 /**
- * @brief Insert an edge to the edge table
- * @param x x component
- * @param y y component
+ * @brief Perfrom scanline fill given a edge table
+ * @param buf a struct sgl_framebuffer
  */
-void _insert_edge(GLint x, GLint y)
+void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
 {
   GET_CURRENT_CONTEXT(ctx);
-  GLint* et = ctx->drawbuffer->edge_tab;
-  GLint cidx = EDGE_TABLE_SIZE -1;
-  GLint oidx = EDGE_TABLE_SIZE -2;
-  GLuint count = ET_GET(et, y, cidx);
-  GLint l = 0;
 
-  if (count >= EDGE_TABLE_SIZE - 2)
-    return;
-
-  for (l = 0; l < count; ++l)
-    if (ET_GET(et, y, l) == x)
-      return;
-
-  switch (count % 2) {
-    case 0:
-      if (count && abs(ET_GET(et, y, count -1) -x) == ET_GET(et, y, oidx))
-        ++ET_GET(et, y, oidx);
-      else {
-        ET_GET(et, y, oidx) = 1;
-        ET_GET(et, y, count) = x;
-        ++ET_GET(et, y, cidx);
-      }
-      break;
-    case 1:
-      if (abs(ET_GET(et, y, count -1) -x) == 1) {
-        ET_GET(et, y, count -1) = x;
-      } else {
-        ET_GET(et, y, count) = x;
-        ++ET_GET(et, y, cidx);
-      }
-      break;
+  /* Find AABB */
+  GLint xmin = INT_MAX, ymin = INT_MAX, xmax = INT_MIN, ymax = INT_MIN;
+  GLint i = 0;
+  for (i = 0; i < 3; ++i) {
+    if (point[i << 2] < xmin) {
+      xmin = point[i << 2];
+    }
+    if (point[i << 2] > xmax) {
+      xmax = point[i << 2];
+    }
+    if (point[(i << 2) + 1] < ymin) {
+      ymin = point[(i << 2) + 1];
+    }
+    if (point[(i << 2) + 1] > ymax) {
+      ymax = point[(i << 2) + 1];
+    }
   }
+
+  /* Find three edge equation */
+  GLfloat m1, m2, m3, b1, b2, b3;
+
+  m1 = (point[5] - point[1]) / (point[4] - point[0]);
+  b1 = point[1] - m1 * point[0];
+
+  m2 = (point[9] - point[5]) / (point[8] - point[4]);
+  b2 = point[5] - m2 * point[4];
+
+  m3 = (point[1] - point[9]) / (point[0] - point[8]);
+  b3 = point[9] - m3 * point[8];
+
+  GLint x = 0, y = 0;
+  GLfloat a0 = 0, b0 = 0, c0 = 0, a = 0, b = 0, c = 0;
+  GLfloat z = 0;
+
+#define DISTANCE(m, b, x, y, ox) (isinf(m)? (x - ox): (m * (x) + b - (y)))
+
+  a0 = DISTANCE(m1, b1, point[8], point[9], point[0]);
+  b0 = DISTANCE(m2, b2, point[0], point[1], point[4]);
+  c0 = DISTANCE(m3, b3, point[4], point[5], point[8]);
+
+  for (y = ymin; y <= ymax; ++y) {
+    for (x = xmin; x <= xmax; ++x) {
+      a = DISTANCE(m1, b1, x, y, point[0]) / a0;
+      b = DISTANCE(m2, b2, x, y, point[4]) / b0;
+      c = DISTANCE(m3, b3, x, y, point[8]) / c0;
+
+      if (a > 0 && b > 0 && c > 0) {
+        z = NORMALIZE_Z(ctx,DEPTH_WSUM(a, point[10], b, point[2], c, point[6]));
+
+        if (ctx->depth.test && z > BUF_GET_D(&buf->depth_buf, x, y))
+          continue;
+
+        BUF_SET_C(&buf->color_buf, x, y, COLOR_WSUM(a, COLOR_FF(color + 8),
+                                                    b, COLOR_FF(color + 0),
+                                                    c, COLOR_FF(color + 4)));
+        BUF_SET_D(&buf->depth_buf, x, y, z);
+      }
+    }
+  }
+
+#undef DISTANCE
 }
 
 /**
@@ -96,61 +132,11 @@ void _sgl_render_pixel(struct sgl_framebuffer* buf,
   x = CLAMP(x, 1, buf->width);
   y = CLAMP(y, 0, buf->height -1);
 
-  BUF_SET_C(&buf->t_color_buf, x, y, cc);
-  BUF_SET_D(&buf->t_depth_buf, x, y, fz);
-
-  if (ctx->render_state.gfill)
-    _insert_edge(x, y);
-
   if (ctx->depth.test && fz > BUF_GET_D(&buf->depth_buf, x, y))
     return;
 
   BUF_SET_C(&buf->color_buf, x, y, cc);
   BUF_SET_D(&buf->depth_buf, x, y, fz);
-}
-
-/**
- * @brief Perfrom scanline fill given a edge table
- * @param buf a struct sgl_framebuffer
- */
-void _scanline_fill(struct sgl_framebuffer* buf)
-{
-  GET_CURRENT_CONTEXT(ctx);
-
-  GLint* et = buf->edge_tab;
-  GLint y = 0, x = 0, d = 0, dx = 0, start = 0, end = 0,
-        cc1 = 0, cc2 = 0;
-  GLfloat z1 = 0, z2 = 0, zi = 0;
-
-  for (y = 0; y < buf->height; ++y) {
-    for (x = 0; x + 1 < ET_GET(et, y, EDGE_TABLE_SIZE -1); x += 2) {
-      start = ET_GET(et, y, x);
-      end = ET_GET(et, y, x + 1);
-
-      dx = (end > start)? 1: -1;
-      for (d = start + dx; d != end; d += dx) {
-        z1 = BUF_GET_D(&buf->t_depth_buf, CLAMP(start, 1, buf->width),
-                                          CLAMP(y, 0, buf->height-1));
-        z2 = BUF_GET_D(&buf->t_depth_buf, CLAMP(end, 1, buf->width),
-                                          CLAMP(y, 0, buf->height-1));
-
-        zi = LINEAR_IP(z1, z2, abs(d - start), abs(end - start));
-
-        if (ctx->depth.test && zi > BUF_GET_D(&buf->depth_buf, d, y))
-          continue;
-
-        cc1 = BUF_GET_C(&buf->t_color_buf, CLAMP(start, 1, buf->width),
-                                           CLAMP(y, 0, buf->height-1));
-        cc2 = BUF_GET_C(&buf->t_color_buf, CLAMP(end, 1, buf->width),
-                                           CLAMP(y, 0, buf->height-1));
-
-        BUF_SET_C(&buf->color_buf, d, y,
-                  COLOR_IP(cc1, cc2, abs(d - start), abs(end - start)));
-        BUF_SET_D(&buf->depth_buf, d, y, zi);
-      }
-    }
-  }
-  _sgl_framebuffer_edge_table_clear();
 }
 
 /**
@@ -239,31 +225,57 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
 }
 
 /**
+ * @brief Draw a line specified by an varaiable list
+ * @param buf a struct sgl_framebuffer
+ * @param point a 8 element float array specifing two point
+ * @param color a 8 element float array specifing two color
+ */
+void _sgl_draw_line_v(struct sgl_framebuffer* buf,
+                      GLfloat* point, GLfloat* color)
+{
+  _sgl_draw_line(buf, point, point + 4, color, color + 4);
+}
+
+/**
+ * @brief Start drawing line loop
+ * @param buf a struct sgl_framebuffer
+ * @param point point (x, y, z) specified by a float array
+ * @param color color (r, g, b, a) specified by a float array
+ */
+void _sgl_draw_line_loop_start(struct sgl_framebuffer* buf,
+                               GLfloat* point, GLfloat* color)
+{
+  MOVE_FLOAT_4(_ll_first_point, point);
+  MOVE_FLOAT_4(_ll_first_color, color);
+  MOVE_FLOAT_4(_ll_prev_point, point);
+  MOVE_FLOAT_4(_ll_prev_color, color);
+}
+
+/**
  * @brief Draw line loop
  * @param buf a struct sgl_framebuffer
  * @param point point (x, y, z) specified by a float array
  * @param color color (r, g, b, a) specified by a float array
- * @param count the current number of vertices that is passed to the function
  */
 void _sgl_draw_line_loop(struct sgl_framebuffer* buf,
-                         GLfloat* point, GLfloat* color,
-                         GLint count) 
+                         GLfloat* point, GLfloat* color)
 {
-  static GLfloat first_point[4], first_color[4];
-  static GLfloat prev_point[4], prev_color[4];
+  _sgl_draw_line(buf, _ll_prev_point, point, _ll_prev_color, color);
+  MOVE_FLOAT_4(_ll_prev_point, point);
+  MOVE_FLOAT_4(_ll_prev_color, color);
+}
 
-  if (count == 0) {
-    MOVE_FLOAT_4(first_point, point);
-    MOVE_FLOAT_4(first_color, color);
-    MOVE_FLOAT_4(prev_point, point);
-    MOVE_FLOAT_4(prev_color, color);
-  } else if (count == -1) {
-    _sgl_draw_line(buf, prev_point, first_point, prev_color, first_color);
-  } else {
-    _sgl_draw_line(buf, prev_point, point, prev_color, color);
-    MOVE_FLOAT_4(prev_point, point);
-    MOVE_FLOAT_4(prev_color, color);
-  }
+/**
+ * @brief Finalize drawing line loop
+ * @param buf a struct sgl_framebuffer
+ * @param point point (x, y, z) specified by a float array
+ * @param color color (r, g, b, a) specified by a float array
+ */
+void _sgl_draw_line_loop_end(struct sgl_framebuffer* buf,
+                             GLfloat* point, GLfloat* color)
+{
+  _sgl_draw_line(buf, _ll_prev_point, _ll_first_point,
+                      _ll_prev_color, _ll_first_color);
 }
 
 /**
@@ -283,14 +295,9 @@ void _sgl_draw_triangle(struct sgl_framebuffer* buf,
                         GLfloat* p1, GLfloat* p2, GLfloat* p3,
                         GLfloat* c1, GLfloat* c2, GLfloat* c3)
 {
-  GET_CURRENT_CONTEXT(ctx);
-
   _sgl_draw_line(buf, p1, p2, c1, c2);
   _sgl_draw_line(buf, p2, p3, c2, c3);
   _sgl_draw_line(buf, p3, p1, c3, c1);
-
-  if (ctx->polygon.front == GL_FILL)
-    _scanline_fill(buf);
 }
 
 /**
@@ -302,8 +309,36 @@ void _sgl_draw_triangle(struct sgl_framebuffer* buf,
 void _sgl_draw_triangle_v(struct sgl_framebuffer* buf, GLfloat* point,
                           GLfloat* color)
 {
-  _sgl_draw_triangle(buf, &point[0], &point[4], &point[8],
-                          &color[0], &color[4], &color[8]);
+  GET_CURRENT_CONTEXT(ctx);
+  if (ctx->polygon.front == GL_FILL) {
+    _scanline_fill(buf, point, color);
+  } else {
+    _sgl_draw_triangle(buf, &point[0], &point[4], &point[8],
+                            &color[0], &color[4], &color[8]);
+  }
+}
+
+/**
+ * @brief Start drawing triangle strip
+ * @param buf a struct sgl_framebuffer
+ * @param point a 4 element float array specifing a point
+ * @param color a 4 element float array specifing a color
+ */
+void _sgl_draw_triangle_strip_start(struct sgl_framebuffer* buf, GLfloat* point,
+                                    GLfloat* color)
+{
+  if (_ts_count == 0) {
+    MOVE_FLOAT_4(_ts_prev_point, point);
+    MOVE_FLOAT_4(_ts_prev_color, color);
+  } else if (_ts_count == 1) {
+    MOVE_FLOAT_4(_ts_prev_point + 4, point);
+    MOVE_FLOAT_4(_ts_prev_color + 4, color);
+    GET_CURRENT_CONTEXT(ctx);
+    if (ctx->polygon.front != GL_FILL) {
+      _sgl_draw_line(buf, _ts_prev_point, _ts_prev_point + 4,
+                          _ts_prev_color, _ts_prev_color + 4);
+    }
+  }
 }
 
 /**
@@ -311,73 +346,31 @@ void _sgl_draw_triangle_v(struct sgl_framebuffer* buf, GLfloat* point,
  * @param buf a struct sgl_framebuffer
  * @param point a 4 element float array specifing a point
  * @param color a 4 element float array specifing a color
- * @param count the current number of vertices that is passed to the function
  */
 void _sgl_draw_triangle_strip(struct sgl_framebuffer* buf, GLfloat* point,
-                              GLfloat* color, GLuint count)
+                              GLfloat* color)
 {
   GET_CURRENT_CONTEXT(ctx);
-  static GLfloat prev_point[8], prev_color[8];
-
-  if (count == 0) {
-    MOVE_FLOAT_4(prev_point, point);
-    MOVE_FLOAT_4(prev_color, color);
-  } else if (count == 1) {
-    MOVE_FLOAT_4(prev_point + 4, point);
-    MOVE_FLOAT_4(prev_color + 4, color);
-    _sgl_draw_line(buf, prev_point, prev_point + 4, prev_color, prev_color + 4);
+  if (ctx->polygon.front == GL_FILL) {
+    GLfloat t_point[12], t_color[12];
+    MOVE_FLOAT_4(t_point, _ts_prev_point);
+    MOVE_FLOAT_4(t_point + 4, _ts_prev_point + 4);
+    MOVE_FLOAT_4(t_point + 8, point);
+    MOVE_FLOAT_4(t_color, _ts_prev_color);
+    MOVE_FLOAT_4(t_color + 4, _ts_prev_color + 4);
+    MOVE_FLOAT_4(t_color + 8, color);
+    _scanline_fill(buf, t_point, t_color);
   } else {
-    _sgl_draw_line(buf, prev_point, prev_point + 4, prev_color, prev_color + 4);
-    _sgl_draw_line(buf, prev_point, point, prev_color, color);
-    _sgl_draw_line(buf, prev_point + 4, point, prev_color + 4, color);
-
-    if (ctx->polygon.front == GL_FILL)
-      _scanline_fill(buf);
-
-    MOVE_FLOAT_4(prev_point, prev_point + 4);
-    MOVE_FLOAT_4(prev_color, prev_color + 4);
-    MOVE_FLOAT_4(prev_point + 4, point);
-    MOVE_FLOAT_4(prev_color + 4, color);
+    _sgl_draw_line(buf, _ts_prev_point, _ts_prev_point + 4,
+                        _ts_prev_color, _ts_prev_color + 4);
+    _sgl_draw_line(buf, _ts_prev_point, point, _ts_prev_color, color);
+    _sgl_draw_line(buf, _ts_prev_point + 4, point, _ts_prev_color + 4, color);
   }
-}
 
-/**
- * @brief Draw a quad
- * @param buf a struct sgl_framebuffer
- * @param p1 point (x, y, z) specified by a float array
- * @param p2 point (x, y, z) specified by a float array
- * @param p3 point (x, y, z) specified by a float array
- * @param p4 point (x, y, z) specified by a float array
- * @param c1 color (r, g, b, a) specified by a float array
- * @param c2 color (r, g, b, a) specified by a float array
- * @param c3 color (r, g, b, a) specified by a float array
- * @param c4 color (r, g, b, a) specified by a float array
- */
-void _sgl_draw_quad(struct sgl_framebuffer* buf,
-                    GLfloat* p1, GLfloat* p2, GLfloat* p3, GLfloat* p4,
-                    GLfloat* c1, GLfloat* c2, GLfloat* c3, GLfloat* c4)
-{
-  GET_CURRENT_CONTEXT(ctx);
-  _sgl_draw_line(buf, p1, p2, c1, c2);
-  _sgl_draw_line(buf, p2, p3, c2, c3);
-  _sgl_draw_line(buf, p3, p4, c3, c4);
-  _sgl_draw_line(buf, p4, p1, c4, c1);
-
-  if (ctx->polygon.front == GL_FILL)
-    _scanline_fill(buf);
-}
-
-/**
- * @brief Draw a quad specified by an varaiable list
- * @param buf a struct sgl_framebuffer
- * @param point a 16 element float array specifing three point
- * @param color a 16 element float array specifing three color
- */
-void _sgl_draw_quad_v(struct sgl_framebuffer* buf, GLfloat* point,
-                      GLfloat* color)
-{
-  _sgl_draw_quad(buf, &point[0], &point[4], &point[8], &point[12],
-                      &color[0], &color[4], &color[8], &color[12]);
+  MOVE_FLOAT_4(_ts_prev_point, _ts_prev_point + 4);
+  MOVE_FLOAT_4(_ts_prev_color, _ts_prev_color + 4);
+  MOVE_FLOAT_4(_ts_prev_point + 4, point);
+  MOVE_FLOAT_4(_ts_prev_color + 4, color);
 }
 
 /**
@@ -386,153 +379,75 @@ void _sgl_draw_quad_v(struct sgl_framebuffer* buf, GLfloat* point,
 void _sgl_pipeline_draw_list(void)
 {
   GET_CURRENT_CONTEXT(ctx);
-  GLint i = 0, idx = 0;
-  GLfloat *point, *color;
   GLenum prim_mode = ctx->render_state.current_exec_primitive;
-  GLint n_data = (prim_mode == GL_POINTS) * 1 +
-                 (prim_mode == GL_LINES) * 2 +
-                 (prim_mode == GL_LINE_LOOP) * 1 +
-                 (prim_mode == GL_TRIANGLES) * 3 +
-                 (prim_mode == GL_TRIANGLE_STRIP) * 1 +
-                 (prim_mode == GL_QUADS) * 4;
+  GLint idx = 0, end_idx = 0, offset = 0;
+  void (*p_draw_func)(struct sgl_framebuffer* , GLfloat*, GLfloat*);
 
-  /* Move for-loop inside to reduce branching */
+  end_idx = ctx->vector_point.count;
+
+  /* Pre draw */
   switch (prim_mode) {
   case GL_POINTS:
-    ctx->render_state.gfill = GL_FALSE;
-    for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
-      idx = i * n_data;
-      _sgl_draw_point(ctx->drawbuffer,
-                      VEC_ELT(&ctx->vector_point, GLvoid, idx),
-                      VEC_ELT(&ctx->vector_color, GLvoid, idx));
-    }
+    offset = 1;
+    p_draw_func = _sgl_draw_point;
     break;
+
   case GL_LINES:
-    ctx->render_state.gfill = GL_FALSE;
-    for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
-      idx = i * n_data;
-      point = VEC_ELT(&ctx->vector_point, GLvoid, idx);
-      color = VEC_ELT(&ctx->vector_color, GLvoid, idx);
-      _sgl_draw_line(ctx->drawbuffer, point, point + 4, color, color + 4);
-    }
+    offset = 2;
+    p_draw_func = _sgl_draw_line_v;
     break;
+
   case GL_LINE_LOOP:
-    ctx->render_state.gfill = GL_FALSE;
-    for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
-      idx = i * n_data;
-      _sgl_draw_line_loop(ctx->drawbuffer,
-                          VEC_ELT(&ctx->vector_point, GLvoid, idx),
-                          VEC_ELT(&ctx->vector_color, GLvoid, idx), i);
-    }
-    _sgl_draw_line_loop(ctx->drawbuffer, point = 0, color = 0, -1);
+    p_draw_func = _sgl_draw_line_loop;
+    _sgl_draw_line_loop_start(ctx->drawbuffer,
+                              VEC_ELT(&ctx->vector_point, GLfloat, 0),
+                              VEC_ELT(&ctx->vector_color, GLfloat, 0));
+    idx = 1;
+    end_idx -= 1;
+    offset = 1;
     break;
+
   case GL_TRIANGLES:
-    ctx->render_state.gfill = GL_TRUE;
-    for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
-      idx = i * n_data;
-      _sgl_draw_triangle_v(ctx->drawbuffer,
-                           VEC_ELT(&ctx->vector_point, GLvoid, idx),
-                           VEC_ELT(&ctx->vector_color, GLvoid, idx));
-    }
+    p_draw_func = _sgl_draw_triangle_v;
+    offset = 3;
     break;
+
   case GL_TRIANGLE_STRIP:
-    ctx->render_state.gfill = GL_TRUE;
-    for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
-      idx = i * n_data;
-      _sgl_draw_triangle_strip(ctx->drawbuffer,
-                               VEC_ELT(&ctx->vector_point, GLvoid, idx),
-                               VEC_ELT(&ctx->vector_color, GLvoid, idx), i);
-    }
+    p_draw_func = _sgl_draw_triangle_strip;
+    _ts_count = 0;
+    _sgl_draw_triangle_strip_start(ctx->drawbuffer,
+                                   VEC_ELT(&ctx->vector_point, GLfloat, 0),
+                                   VEC_ELT(&ctx->vector_color, GLfloat, 0));
+    _ts_count = 1;
+    _sgl_draw_triangle_strip_start(ctx->drawbuffer,
+                                   VEC_ELT(&ctx->vector_point, GLfloat, 1),
+                                   VEC_ELT(&ctx->vector_color, GLfloat, 1));
+    idx = 2;
+    offset = 1;
     break;
-  case GL_QUADS:
-    ctx->render_state.gfill = GL_TRUE;
-    for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
-      idx = i * n_data;
-      _sgl_draw_quad_v(ctx->drawbuffer,
-                       VEC_ELT(&ctx->vector_point, GLvoid, idx),
-                       VEC_ELT(&ctx->vector_color, GLvoid, idx));
-    }
-    break;
+
+  default:
+    _sgl_error(ctx, GL_INVALID_ENUM, "_sgl_pipeline_draw_list(): invalid "
+               "primitive\n");
+    return;
   }
-}
 
-void _sgl_pipeline_draw_array(void)
-{
-#if 0
-  GET_CURRENT_CONTEXT(ctx);
-  GLint i = 0, j = 0, idx = 0;
-  GLfloat *point, *color, *normal;
-  char* pidx = (char*)ctx->varray.indices_ptr;
-  GLint ts = _sgl_sizeof_type(ctx->varray.type);
-  GLenum prim_mode = ctx->render_state.current_exec_primitive;
-  GLint n_data = (prim_mode == GL_POINTS) * 1 +
-                 (prim_mode == GL_LINES) * 2 +
-                 (prim_mode == GL_TRIANGLES) * 3 +
-                 (prim_mode == GL_TRIANGLE_STRIP) * 1 +
-                 (prim_mode == GL_QUADS) * 4;
+  /* Do draw */
+  while (idx < end_idx) {
+    p_draw_func(ctx->drawbuffer,
+                VEC_ELT(&ctx->vector_point, GLfloat, idx),
+                VEC_ELT(&ctx->vector_color, GLfloat, idx));
+    idx += offset;
+  }
 
-  point = VEC_ELT(&ctx->vector_point, GLvoid, idx);
-  color = VEC_ELT(&ctx->vector_color, GLvoid, idx);
-  normal = VEC_ELT(&ctx->vector_normal, GLvoid, idx);
-
+  /* Post draw */
   switch (prim_mode) {
-  case GL_POINTS:
-    for (i = 0; i < ctx->vector_point.count / n_data; ++i) {
-      idx = i * n_data;
-      _sgl_draw_point(ctx->drawbuffer,
-                      VEC_ELT(&ctx->vector_point, GLvoid, idx),
-                      VEC_ELT(&ctx->vector_color, GLvoid, idx));
-      if (ctx->depth.test)
-    }
-    break;
-  case GL_LINES:
-    for (i = 0; i < ctx->vector_point.count / n_data; ++i, pidx += ts * 2) {
-      _sgl_draw_point(ctx->drawbuffer,
-                      VEC_ELT(&ctx->vector_point, GLvoid, pidx + ts * 1),
-                      VEC_ELT(&ctx->vector_point, GLvoid, pidx + ts * 2),
-                      VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 1),
-                      VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 2));
-      if (ctx->depth.test)
-    }
-    break;
-  case GL_TRIANGLES:
-    for (i = 0; i < ctx->vector_point.count / n_data; ++i, pidx += ts * 3) {
-      _sgl_draw_triangle_v(ctx->drawbuffer,
-                           VEC_ELT(&ctx->vector_point, GLvoid, pidx + ts * 1),
-                           VEC_ELT(&ctx->vector_point, GLvoid, pidx + ts * 2),
-                           VEC_ELT(&ctx->vector_point, GLvoid, pidx + ts * 3),
-                           VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 1),
-                           VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 2),
-                           VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 3));
-      if (ctx->depth.test)
-    }
-    break;
-  case GL_TRIANGLE_STRIP:
-    _sgl_draw_triangle_strip(ctx->drawbuffer, point, color, i);
-    for (i = 0; i < ctx->vector_point.count / n_data; ++i, pidx += ts) {
-      _sgl_draw_triangle_strip(ctx->drawbuffer,
-                               VEC_ELT(&ctx->vector_point, GLvoid, pidx + ts),
-                               VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts));
-      if (ctx->depth.test)
-    }
-    break;
-  case GL_QUADS:
-    _sgl_draw_quad_v(ctx->drawbuffer, point, color);
-    for (i = 0; i < ctx->vector_point.count / n_data; ++i, pidx += ts * 6) {
-      _sgl_draw_quad_v(ctx->drawbuffer,
-                       VEC_ELT(&ctx->vector_point, GLvoid, pidx + ts * 1),
-                       VEC_ELT(&ctx->vector_point, GLvoid, pidx + ts * 2),
-                       VEC_ELT(&ctx->vector_point, GLvoid, pidx + ts * 3),
-                       VEC_ELT(&ctx->vector_point, GLvoid, pidx + ts * 4),
-                       VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 1),
-                       VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 2),
-                       VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 3),
-                       VEC_ELT(&ctx->vector_color, GLvoid, pidx + ts * 4));
-      if (ctx->depth.test)
-    }
+  case GL_LINE_LOOP:
+    _sgl_draw_line_loop_end(ctx->drawbuffer,
+                            VEC_ELT(&ctx->vector_point, GLfloat, end_idx + 1),
+                            VEC_ELT(&ctx->vector_color, GLfloat, end_idx + 1));
     break;
   }
-#endif
 }
 
 /**
@@ -543,7 +458,6 @@ void _sgl_pipeline_rasterize(void)
   GET_CURRENT_CONTEXT(ctx);
   if (ctx->render_state.type == 0)
     _sgl_pipeline_draw_list();
-  else if (ctx->render_state.type == GL_VERTEX_ARRAY)
-    _sgl_pipeline_draw_array();
+  //else if (ctx->render_state.type == GL_VERTEX_ARRAY)
+  //  _sgl_pipeline_draw_array();
 }
-

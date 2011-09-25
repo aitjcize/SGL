@@ -81,16 +81,16 @@ do {                        \
 #define LEN_SQUARED_2FV( V ) ((V)[0]*(V)[0]+(V)[1]*(V)[1])
 
 #define COLOR_FF(c)                                  \
-  (((GLuint)(CLAMP(c[3], 0, 1.0) * 255) << 24) |     \
-   ((GLuint)(CLAMP(c[0], 0, 1.0) * 255) << 16) |     \
-   ((GLuint)(CLAMP(c[1], 0, 1.0) * 255) <<  8) |     \
-   ((GLuint)(CLAMP(c[2], 0, 1.0) * 255)))
+  (((GLuint)(CLAMP((c)[3], 0, 1.0) * 255) << 24) |     \
+   ((GLuint)(CLAMP((c)[0], 0, 1.0) * 255) << 16) |     \
+   ((GLuint)(CLAMP((c)[1], 0, 1.0) * 255) <<  8) |     \
+   ((GLuint)(CLAMP((c)[2], 0, 1.0) * 255)))
 
 #define COLOR_FE(r, g, b, a)                      \
-  (((GLuint)(CLAMP(a, 0, 1.0) * 255) << 24) |     \
-   ((GLuint)(CLAMP(r, 0, 1.0) * 255) << 16) |     \
-   ((GLuint)(CLAMP(g, 0, 1.0) * 255) <<  8) |     \
-   ((GLuint)(CLAMP(b, 0, 1.0) * 255)))
+  (((GLuint)(CLAMP((a), 0, 1.0) * 255) << 24) |     \
+   ((GLuint)(CLAMP((r), 0, 1.0) * 255) << 16) |     \
+   ((GLuint)(CLAMP((g), 0, 1.0) * 255) <<  8) |     \
+   ((GLuint)(CLAMP((b), 0, 1.0) * 255)))
 
 #define LINEAR_IP(val1, val2, f, a) \
   ((val1) + ((val2) - (val1)) * (GLfloat)f / a)
@@ -104,6 +104,23 @@ do {                        \
                     (cc2 & 0x0000ff00) >> 8 , f, a) << 8  |   \
    (GLint)LINEAR_IP((cc1 & 0x000000ff) >> 0 ,                 \
                     (cc2 & 0x000000ff) >> 0 , f, a))
+
+#define COLOR_WSUM(a, cc1, b, cc2, c, cc3)                \
+  ((GLint)(a * ((cc1 & 0xff000000) >> 24) +               \
+           b * ((cc2 & 0xff000000) >> 24) +               \
+           c * ((cc3 & 0xff000000) >> 24)) << 24 |        \
+   (GLint)(a * ((cc1 & 0x00ff0000) >> 16) +               \
+           b * ((cc2 & 0x00ff0000) >> 16) +               \
+           c * ((cc3 & 0x00ff0000) >> 16)) << 16 |        \
+   (GLint)(a * ((cc1 & 0x0000ff00) >>  8) +               \
+           b * ((cc2 & 0x0000ff00) >>  8) +               \
+           c * ((cc3 & 0x0000ff00) >>  8)) <<  8 |        \
+   (GLint)(a * ((cc1 & 0x000000ff) >>  0) +               \
+           b * ((cc2 & 0x000000ff) >>  0) +               \
+           c * ((cc3 & 0x000000ff) >>  0)) <<  0)
+
+#define DEPTH_WSUM(a, d1, b, d2, c, d3)                \
+  (a * d1 + b * d2 + c * d3)
 
 /* Framebuffer access related */
 #define BUF_SET_C(buf, x, y, cc) \
@@ -125,9 +142,6 @@ do {                        \
 #define DNORMALIZE_Z(ctx, z) \
    (z * (ctx->drawbuffer->depth_max * (ctx->viewport.far-ctx->viewport.near)) \
      + ctx->drawbuffer->depth_max * ctx->viewport.near)
-
-/* Edge Table related */
-#define ET_GET(et, y, x) et[(y) * EDGE_TABLE_SIZE + (x)]
 
 #define MOVE_FLOAT_4(dst, src) \
   do {                         \

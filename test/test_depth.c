@@ -41,25 +41,25 @@ void display(void)
   glEnable(GL_DEPTH_TEST);
 
   glColor3f (1.0, 0.0, 0.0);
-  glBegin(GL_QUADS);
+  glBegin(GL_TRIANGLE_STRIP);
     glVertex3f(1, 1, 0);
     glVertex3f(1, -1, 0);
-    glVertex3f(-1, -1, 0);
     glVertex3f(-1, 1, 0);
+    glVertex3f(-1, -1, 0);
   glEnd();
   glColor3f (0.0, 1.0, 0.0);
-  glBegin(GL_QUADS);
+  glBegin(GL_TRIANGLE_STRIP);
     glVertex3f(0.0, 1, 1);
     glVertex3f(0.0, 1, -1);
-    glVertex3f(0.0, -1, -1);
     glVertex3f(0.0, -1, 1);
+    glVertex3f(0.0, -1, -1);
   glEnd();
   glColor3f (0.0, 0.0, 1.0);
-  glBegin(GL_QUADS);
+  glBegin(GL_TRIANGLE_STRIP);
     glVertex3f(1, 0, 1);
     glVertex3f(1, 0, -1);
-    glVertex3f(-1, 0, -1);
     glVertex3f(-1, 0, 1);
+    glVertex3f(-1, 0, -1);
   glEnd();
 
   glDisable(GL_DEPTH_TEST);
