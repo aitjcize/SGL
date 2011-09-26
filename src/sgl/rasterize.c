@@ -155,7 +155,7 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
         cc = COLOR_WSUM(a, COLOR_FF_CT(color + 8),
                         b, COLOR_FF_CT(color + 0),
                         c, COLOR_FF_CT(color + 4));
-        BUF_SET_C(&buf->color_buf, d, y, *(GLuint*)&cc);
+        BUF_SET_C(&buf->color_buf, d, y, cc.val);
         BUF_SET_D(&buf->depth_buf, d, y, z);
       }
     }
@@ -230,8 +230,8 @@ void _sgl_draw_line(struct sgl_framebuffer* buf,
   GLint dx, dy, i, err;
   GLint incx, incy, inc1, inc2;
   GLfloat a = LEN_2(x2 - x1, y2 - y1), x = x1, y = y1;
-  GLint cc1 = COLOR_FF(color1);
-  GLint cc2 = COLOR_FF(color2);
+  color_t cc1 = COLOR_FF_CT(color1);
+  color_t cc2 = COLOR_FF_CT(color2);
 
   dx = abs(x2 - x1);
   dy = abs(y2 - y1);

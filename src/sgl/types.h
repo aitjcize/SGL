@@ -256,12 +256,15 @@ struct sgl_context
 /**
  * @struct color_t
  */
-typedef struct _color_t color_t;
-struct _color_t {
-  GLubyte a;
-  GLubyte r;
-  GLubyte g;
-  GLubyte b;
+typedef union _color_t color_t;
+union _color_t {
+  GLuint val;
+  struct {
+    GLubyte a;
+    GLubyte r;
+    GLubyte g;
+    GLubyte b;
+  } c;
 };
 
 #endif /* __SGL_TYPES_H__ */

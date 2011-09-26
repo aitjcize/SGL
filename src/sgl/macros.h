@@ -29,7 +29,10 @@
 #define __SGL_MACROS_H__
 
 /* Clamp X to [MIN,MAX] */
-#define CLAMP( X, MIN, MAX )  ( (X)<(MIN) ? (MIN) : ((X)>(MAX) ? (MAX) : (X)) )
+#define CLAMP(X, MIN, MAX)  ((X)<(MIN) ? (MIN) : ((X)>(MAX) ? (MAX) : (X)))
+
+/* Clamp X to [0,255] */
+#define CCLAMP(X)  ((GLuint)((X) * 255) & 0xff)
 
 /* Minimum of two values: */
 #define MIN2( A, B )   ( (A)<(B) ? (A) : (B) )
@@ -52,8 +55,8 @@
 
 
 /* Cross product of two 3-element vectors */
-#define CROSS3(n, u, v)             \
-do {                        \
+#define CROSS3(n, u, v)                     \
+do {                                        \
    (n)[0] = (u)[1]*(v)[2] - (u)[2]*(v)[1];  \
    (n)[1] = (u)[2]*(v)[0] - (u)[0]*(v)[2];  \
    (n)[2] = (u)[0]*(v)[1] - (u)[1]*(v)[0];  \
@@ -61,15 +64,15 @@ do {                        \
 
 
 /* Normalize a 3-element vector to unit length. */
-#define NORMALIZE_3FV( V )          \
-do {                        \
+#define NORMALIZE_3FV( V )                      \
+do {                                            \
    GLfloat len = (GLfloat) LEN_SQUARED_3FV(V);  \
-   if (len) {                   \
-      len = INV_SQRTF(len);         \
-      (V)[0] = (GLfloat) ((V)[0] * len);    \
-      (V)[1] = (GLfloat) ((V)[1] * len);    \
-      (V)[2] = (GLfloat) ((V)[2] * len);    \
-   }                        \
+   if (len) {                                   \
+      len = INV_SQRTF(len);                     \
+      (V)[0] = (GLfloat) ((V)[0] * len);        \
+      (V)[1] = (GLfloat) ((V)[1] * len);        \
+      (V)[2] = (GLfloat) ((V)[2] * len);        \
+   }                                            \
 } while(0)
 
 #define LEN_2(x, y) (sqrtf((x)*(x) + (y)*(y)))
@@ -80,51 +83,46 @@ do {                        \
 #define LEN_SQUARED_3FV( V ) ((V)[0]*(V)[0]+(V)[1]*(V)[1]+(V)[2]*(V)[2])
 #define LEN_SQUARED_2FV( V ) ((V)[0]*(V)[0]+(V)[1]*(V)[1])
 
-#define COLOR_FF(c)                                    \
-  (((GLuint)(CLAMP((c)[3], 0, 1.0) * 255) << 24) |     \
-   ((GLuint)(CLAMP((c)[0], 0, 1.0) * 255) << 16) |     \
-   ((GLuint)(CLAMP((c)[1], 0, 1.0) * 255) <<  8) |     \
-   ((GLuint)(CLAMP((c)[2], 0, 1.0) * 255)))
+#define COLOR_FF(c)             \
+  ((CCLAMP((c)[3]) << 24) |     \
+   (CCLAMP((c)[0]) << 16) |     \
+   (CCLAMP((c)[1]) <<  8) |     \
+   (CCLAMP((c)[2])))
 
-#define COLOR_FF_CT(c)                                 \
- (__extension__({                                      \
-   color_t __rc = {                                    \
-     (GLubyte)(CLAMP((c)[2], 0, 1.0) * 255),           \
-     (GLubyte)(CLAMP((c)[1], 0, 1.0) * 255),           \
-     (GLubyte)(CLAMP((c)[0], 0, 1.0) * 255),           \
-     (GLubyte)(CLAMP((c)[3], 0, 1.0) * 255)            \
-  };                                                   \
-   __rc;                                               \
+#define COLOR_FF_CT(cc)                  \
+ (__extension__({                        \
+   color_t __rc;                         \
+   __rc.c.a = (GLubyte)CCLAMP((cc)[2]);  \
+   __rc.c.r = (GLubyte)CCLAMP((cc)[1]);  \
+   __rc.c.g = (GLubyte)CCLAMP((cc)[0]);  \
+   __rc.c.b = (GLubyte)CCLAMP((cc)[3]);  \
+   __rc;                                 \
  }))
 
-#define COLOR_FE(r, g, b, a)                      \
-  (((GLuint)(CLAMP((a), 0, 1.0) * 255) << 24) |     \
-   ((GLuint)(CLAMP((r), 0, 1.0) * 255) << 16) |     \
-   ((GLuint)(CLAMP((g), 0, 1.0) * 255) <<  8) |     \
-   ((GLuint)(CLAMP((b), 0, 1.0) * 255)))
+#define COLOR_FE(r, g, b, a) \
+  ((CCLAMP(a) << 24) | (CCLAMP(r) << 16) | (CCLAMP(g) <<  8) | (CCLAMP(b)))
 
 #define LINEAR_IP(val1, val2, f, a) \
   ((val1) + ((val2) - (val1)) * (GLfloat)f / a)
 
-#define COLOR_IP(cc1, cc2, f, a)                              \
-  ((GLint)LINEAR_IP((cc1 & 0xff000000) >> 24,                 \
-                    (cc2 & 0xff000000) >> 24, f, a) << 24 |   \
-   (GLint)LINEAR_IP((cc1 & 0x00ff0000) >> 16,                 \
-                    (cc2 & 0x00ff0000) >> 16, f, a) << 16 |   \
-   (GLint)LINEAR_IP((cc1 & 0x0000ff00) >> 8 ,                 \
-                    (cc2 & 0x0000ff00) >> 8 , f, a) << 8  |   \
-   (GLint)LINEAR_IP((cc1 & 0x000000ff) >> 0 ,                 \
-                    (cc2 & 0x000000ff) >> 0 , f, a))
+#define COLOR_IP(cc1, cc2, f, a)                  \
+ (__extension__({                                 \
+   color_t __rc;                                  \
+   __rc.c.a = LINEAR_IP(cc1.c.a, cc2.c.a, f, a);  \
+   __rc.c.r = LINEAR_IP(cc1.c.r, cc2.c.r, f, a);  \
+   __rc.c.g = LINEAR_IP(cc1.c.g, cc2.c.g, f, a);  \
+   __rc.c.b = LINEAR_IP(cc1.c.b, cc2.c.b, f, a);  \
+   __rc.val;                                      \
+ }))
 
-#define COLOR_WSUM(a, cc1, b, cc2, c, cc3)                \
-  (__extension__({                                        \
-    color_t __rc = {                                      \
-      (GLubyte)(a * cc1.a + b * cc2.a + c * cc3.a),       \
-      (GLubyte)(a * cc1.r + b * cc2.r + c * cc3.r),       \
-      (GLubyte)(a * cc1.g + b * cc2.g + c * cc3.g),       \
-      (GLubyte)(a * cc1.b + b * cc2.b + c * cc3.b)        \
-    };                                                    \
-    __rc;                                                 \
+#define COLOR_WSUM(a, cc1, b, cc2, c, cc3)                         \
+  (__extension__({                                                 \
+    color_t __rc;                                                  \
+    __rc.c.a = (GLubyte)(a * cc1.c.a + b * cc2.c.a + c * cc3.c.a); \
+    __rc.c.r = (GLubyte)(a * cc1.c.r + b * cc2.c.r + c * cc3.c.r); \
+    __rc.c.g = (GLubyte)(a * cc1.c.g + b * cc2.c.g + c * cc3.c.g); \
+    __rc.c.b = (GLubyte)(a * cc1.c.b + b * cc2.c.b + c * cc3.c.b); \
+    __rc;                                                          \
   }))
 
 #define DEPTH_WSUM(a, d1, b, d2, c, d3)                \
