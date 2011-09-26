@@ -53,36 +53,13 @@ void _insert_edge(GLint x, GLint y)
 {
   GET_CURRENT_CONTEXT(ctx);
   GLint* et = ctx->drawbuffer->edge_tab;
-  GLint cidx = EDGE_TABLE_SIZE -1;
-  GLint oidx = EDGE_TABLE_SIZE -2;
-  GLuint count = ET_GET(et, y, cidx);
-  GLint l = 0;
 
-  if (count >= EDGE_TABLE_SIZE - 2)
-    return;
+  if (x < ET_GET(et, y, 0)) {
+    ET_GET(et, y, 0) = x;
+  }
 
-  for (l = 0; l < count; ++l)
-    if (ET_GET(et, y, l) == x)
-      return;
-
-  switch (count % 2) {
-    case 0:
-      if (count && abs(ET_GET(et, y, count -1) -x) == ET_GET(et, y, oidx))
-        ++ET_GET(et, y, oidx);
-      else {
-        ET_GET(et, y, oidx) = 1;
-        ET_GET(et, y, count) = x;
-        ++ET_GET(et, y, cidx);
-      }
-      break;
-    case 1:
-      if (abs(ET_GET(et, y, count -1) -x) == 1) {
-        ET_GET(et, y, count -1) = x;
-      } else {
-        ET_GET(et, y, count) = x;
-        ++ET_GET(et, y, cidx);
-      }
-      break;
+  if (x > ET_GET(et, y, 1)) {
+    ET_GET(et, y, 1) = x;
   }
 }
 
@@ -135,29 +112,25 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
   c0 = DISTANCE(m3, b3, point[4], point[5], point[8]);
 
   GLint* et = buf->edge_tab;
+  for (y = ymin; y <= ymax; ++y) {
+    start = ET_GET(et, y, 0);
+    end = ET_GET(et, y, 1);
 
-  for (y = 0; y < buf->height; ++y) {
-    for (x = 0; x + 1 < ET_GET(et, y, EDGE_TABLE_SIZE -1); x += 2) {
-      start = ET_GET(et, y, x);
-      end = ET_GET(et, y, x + 1);
+    for (d = start; d != end; ++d) {
+      a = DISTANCE(m1, b1, d, y, point[0]) / a0;
+      b = DISTANCE(m2, b2, d, y, point[4]) / b0;
+      c = DISTANCE(m3, b3, d, y, point[8]) / c0;
 
-      dx = (end > start)? 1: -1;
-      for (d = start + dx; d != end; d += dx) {
-        a = DISTANCE(m1, b1, d, y, point[0]) / a0;
-        b = DISTANCE(m2, b2, d, y, point[4]) / b0;
-        c = DISTANCE(m3, b3, d, y, point[8]) / c0;
+      z = NORMALIZE_Z(ctx,DEPTH_WSUM(a, point[10], b, point[2], c, point[6]));
 
-        z = NORMALIZE_Z(ctx,DEPTH_WSUM(a, point[10], b, point[2], c, point[6]));
+      if (ctx->depth.test && z > BUF_GET_D(&buf->depth_buf, d, y))
+        continue;
 
-        if (ctx->depth.test && z > BUF_GET_D(&buf->depth_buf, d, y))
-          continue;
-
-        cc = COLOR_WSUM(a, COLOR_FF_CT(color + 8),
-                        b, COLOR_FF_CT(color + 0),
-                        c, COLOR_FF_CT(color + 4));
-        BUF_SET_C(&buf->color_buf, d, y, cc.val);
-        BUF_SET_D(&buf->depth_buf, d, y, z);
-      }
+      cc = COLOR_WSUM(a, COLOR_FF_CT(color + 8),
+                      b, COLOR_FF_CT(color + 0),
+                      c, COLOR_FF_CT(color + 4));
+      BUF_SET_C(&buf->color_buf, d, y, cc.val);
+      BUF_SET_D(&buf->depth_buf, d, y, z);
     }
   }
   _sgl_framebuffer_edge_table_clear();
@@ -182,14 +155,12 @@ void _sgl_render_pixel(struct sgl_framebuffer* buf,
   x = CLAMP(x, 1, buf->width);
   y = CLAMP(y, 0, buf->height -1);
 
-  if (ctx->polygon.front == GL_FILL)
+  if (ctx->polygon.front == GL_FILL) {
     _insert_edge(x, y);
-
-  if ((ctx->depth.test && fz > BUF_GET_D(&buf->depth_buf, x, y)))
-    return;
-
-  BUF_SET_C(&buf->color_buf, x, y, cc);
-  BUF_SET_D(&buf->depth_buf, x, y, fz);
+  } else if ((!ctx->depth.test || fz <= BUF_GET_D(&buf->depth_buf, x, y))) {
+    BUF_SET_C(&buf->color_buf, x, y, cc);
+    BUF_SET_D(&buf->depth_buf, x, y, fz);
+  }
 }
 
 /**

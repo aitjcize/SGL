@@ -83,12 +83,12 @@ struct sgl_framebuffer
   GLfloat depth_max;                        /**< Max depth buffer depth */
 
   /* Buffers */
-  struct sgl_renderbuffer clear_color_buf;  /**< clear colorbuffer */
-  struct sgl_renderbuffer clear_depth_buf;  /**< clear depthbuffer */
+  struct sgl_renderbuffer clear_color_buf;  /**< Clear colorbuffer */
+  struct sgl_renderbuffer clear_depth_buf;  /**< Clear depthbuffer */
+  GLint* clear_edge_tab;                    /**< Clear edge table */
 
   struct sgl_renderbuffer color_buf;        /**< Colorbuffer */
   struct sgl_renderbuffer depth_buf;        /**< Depthbuffer */
-
   GLint* edge_tab;                          /**< Edge table for scanline fill */
 };
 

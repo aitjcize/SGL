@@ -24,12 +24,14 @@
 
 #include "framebuffer.h"
 
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "context.h"
-#include "renderbuffer.h"
 #include "logging.h"
+#include "macros.h"
+#include "renderbuffer.h"
 
 void _sgl_init_framebuffer(struct sgl_context* ctx)
 {
@@ -49,9 +51,17 @@ void _sgl_init_framebuffer(struct sgl_context* ctx)
 
   /* Clear Edge Table */
   buf->edge_tab = malloc(et_size);
-  memset(buf->edge_tab, 0, et_size);
+  buf->clear_edge_tab = malloc(et_size);
+  
+  GLint y = 0;
+  for (y = 0; y < buf->height; ++y) {
+    ET_GET(buf->clear_edge_tab, y, 0) = INT_MAX;
+    ET_GET(buf->clear_edge_tab, y, 1) = INT_MIN;
+  }
 
   ctx->drawbuffer = buf;
+
+  _sgl_framebuffer_edge_table_clear();
 }
 
 void _sgl_free_framebuffer_data(struct sgl_context* ctx)
@@ -88,7 +98,6 @@ void _sgl_framebuffer_depth(GLboolean status)
 void _sgl_framebuffer_edge_table_clear(void)
 {
   GET_CURRENT_CONTEXT(ctx);
-
-  memset(ctx->drawbuffer->edge_tab, 0,
+  memcpy(ctx->drawbuffer->edge_tab, ctx->drawbuffer->clear_edge_tab,
          ctx->drawbuffer->height * EDGE_TABLE_SIZE * sizeof(GLint));
 }

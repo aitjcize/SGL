@@ -39,6 +39,6 @@
 #define MAX_VIEWPORT_HEIGHT 768
 
 /* Edge Table size */
-#define EDGE_TABLE_SIZE 6
+#define EDGE_TABLE_SIZE 4
 
 #endif /* __SGL_CONFIG_H__ */

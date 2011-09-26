@@ -150,7 +150,7 @@ do {                                            \
      + ctx->drawbuffer->depth_max * ctx->viewport.near)
 
 /* Edge Table related */
-#define ET_GET(et, y, x) et[(y) * EDGE_TABLE_SIZE + (x)]
+#define ET_GET(et, y, x) (et)[(y) * EDGE_TABLE_SIZE + (x)]
 
 #define MOVE_FLOAT_4(dst, src) \
   do {                         \
