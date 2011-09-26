@@ -82,6 +82,7 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
       goto discard;
 
   /* Find AABB */
+  GLint ts_x = 4, ts_y = 2, not_x = 0, not_y = 0;
   GLint xmin = INT_MAX, ymin = INT_MAX, xmax = INT_MIN, ymax = INT_MIN;
   GLint i = 0;
   for (i = 0; i < 3; ++i) {
@@ -99,6 +100,11 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
     }
   }
 
+  not_x = (xmax - xmin) / ts_x + 1;
+  not_y = (ymax - ymin) / ts_y + 1;
+  xmax = xmin + not_x * ts_x;
+  ymax = ymin + not_y * ts_y;
+
   /* Find three edge equation */
   GLfloat m1, m2, m3, b1, b2, b3;
 
@@ -111,7 +117,7 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
   m3 = (y1 - y3) / (GLfloat)(x1 - x3);
   b3 = y3 - m3 * x3;
 
-  GLint x = 0, y = 0, start = 0, end = 0;
+  GLint tx = 0, ty = 0, x = 0, y = 0;
   GLfloat a0 = 0, b0 = 0, c0 = 0, a = 0, b = 0, c = 0, z = 0;
   color_t cc;
 
@@ -125,27 +131,65 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
   if (a0 == 0 || b0 == 0 || c0 == 0)
     goto discard;
 
-  GLint* et = buf->edge_tab;
-  for (y = ymin; y <= ymax; ++y) {
-    start = ET_GET(et, y, 0);
-    end = ET_GET(et, y, 1);
-    for (x = start; x <= end; ++x) {
-      a = DISTANCE(m1, b1, x, y, x1) / a0;
-      b = DISTANCE(m2, b2, x, y, x2) / b0;
-      c = DISTANCE(m3, b3, x, y, x3) / c0;
+  GLint tile_idx = not_x / 2;
+  GLint edge_idx = tile_idx;
 
-      z = NORMALIZE_Z(ctx,DEPTH_WSUM(a, z3, b, z1, c, z2));
+  for (ty = 0; ty < not_y; ++ty) {
+    for (tx = tile_idx; tx < not_x; ++tx) {
+      for (y = ymin + ty * ts_y; y < ymin + (ty + 1) * ts_y; ++y) {
+        for (x = xmin + tx * ts_x; x < xmin + (tx + 1) * ts_x; ++x) {
+          a = DISTANCE(m1, b1, x, y, x1) / a0;
+          b = DISTANCE(m2, b2, x, y, x2) / b0;
+          c = DISTANCE(m3, b3, x, y, x3) / c0;
 
-      if (ctx->depth.test && z > BUF_GET_D(&buf->depth_buf, x, y))
-        continue;
+          if ((int)round(a * 10) == 0
+              || (int)round(b * 10) == 0
+              || (int)(round(c * 10) == 0))
+            edge_idx = tx;
 
-      cc = COLOR_WSUM(a, COLOR_FF_CT(color + 8),
-                      b, COLOR_FF_CT(color + 0),
-                      c, COLOR_FF_CT(color + 4));
+          if (a >= 0 && b >= 0 && c >= 0) {
+            z = NORMALIZE_Z(ctx,DEPTH_WSUM(a, z3, b, z1, c, z2));
 
-      BUF_SET_C(&buf->color_buf, x, y, cc.val);
-      BUF_SET_D(&buf->depth_buf, x, y, z);
+            if (ctx->depth.test && z > BUF_GET_D(&buf->depth_buf, x, y))
+              continue;
+
+            cc = COLOR_WSUM(a, COLOR_FF_CT(color + 8),
+                b, COLOR_FF_CT(color + 0),
+                c, COLOR_FF_CT(color + 4));
+            BUF_SET_C(&buf->color_buf, x, y, cc.val);
+            BUF_SET_D(&buf->depth_buf, x, y, z);
+          }
+        }
+      }
     }
+    for (tx = tile_idx - 1; tx >= 0; --tx) {
+      for (y = ymin + ty * ts_y; y < ymin + (ty + 1) * ts_y; ++y) {
+        for (x = xmin + tx * ts_x; x < xmin + (tx + 1) * ts_x; ++x) {
+          a = DISTANCE(m1, b1, x, y, x1) / a0;
+          b = DISTANCE(m2, b2, x, y, x2) / b0;
+          c = DISTANCE(m3, b3, x, y, x3) / c0;
+
+          if ((int)round(a * 10) == 0
+              || (int)round(b * 10) == 0
+              || (int)(round(c * 10) == 0))
+            edge_idx = tx;
+
+          if (a >= 0 && b >= 0 && c >= 0) {
+            z = NORMALIZE_Z(ctx,DEPTH_WSUM(a, z3, b, z1, c, z2));
+
+            if (ctx->depth.test && z > BUF_GET_D(&buf->depth_buf, x, y))
+              continue;
+
+            cc = COLOR_WSUM(a, COLOR_FF_CT(color + 8),
+                b, COLOR_FF_CT(color + 0),
+                c, COLOR_FF_CT(color + 4));
+            BUF_SET_C(&buf->color_buf, x, y, cc.val);
+            BUF_SET_D(&buf->depth_buf, x, y, z);
+          }
+        }
+      }
+    }
+    tile_idx = edge_idx;
   }
 
 discard:
