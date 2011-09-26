@@ -45,6 +45,47 @@ static GLint _ts_count;
 static GLfloat _ts_prev_point[8], _ts_prev_color[8];
 
 /**
+ * @brief Insert an edge to the edge table
+ * @param x x component
+ * @param y y component
+ */
+void _insert_edge(GLint x, GLint y)
+{
+  GET_CURRENT_CONTEXT(ctx);
+  GLint* et = ctx->drawbuffer->edge_tab;
+  GLint cidx = EDGE_TABLE_SIZE -1;
+  GLint oidx = EDGE_TABLE_SIZE -2;
+  GLuint count = ET_GET(et, y, cidx);
+  GLint l = 0;
+
+  if (count >= EDGE_TABLE_SIZE - 2)
+    return;
+  for (l = 0; l < count; ++l)
+    if (ET_GET(et, y, l) == x)
+      return;
+
+  switch (count % 2) {
+    case 0:
+      if (count && abs(ET_GET(et, y, count -1) -x) == ET_GET(et, y, oidx))
+        ++ET_GET(et, y, oidx);
+      else {
+        ET_GET(et, y, oidx) = 1;
+        ET_GET(et, y, count) = x;
+        ++ET_GET(et, y, cidx);
+      }
+      break;
+    case 1:
+      if (abs(ET_GET(et, y, count -1) -x) == 1) {
+        ET_GET(et, y, count -1) = x;
+      } else {
+        ET_GET(et, y, count) = x;
+        ++ET_GET(et, y, cidx);
+      }
+      break;
+  }
+}
+
+/**
  * @brief Perfrom scanline fill given a edge table
  * @param buf a struct sgl_framebuffer
  */
@@ -82,7 +123,7 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
   m3 = (point[1] - point[9]) / (point[0] - point[8]);
   b3 = point[9] - m3 * point[8];
 
-  GLint x = 0, y = 0;
+  GLint x = 0, y = 0, d = 0, dx = 0, start = 0, end = 0;
   GLfloat a0 = 0, b0 = 0, c0 = 0, a = 0, b = 0, c = 0;
   GLfloat z = 0;
 
@@ -92,25 +133,33 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
   b0 = DISTANCE(m2, b2, point[0], point[1], point[4]);
   c0 = DISTANCE(m3, b3, point[4], point[5], point[8]);
 
-  for (y = ymin; y <= ymax; ++y) {
-    for (x = xmin; x <= xmax; ++x) {
-      a = DISTANCE(m1, b1, x, y, point[0]) / a0;
-      b = DISTANCE(m2, b2, x, y, point[4]) / b0;
-      c = DISTANCE(m3, b3, x, y, point[8]) / c0;
+  GLint* et = buf->edge_tab;
 
-      if (a > 0 && b > 0 && c > 0) {
+  for (y = 0; y < buf->height; ++y) {
+    for (x = 0; x + 1 < ET_GET(et, y, EDGE_TABLE_SIZE -1); x += 2) {
+      start = ET_GET(et, y, x);
+      end = ET_GET(et, y, x + 1);
+
+      dx = (end > start)? 1: -1;
+      for (d = start + dx; d != end; d += dx) {
+        a = DISTANCE(m1, b1, d, y, point[0]) / a0;
+        b = DISTANCE(m2, b2, d, y, point[4]) / b0;
+        c = DISTANCE(m3, b3, d, y, point[8]) / c0;
+
         z = NORMALIZE_Z(ctx,DEPTH_WSUM(a, point[10], b, point[2], c, point[6]));
 
-        if (ctx->depth.test && z > BUF_GET_D(&buf->depth_buf, x, y))
+        if (ctx->depth.test && z > BUF_GET_D(&buf->depth_buf, d, y))
           continue;
 
-        BUF_SET_C(&buf->color_buf, x, y, COLOR_WSUM(a, COLOR_FF(color + 8),
+
+        BUF_SET_C(&buf->color_buf, d, y, COLOR_WSUM(a, COLOR_FF(color + 8),
                                                     b, COLOR_FF(color + 0),
                                                     c, COLOR_FF(color + 4)));
-        BUF_SET_D(&buf->depth_buf, x, y, z);
+        BUF_SET_D(&buf->depth_buf, d, y, z);
       }
     }
   }
+  _sgl_framebuffer_edge_table_clear();
 
 #undef DISTANCE
 }
@@ -132,7 +181,14 @@ void _sgl_render_pixel(struct sgl_framebuffer* buf,
   x = CLAMP(x, 1, buf->width);
   y = CLAMP(y, 0, buf->height -1);
 
-  if (ctx->depth.test && fz > BUF_GET_D(&buf->depth_buf, x, y))
+  BUF_SET_C(&buf->t_color_buf, x, y, cc);
+  BUF_SET_D(&buf->t_depth_buf, x, y, fz);
+
+  if (ctx->polygon.front == GL_FILL)
+    _insert_edge(x, y);
+
+  if ((ctx->polygon.front == GL_FILL) ||
+      (ctx->depth.test && fz > BUF_GET_D(&buf->depth_buf, x, y)))
     return;
 
   BUF_SET_C(&buf->color_buf, x, y, cc);
@@ -310,11 +366,10 @@ void _sgl_draw_triangle_v(struct sgl_framebuffer* buf, GLfloat* point,
                           GLfloat* color)
 {
   GET_CURRENT_CONTEXT(ctx);
+  _sgl_draw_triangle(buf, &point[0], &point[4], &point[8],
+                          &color[0], &color[4], &color[8]);
   if (ctx->polygon.front == GL_FILL) {
     _scanline_fill(buf, point, color);
-  } else {
-    _sgl_draw_triangle(buf, &point[0], &point[4], &point[8],
-                            &color[0], &color[4], &color[8]);
   }
 }
 
@@ -351,6 +406,11 @@ void _sgl_draw_triangle_strip(struct sgl_framebuffer* buf, GLfloat* point,
                               GLfloat* color)
 {
   GET_CURRENT_CONTEXT(ctx);
+  _sgl_draw_line(buf, _ts_prev_point, _ts_prev_point + 4,
+                      _ts_prev_color, _ts_prev_color + 4);
+  _sgl_draw_line(buf, _ts_prev_point, point, _ts_prev_color, color);
+  _sgl_draw_line(buf, _ts_prev_point + 4, point, _ts_prev_color + 4, color);
+
   if (ctx->polygon.front == GL_FILL) {
     GLfloat t_point[12], t_color[12];
     MOVE_FLOAT_4(t_point, _ts_prev_point);
@@ -360,11 +420,6 @@ void _sgl_draw_triangle_strip(struct sgl_framebuffer* buf, GLfloat* point,
     MOVE_FLOAT_4(t_color + 4, _ts_prev_color + 4);
     MOVE_FLOAT_4(t_color + 8, color);
     _scanline_fill(buf, t_point, t_color);
-  } else {
-    _sgl_draw_line(buf, _ts_prev_point, _ts_prev_point + 4,
-                        _ts_prev_color, _ts_prev_color + 4);
-    _sgl_draw_line(buf, _ts_prev_point, point, _ts_prev_color, color);
-    _sgl_draw_line(buf, _ts_prev_point + 4, point, _ts_prev_color + 4, color);
   }
 
   MOVE_FLOAT_4(_ts_prev_point, _ts_prev_point + 4);
@@ -413,6 +468,7 @@ void _sgl_pipeline_draw_list(void)
     break;
 
   case GL_TRIANGLE_STRIP:
+    //ctx->render_state.gfill = GL_TRUE;
     p_draw_func = _sgl_draw_triangle_strip;
     _ts_count = 0;
     _sgl_draw_triangle_strip_start(ctx->drawbuffer,

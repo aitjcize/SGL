@@ -86,8 +86,13 @@ struct sgl_framebuffer
   struct sgl_renderbuffer clear_color_buf;  /**< clear colorbuffer */
   struct sgl_renderbuffer clear_depth_buf;  /**< clear depthbuffer */
 
+  struct sgl_renderbuffer t_color_buf;      /**< Temp colorbuffer */
+  struct sgl_renderbuffer t_depth_buf;      /**< Temp depthbuffer */
+
   struct sgl_renderbuffer color_buf;        /**< Colorbuffer */
   struct sgl_renderbuffer depth_buf;        /**< Depthbuffer */
+
+  GLint* edge_tab;                          /**< Edge table for scanline fill */
 };
 
 struct sgl_matrix_stack
