@@ -124,8 +124,8 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
   b3 = point[9] - m3 * point[8];
 
   GLint x = 0, y = 0, d = 0, dx = 0, start = 0, end = 0;
-  GLfloat a0 = 0, b0 = 0, c0 = 0, a = 0, b = 0, c = 0;
-  GLfloat z = 0;
+  GLfloat a0 = 0, b0 = 0, c0 = 0, a = 0, b = 0, c = 0, z = 0;
+  color_t cc;
 
 #define DISTANCE(m, b, x, y, ox) (isinf(m)? (x - ox): (m * (x) + b - (y)))
 
@@ -152,9 +152,10 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
           continue;
 
 
-        BUF_SET_C(&buf->color_buf, d, y, COLOR_WSUM(a, COLOR_FF(color + 8),
-                                                    b, COLOR_FF(color + 0),
-                                                    c, COLOR_FF(color + 4)));
+        cc = COLOR_WSUM(a, COLOR_FF_CT(color + 8),
+                        b, COLOR_FF_CT(color + 0),
+                        c, COLOR_FF_CT(color + 4));
+        BUF_SET_C(&buf->color_buf, d, y, *(GLuint*)&cc);
         BUF_SET_D(&buf->depth_buf, d, y, z);
       }
     }
@@ -187,8 +188,7 @@ void _sgl_render_pixel(struct sgl_framebuffer* buf,
   if (ctx->polygon.front == GL_FILL)
     _insert_edge(x, y);
 
-  if ((ctx->polygon.front == GL_FILL) ||
-      (ctx->depth.test && fz > BUF_GET_D(&buf->depth_buf, x, y)))
+  if ((ctx->depth.test && fz > BUF_GET_D(&buf->depth_buf, x, y)))
     return;
 
   BUF_SET_C(&buf->color_buf, x, y, cc);

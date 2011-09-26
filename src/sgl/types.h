@@ -253,4 +253,15 @@ struct sgl_context
   GLenum clientstate_flags;
 };
 
+/**
+ * @struct color_t
+ */
+typedef struct _color_t color_t;
+struct _color_t {
+  GLubyte a;
+  GLubyte r;
+  GLubyte g;
+  GLubyte b;
+};
+
 #endif /* __SGL_TYPES_H__ */

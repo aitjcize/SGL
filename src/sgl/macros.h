@@ -80,11 +80,22 @@ do {                        \
 #define LEN_SQUARED_3FV( V ) ((V)[0]*(V)[0]+(V)[1]*(V)[1]+(V)[2]*(V)[2])
 #define LEN_SQUARED_2FV( V ) ((V)[0]*(V)[0]+(V)[1]*(V)[1])
 
-#define COLOR_FF(c)                                  \
+#define COLOR_FF(c)                                    \
   (((GLuint)(CLAMP((c)[3], 0, 1.0) * 255) << 24) |     \
    ((GLuint)(CLAMP((c)[0], 0, 1.0) * 255) << 16) |     \
    ((GLuint)(CLAMP((c)[1], 0, 1.0) * 255) <<  8) |     \
    ((GLuint)(CLAMP((c)[2], 0, 1.0) * 255)))
+
+#define COLOR_FF_CT(c)                                 \
+ (__extension__({                                      \
+   color_t __rc = {                                    \
+     (GLubyte)(CLAMP((c)[2], 0, 1.0) * 255),           \
+     (GLubyte)(CLAMP((c)[1], 0, 1.0) * 255),           \
+     (GLubyte)(CLAMP((c)[0], 0, 1.0) * 255),           \
+     (GLubyte)(CLAMP((c)[3], 0, 1.0) * 255)            \
+  };                                                   \
+   __rc;                                               \
+ }))
 
 #define COLOR_FE(r, g, b, a)                      \
   (((GLuint)(CLAMP((a), 0, 1.0) * 255) << 24) |     \
@@ -106,18 +117,15 @@ do {                        \
                     (cc2 & 0x000000ff) >> 0 , f, a))
 
 #define COLOR_WSUM(a, cc1, b, cc2, c, cc3)                \
-  ((GLint)(a * ((cc1 & 0xff000000) >> 24) +               \
-           b * ((cc2 & 0xff000000) >> 24) +               \
-           c * ((cc3 & 0xff000000) >> 24)) << 24 |        \
-   (GLint)(a * ((cc1 & 0x00ff0000) >> 16) +               \
-           b * ((cc2 & 0x00ff0000) >> 16) +               \
-           c * ((cc3 & 0x00ff0000) >> 16)) << 16 |        \
-   (GLint)(a * ((cc1 & 0x0000ff00) >>  8) +               \
-           b * ((cc2 & 0x0000ff00) >>  8) +               \
-           c * ((cc3 & 0x0000ff00) >>  8)) <<  8 |        \
-   (GLint)(a * ((cc1 & 0x000000ff) >>  0) +               \
-           b * ((cc2 & 0x000000ff) >>  0) +               \
-           c * ((cc3 & 0x000000ff) >>  0)) <<  0)
+  (__extension__({                                        \
+    color_t __rc = {                                      \
+      (GLubyte)(a * cc1.a + b * cc2.a + c * cc3.a),       \
+      (GLubyte)(a * cc1.r + b * cc2.r + c * cc3.r),       \
+      (GLubyte)(a * cc1.g + b * cc2.g + c * cc3.g),       \
+      (GLubyte)(a * cc1.b + b * cc2.b + c * cc3.b)        \
+    };                                                    \
+    __rc;                                                 \
+  }))
 
 #define DEPTH_WSUM(a, d1, b, d2, c, d3)                \
   (a * d1 + b * d2 + c * d3)
