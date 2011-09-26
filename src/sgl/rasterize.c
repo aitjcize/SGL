@@ -111,26 +111,31 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
   b0 = DISTANCE(m2, b2, point[0], point[1], point[4]);
   c0 = DISTANCE(m3, b3, point[4], point[5], point[8]);
 
+  /* This triangle is a straight line */
+  if (a0 == 0 || b0 == 0 || c0 == 0)
+    return;
+
   GLint* et = buf->edge_tab;
   for (y = ymin; y <= ymax; ++y) {
     start = ET_GET(et, y, 0);
     end = ET_GET(et, y, 1);
 
-    for (d = start; d != end; ++d) {
-      a = DISTANCE(m1, b1, d, y, point[0]) / a0;
-      b = DISTANCE(m2, b2, d, y, point[4]) / b0;
-      c = DISTANCE(m3, b3, d, y, point[8]) / c0;
+    for (x = start; x <= end; ++x) {
+      a = DISTANCE(m1, b1, x, y, point[0]) / a0;
+      b = DISTANCE(m2, b2, x, y, point[4]) / b0;
+      c = DISTANCE(m3, b3, x, y, point[8]) / c0;
 
       z = NORMALIZE_Z(ctx,DEPTH_WSUM(a, point[10], b, point[2], c, point[6]));
 
-      if (ctx->depth.test && z > BUF_GET_D(&buf->depth_buf, d, y))
+      if (ctx->depth.test && z > BUF_GET_D(&buf->depth_buf, x, y))
         continue;
 
       cc = COLOR_WSUM(a, COLOR_FF_CT(color + 8),
                       b, COLOR_FF_CT(color + 0),
                       c, COLOR_FF_CT(color + 4));
-      BUF_SET_C(&buf->color_buf, d, y, cc.val);
-      BUF_SET_D(&buf->depth_buf, d, y, z);
+
+      BUF_SET_C(&buf->color_buf, x, y, cc.val);
+      BUF_SET_D(&buf->depth_buf, x, y, z);
     }
   }
   _sgl_framebuffer_edge_table_clear();
