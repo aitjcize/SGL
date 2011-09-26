@@ -101,7 +101,7 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
   m3 = (point[1] - point[9]) / (point[0] - point[8]);
   b3 = point[9] - m3 * point[8];
 
-  GLint x = 0, y = 0, d = 0, dx = 0, start = 0, end = 0;
+  GLint x = 0, y = 0, start = 0, end = 0;
   GLfloat a0 = 0, b0 = 0, c0 = 0, a = 0, b = 0, c = 0, z = 0;
   color_t cc;
 
@@ -113,13 +113,12 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
 
   /* This triangle is a straight line */
   if (a0 == 0 || b0 == 0 || c0 == 0)
-    return;
+    goto cleanup;
 
   GLint* et = buf->edge_tab;
   for (y = ymin; y <= ymax; ++y) {
     start = ET_GET(et, y, 0);
     end = ET_GET(et, y, 1);
-
     for (x = start; x <= end; ++x) {
       a = DISTANCE(m1, b1, x, y, point[0]) / a0;
       b = DISTANCE(m2, b2, x, y, point[4]) / b0;
@@ -138,6 +137,8 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
       BUF_SET_D(&buf->depth_buf, x, y, z);
     }
   }
+
+cleanup:
   _sgl_framebuffer_edge_table_clear();
 
 #undef DISTANCE
