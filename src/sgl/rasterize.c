@@ -60,6 +60,7 @@ void _insert_edge(GLint x, GLint y)
 
   if (count >= EDGE_TABLE_SIZE - 2)
     return;
+
   for (l = 0; l < count; ++l)
     if (ET_GET(et, y, l) == x)
       return;
@@ -86,7 +87,7 @@ void _insert_edge(GLint x, GLint y)
 }
 
 /**
- * @brief Perfrom scanline fill given a edge table
+ * @brief Perfrom scanline fill given an edge table
  * @param buf a struct sgl_framebuffer
  */
 void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
@@ -151,7 +152,6 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
         if (ctx->depth.test && z > BUF_GET_D(&buf->depth_buf, d, y))
           continue;
 
-
         cc = COLOR_WSUM(a, COLOR_FF_CT(color + 8),
                         b, COLOR_FF_CT(color + 0),
                         c, COLOR_FF_CT(color + 4));
@@ -181,9 +181,6 @@ void _sgl_render_pixel(struct sgl_framebuffer* buf,
 
   x = CLAMP(x, 1, buf->width);
   y = CLAMP(y, 0, buf->height -1);
-
-  BUF_SET_C(&buf->t_color_buf, x, y, cc);
-  BUF_SET_D(&buf->t_depth_buf, x, y, fz);
 
   if (ctx->polygon.front == GL_FILL)
     _insert_edge(x, y);
@@ -468,7 +465,6 @@ void _sgl_pipeline_draw_list(void)
     break;
 
   case GL_TRIANGLE_STRIP:
-    //ctx->render_state.gfill = GL_TRUE;
     p_draw_func = _sgl_draw_triangle_strip;
     _ts_count = 0;
     _sgl_draw_triangle_strip_start(ctx->drawbuffer,
