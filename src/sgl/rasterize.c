@@ -82,7 +82,7 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
       goto discard;
 
   /* Find AABB */
-  GLint ts_x = 4, ts_y = 2, not_x = 0, not_y = 0;
+  GLint ts_x = 20, ts_y = 20, not_x = 0, not_y = 0;
   GLint xmin = INT_MAX, ymin = INT_MAX, xmax = INT_MIN, ymax = INT_MIN;
   GLint i = 0;
   for (i = 0; i < 3; ++i) {
@@ -134,6 +134,18 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
   GLint tile_idx = not_x / 2;
   GLint edge_idx = tile_idx;
 
+  /*
+  for (ty = 0; ty <= not_y; ++ty) {
+    for (x = xmin; x <= xmax; ++x) {
+      BUF_SET_C(&buf->color_buf, x, ymin + ty * ts_y, 0xffffffff);
+    }
+  }
+  for (tx = 0; tx <= not_x; ++tx) {
+    for (y = ymin; y <= ymax; ++y) {
+      BUF_SET_C(&buf->color_buf, xmin + tx * ts_x, y, 0xffffffff);
+    }
+  }
+  */
   for (ty = 0; ty < not_y; ++ty) {
     for (tx = tile_idx; tx < not_x; ++tx) {
       for (y = ymin + ty * ts_y; y < ymin + (ty + 1) * ts_y; ++y) {
@@ -154,8 +166,8 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
               continue;
 
             cc = COLOR_WSUM(a, COLOR_FF_CT(color + 8),
-                b, COLOR_FF_CT(color + 0),
-                c, COLOR_FF_CT(color + 4));
+                            b, COLOR_FF_CT(color + 0),
+                            c, COLOR_FF_CT(color + 4));
             BUF_SET_C(&buf->color_buf, x, y, cc.val);
             BUF_SET_D(&buf->depth_buf, x, y, z);
           }
@@ -169,9 +181,10 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
           b = DISTANCE(m2, b2, x, y, x2) / b0;
           c = DISTANCE(m3, b3, x, y, x3) / c0;
 
-          if ((int)round(a * 10) == 0
+          if (((int)round(a * 10) == 0
               || (int)round(b * 10) == 0
               || (int)(round(c * 10) == 0))
+              && edge_idx == tile_idx)
             edge_idx = tx;
 
           if (a >= 0 && b >= 0 && c >= 0) {
@@ -181,8 +194,8 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
               continue;
 
             cc = COLOR_WSUM(a, COLOR_FF_CT(color + 8),
-                b, COLOR_FF_CT(color + 0),
-                c, COLOR_FF_CT(color + 4));
+                            b, COLOR_FF_CT(color + 0),
+                            c, COLOR_FF_CT(color + 4));
             BUF_SET_C(&buf->color_buf, x, y, cc.val);
             BUF_SET_D(&buf->depth_buf, x, y, z);
           }

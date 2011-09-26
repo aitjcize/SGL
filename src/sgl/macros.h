@@ -130,10 +130,10 @@ do {                                            \
 
 /* Framebuffer access related */
 #define BUF_SET_C(buf, x, y, cc) \
-    ((GLuint*)(buf)->data)[((buf)->height-y-1)*(buf)->width+x-1] = cc;
+    ((GLuint*)(buf)->data)[((buf)->height-(y)-1)*(buf)->width+(x)-1] = cc;
 
 #define BUF_SET_D(buf, x, y, d) \
-    ((GLfloat*)(buf)->data)[((buf)->height-y-1)*(buf)->width+x-1] = d;
+    ((GLfloat*)(buf)->data)[((buf)->height-(y)-1)*(buf)->width+(x)-1] = d;
 
 #define BUF_GET_C(buf, x, y) \
   (((GLuint*)(buf)->data)[((buf)->height-(y)-1)*(buf)->width+(x)-1])
