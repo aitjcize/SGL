@@ -1,7 +1,7 @@
 /**
  * @file   utils.c
  *
- * Copyright (C) 2011 - SGL Authors <aitjcize@gmail.com>
+ * Copyright (C) 2011 - Wei-Ning Huang <aitjcize@gmail.com>
  * All Rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a

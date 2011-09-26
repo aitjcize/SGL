@@ -4,3 +4,4 @@ SGL - Software GL
 
 SGL implements a subset of standard OpenGL APIs with pure software simulation
 (without GPU)
+SGL framework based heavily on the Mesa 3D <http://www.mesa3d.org/> project.
