@@ -36,8 +36,8 @@ void display(void)
   glRotatef(g_theta, cos(RAD(g_phi)), 0.0, -sin(RAD(g_phi)));
 
   glColor3f(1.0, 1.0, 1.0);
-  glutSolidSphere(1.5, 30, 30);
-  //glutWireSphere(1.5, 30, 30);
+  //glutSolidSphere(1.5, 10, 10);
+  glutWireSphere(1.5, 30, 30);
 
   glutSwapBuffers();
 }

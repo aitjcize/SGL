@@ -71,6 +71,16 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
 {
   GET_CURRENT_CONTEXT(ctx);
 
+  GLint x1 = point[0], y1 = point[1], z1 = point[2],
+        x2 = point[4], y2 = point[5], z2 = point[6],
+        x3 = point[8], y3 = point[9], z3 = point[10];
+
+  /* Two points of the triangle is the same point */
+  if ((x1 == x2 && y1 == y2) ||
+      (x2 == x3 && y2 == y3) ||
+      (x3 == x1 && y3 == y1))
+      goto discard;
+
   /* Find AABB */
   GLint xmin = INT_MAX, ymin = INT_MAX, xmax = INT_MIN, ymax = INT_MIN;
   GLint i = 0;
@@ -92,14 +102,14 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
   /* Find three edge equation */
   GLfloat m1, m2, m3, b1, b2, b3;
 
-  m1 = (point[5] - point[1]) / (point[4] - point[0]);
-  b1 = point[1] - m1 * point[0];
+  m1 = (y2 - y1) / (GLfloat)(x2 - x1);
+  b1 = y1 - m1 * x1;
 
-  m2 = (point[9] - point[5]) / (point[8] - point[4]);
-  b2 = point[5] - m2 * point[4];
+  m2 = (y3 - y2) / (GLfloat)(x3 - x2);
+  b2 = y2 - m2 * x2;
 
-  m3 = (point[1] - point[9]) / (point[0] - point[8]);
-  b3 = point[9] - m3 * point[8];
+  m3 = (y1 - y3) / (GLfloat)(x1 - x3);
+  b3 = y3 - m3 * x3;
 
   GLint x = 0, y = 0, start = 0, end = 0;
   GLfloat a0 = 0, b0 = 0, c0 = 0, a = 0, b = 0, c = 0, z = 0;
@@ -107,24 +117,24 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
 
 #define DISTANCE(m, b, x, y, ox) (isinf(m)? (x - ox): (m * (x) + b - (y)))
 
-  a0 = DISTANCE(m1, b1, point[8], point[9], point[0]);
-  b0 = DISTANCE(m2, b2, point[0], point[1], point[4]);
-  c0 = DISTANCE(m3, b3, point[4], point[5], point[8]);
+  a0 = DISTANCE(m1, b1, x3, y3, x1);
+  b0 = DISTANCE(m2, b2, x1, y1, x2);
+  c0 = DISTANCE(m3, b3, x2, y2, x3);
 
   /* This triangle is a straight line */
   if (a0 == 0 || b0 == 0 || c0 == 0)
-    goto cleanup;
+    goto discard;
 
   GLint* et = buf->edge_tab;
   for (y = ymin; y <= ymax; ++y) {
     start = ET_GET(et, y, 0);
     end = ET_GET(et, y, 1);
     for (x = start; x <= end; ++x) {
-      a = DISTANCE(m1, b1, x, y, point[0]) / a0;
-      b = DISTANCE(m2, b2, x, y, point[4]) / b0;
-      c = DISTANCE(m3, b3, x, y, point[8]) / c0;
+      a = DISTANCE(m1, b1, x, y, x1) / a0;
+      b = DISTANCE(m2, b2, x, y, x2) / b0;
+      c = DISTANCE(m3, b3, x, y, x3) / c0;
 
-      z = NORMALIZE_Z(ctx,DEPTH_WSUM(a, point[10], b, point[2], c, point[6]));
+      z = NORMALIZE_Z(ctx,DEPTH_WSUM(a, z3, b, z1, c, z2));
 
       if (ctx->depth.test && z > BUF_GET_D(&buf->depth_buf, x, y))
         continue;
@@ -138,7 +148,7 @@ void _scanline_fill(struct sgl_framebuffer* buf, GLfloat* point, GLfloat* color)
     }
   }
 
-cleanup:
+discard:
   _sgl_framebuffer_edge_table_clear();
 
 #undef DISTANCE
@@ -362,11 +372,6 @@ void _sgl_draw_triangle_strip_start(struct sgl_framebuffer* buf, GLfloat* point,
   } else if (_ts_count == 1) {
     MOVE_FLOAT_4(_ts_prev_point + 4, point);
     MOVE_FLOAT_4(_ts_prev_color + 4, color);
-    GET_CURRENT_CONTEXT(ctx);
-    if (ctx->polygon.front != GL_FILL) {
-      _sgl_draw_line(buf, _ts_prev_point, _ts_prev_point + 4,
-                          _ts_prev_color, _ts_prev_color + 4);
-    }
   }
 }
 

@@ -31,21 +31,21 @@
 
 void _sglut_sphere(GLdouble radius, GLint stacks, GLint slices, GLenum type)
 {
-  int i = 0, j = 0;
-  int num_vertices = (stacks + 1) * slices;
-  int num_quads = stacks * slices;
+  GLint i = 0, j = 0;
+  GLint num_vertices = (stacks + 1) * slices;
+  GLint num_quads = stacks * slices;
 
   GLdouble* vert = (GLdouble*)malloc(num_vertices * 3 * sizeof(GLdouble));
   GLushort* idices = (GLushort*)malloc(num_quads * 4 * sizeof(GLushort));
 
-  double theta_total = 180;
-  double phi_total = 360;
-  double theta_inc = theta_total / stacks;
-  double phi_inc = phi_total / slices;
+  GLdouble theta_total = 180;
+  GLdouble phi_total = 360;
+  GLdouble theta_inc = theta_total / stacks;
+  GLdouble phi_inc = phi_total / slices;
 
-  double theta = 0;
-  double phi = 0;
-  int idx = 0, base = 0;
+  GLdouble theta = 0;
+  GLdouble phi = 0;
+  GLint idx = 0, base = 0;
 
   for (i = 0; i <= stacks; ++i) {
     for (j = 0; j < slices; ++j) {
@@ -137,7 +137,7 @@ void glutSolidCube(GLdouble dSize)
 #   define N(a,b,c) glNormal3d( a, b, c );
 
     /* PWO: Again, I dared to convert the code to use macros... */
-    glBegin( GL_QUADS );
+    glBegin( GL_TRIANGLE_STRIP );
         N( 1.0, 0.0, 0.0); V(+,-,+); V(+,-,-); V(+,+,-); V(+,+,+);
         N( 0.0, 1.0, 0.0); V(+,+,+); V(+,+,-); V(-,+,-); V(-,+,+);
         N( 0.0, 0.0, 1.0); V(+,+,+); V(-,+,+); V(-,-,+); V(+,-,+);
@@ -162,12 +162,12 @@ void glutWireCube(GLdouble dSize)
 #   define N(a,b,c) glNormal3d( a, b, c );
 
     /* PWO: I dared to convert the code to use macros... */
-    glBegin( GL_LINE_LOOP ); N( 1.0, 0.0, 0.0); V(+,-,+); V(+,-,-); V(+,+,-); V(+,+,+); glEnd();
-    glBegin( GL_LINE_LOOP ); N( 0.0, 1.0, 0.0); V(+,+,+); V(+,+,-); V(-,+,-); V(-,+,+); glEnd();
-    glBegin( GL_LINE_LOOP ); N( 0.0, 0.0, 1.0); V(+,+,+); V(-,+,+); V(-,-,+); V(+,-,+); glEnd();
-    glBegin( GL_LINE_LOOP ); N(-1.0, 0.0, 0.0); V(-,-,+); V(-,+,+); V(-,+,-); V(-,-,-); glEnd();
-    glBegin( GL_LINE_LOOP ); N( 0.0,-1.0, 0.0); V(-,-,+); V(-,-,-); V(+,-,-); V(+,-,+); glEnd();
-    glBegin( GL_LINE_LOOP ); N( 0.0, 0.0,-1.0); V(-,-,-); V(-,+,-); V(+,+,-); V(+,-,-); glEnd();
+    glBegin(GL_LINE_LOOP); N(1.0, 0.0, 0.0); V(+,-,+); V(+,-,-); V(+,+,-); V(+,+,+); glEnd();
+    glBegin(GL_LINE_LOOP); N(0.0, 1.0, 0.0); V(+,+,+); V(+,+,-); V(-,+,-); V(-,+,+); glEnd();
+    glBegin(GL_LINE_LOOP); N(0.0, 0.0, 1.0); V(+,+,+); V(-,+,+); V(-,-,+); V(+,-,+); glEnd();
+    glBegin(GL_LINE_LOOP); N(1.0, 0.0, 0.0); V(-,-,+); V(-,+,+); V(-,+,-); V(-,-,-); glEnd();
+    glBegin(GL_LINE_LOOP); N(0.0,-1.0, 0.0); V(-,-,+); V(-,-,-); V(+,-,-); V(+,-,+); glEnd();
+    glBegin(GL_LINE_LOOP); N(0.0, 0.0,-1.0); V(-,-,-); V(-,+,-); V(+,+,-); V(+,-,-); glEnd();
 
 #   undef V
 #   undef N
