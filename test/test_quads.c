@@ -29,14 +29,15 @@ void display(void)
   glLoadIdentity();
   gluLookAt (0.0, 0.0, g_radius, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
-  glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_DEPTH_TEST);
+  //glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
   glScalef (1.0, 1.0, 1.0);
   glRotatef(g_phi, 0.0, 1.0, 0.0);
   glRotatef(g_theta, cos(RAD(g_phi)), 0.0, -sin(RAD(g_phi)));
 
   glColor3f(1.0, 1.0, 1.0);
-  //glutSolidSphere(1.5, 30, 30);
-  glutWireSphere(1.5, 30, 30);
+  glutSolidSphere(1.5, 30, 30);
+  //glutWireSphere(1.5, 30, 30);
 
   glutSwapBuffers();
 }

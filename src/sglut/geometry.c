@@ -76,13 +76,22 @@ void _sglut_sphere(GLdouble radius, GLint stacks, GLint slices, GLenum type)
   }
 
   if (type == GL_FILL) {
-    glBegin(GL_QUADS);
-    for (i = 0; i < stacks * slices * 4; ++i) {
-      j = idices[i];
+    for (i = 0; i < stacks * slices; ++i) {
+      glBegin(GL_TRIANGLE_STRIP);
+      j = idices[i * 4 + 1];
       glVertex3f(vert[j*3+0] *radius, vert[j*3+1] *radius, vert[j*3+2] *radius);
       glNormal3f(vert[j*3+0], vert[j*3+1], vert[j*3+2]);
+      j = idices[i * 4 + 0];
+      glVertex3f(vert[j*3+0] *radius, vert[j*3+1] *radius, vert[j*3+2] *radius);
+      glNormal3f(vert[j*3+0], vert[j*3+1], vert[j*3+2]);
+      j = idices[i * 4 + 2];
+      glVertex3f(vert[j*3+0] *radius, vert[j*3+1] *radius, vert[j*3+2] *radius);
+      glNormal3f(vert[j*3+0], vert[j*3+1], vert[j*3+2]);
+      j = idices[i * 4 + 3];
+      glVertex3f(vert[j*3+0] *radius, vert[j*3+1] *radius, vert[j*3+2] *radius);
+      glNormal3f(vert[j*3+0], vert[j*3+1], vert[j*3+2]);
+      glEnd();
     }
-    glEnd();
   } else {
     for (i = 0; i < stacks * slices; ++i) {
       glBegin(GL_LINE_LOOP);

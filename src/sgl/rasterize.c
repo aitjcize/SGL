@@ -161,9 +161,9 @@ void _sgl_render_pixel(struct sgl_framebuffer* buf,
   x = CLAMP(x, 1, buf->width);
   y = CLAMP(y, 0, buf->height -1);
 
-  if (ctx->polygon.front == GL_FILL) {
+  if (ctx->render_state.gfill == GL_TRUE && ctx->polygon.front == GL_FILL) {
     _insert_edge(x, y);
-  } else if ((!ctx->depth.test || fz <= BUF_GET_D(&buf->depth_buf, x, y))) {
+  } else if (!ctx->depth.test || (fz <= BUF_GET_D(&buf->depth_buf, x, y))) {
     BUF_SET_C(&buf->color_buf, x, y, cc);
     BUF_SET_D(&buf->depth_buf, x, y, fz);
   }
@@ -417,16 +417,19 @@ void _sgl_pipeline_draw_list(void)
   /* Pre draw */
   switch (prim_mode) {
   case GL_POINTS:
+    ctx->render_state.gfill = GL_FALSE;
     offset = 1;
     p_draw_func = _sgl_draw_point;
     break;
 
   case GL_LINES:
     offset = 2;
+    ctx->render_state.gfill = GL_FALSE;
     p_draw_func = _sgl_draw_line_v;
     break;
 
   case GL_LINE_LOOP:
+    ctx->render_state.gfill = GL_FALSE;
     p_draw_func = _sgl_draw_line_loop;
     _sgl_draw_line_loop_start(ctx->drawbuffer,
                               VEC_ELT(&ctx->vector_point, GLfloat, 0),
@@ -437,11 +440,14 @@ void _sgl_pipeline_draw_list(void)
     break;
 
   case GL_TRIANGLES:
+    ctx->render_state.gfill = GL_TRUE;
+    p_draw_func = _sgl_draw_line_loop;
     p_draw_func = _sgl_draw_triangle_v;
     offset = 3;
     break;
 
   case GL_TRIANGLE_STRIP:
+    ctx->render_state.gfill = GL_TRUE;
     p_draw_func = _sgl_draw_triangle_strip;
     _ts_count = 0;
     _sgl_draw_triangle_strip_start(ctx->drawbuffer,
